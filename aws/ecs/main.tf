@@ -10,6 +10,26 @@ resource "aws_route53_zone" "primary" {
   vpc_region = "${var.aws_region}"
 }
 
+## Kinesis
+
+resource "aws_kinesis_stream" "main" {
+  name             = "main"
+  shard_count      = 1
+  retention_period = 24
+}
+
+resource "aws_kinesis_stream" "error" {
+  name             = "error"
+  shard_count      = 1
+  retention_period = 24
+}
+
+resource "aws_kinesis_stream" "invalid" {
+  name             = "invalid"
+  shard_count      = 1
+  retention_period = 24
+}
+
 ## EC2
 
 ### EC2 » Network
