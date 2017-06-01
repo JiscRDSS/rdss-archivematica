@@ -8,3 +8,15 @@ It provides two templated files required by the generic image: the [template ngi
 The nginx server is configured with the required Shibboleth locations, as well as the `/app` location, which is secured by Shibboleth. Through configuration in the `docker-compose` file, this is a proxy to the [myapp](../myapp) application.
 
 By default the nginx service is configured to be available at `https://myapp.example.ac.uk/`.
+
+Building
+---------
+
+The [build script](build.sh) will prepare the image with the relevant configuration and certificates etc:
+
+	./build.sh
+
+Configuration
+--------------
+
+The template files for the `nginx` configuration and `shibboleth2.xml` configuration are included in the [etc](etc) folder. See [shib/nginx](../../shib/nginx) for more information.

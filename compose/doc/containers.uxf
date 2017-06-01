@@ -4,7 +4,7 @@
     <id>UMLDeployment</id>
     <coordinates>
       <x>30</x>
-      <y>110</y>
+      <y>70</y>
       <w>170</w>
       <h>210</h>
     </coordinates>
@@ -18,7 +18,7 @@ group=14</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>40</x>
-      <y>170</y>
+      <y>130</y>
       <w>140</w>
       <h>40</h>
     </coordinates>
@@ -33,7 +33,7 @@ group=14</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>40</x>
-      <y>220</y>
+      <y>180</y>
       <w>140</w>
       <h>40</h>
     </coordinates>
@@ -49,37 +49,35 @@ group=14</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>30</x>
-      <y>400</y>
+      <y>330</y>
       <w>170</w>
-      <h>100</h>
+      <h>140</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 idp
-bg=#d0f0c5
-group=13</panel_attributes>
+bg=#d0f0c5</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
       <x>40</x>
-      <y>450</y>
+      <y>380</y>
       <w>140</w>
-      <h>40</h>
+      <h>80</h>
     </coordinates>
     <panel_attributes>symbol=component
-Shib IdP
+Jetty
 
 bg=#90de76
-layer=1
-group=13</panel_attributes>
+layer=1</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
       <x>270</x>
-      <y>160</y>
+      <y>120</y>
       <w>140</w>
       <h>80</h>
     </coordinates>
@@ -95,7 +93,7 @@ group=15</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>230</x>
-      <y>110</y>
+      <y>70</y>
       <w>240</w>
       <h>140</h>
     </coordinates>
@@ -109,7 +107,7 @@ group=15</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>280</x>
-      <y>200</y>
+      <y>160</y>
       <w>120</w>
       <h>30</h>
     </coordinates>
@@ -123,7 +121,7 @@ group=15</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>230</x>
-      <y>270</y>
+      <y>240</y>
       <w>240</w>
       <h>140</h>
     </coordinates>
@@ -137,7 +135,7 @@ group=22</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>270</x>
-      <y>320</y>
+      <y>290</y>
       <w>140</w>
       <h>80</h>
     </coordinates>
@@ -153,7 +151,7 @@ group=22</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>280</x>
-      <y>360</y>
+      <y>330</y>
       <w>120</w>
       <h>30</h>
     </coordinates>
@@ -167,7 +165,7 @@ group=22</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>40</x>
-      <y>270</y>
+      <y>230</y>
       <w>140</w>
       <h>40</h>
     </coordinates>
@@ -181,12 +179,13 @@ group=14</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>510</x>
-      <y>180</y>
-      <w>190</w>
-      <h>30</h>
+      <x>500</x>
+      <y>140</y>
+      <w>210</w>
+      <h>40</h>
     </coordinates>
-    <panel_attributes>archivematicaClient.py
+    <panel_attributes>symbol=component
+archivematicaClient
 bg=orange
 layer=1</panel_attributes>
     <additional_attributes/>
@@ -195,7 +194,7 @@ layer=1</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>490</x>
-      <y>110</y>
+      <y>70</y>
       <w>240</w>
       <h>140</h>
     </coordinates>
@@ -207,12 +206,13 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>510</x>
-      <y>340</y>
-      <w>190</w>
-      <h>30</h>
+      <x>500</x>
+      <y>290</y>
+      <w>210</w>
+      <h>40</h>
     </coordinates>
-    <panel_attributes>archivematicaMCP.py
+    <panel_attributes>symbol=component
+archivematicaMCP
 bg=orange
 layer=1</panel_attributes>
     <additional_attributes/>
@@ -221,7 +221,7 @@ layer=1</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>490</x>
-      <y>270</y>
+      <y>240</y>
       <w>240</w>
       <h>140</h>
     </coordinates>
@@ -234,7 +234,7 @@ bg=#ffe7bd</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>400</x>
-      <y>510</y>
+      <y>480</y>
       <w>160</w>
       <h>60</h>
     </coordinates>
@@ -247,7 +247,7 @@ bg=#ffe7bd</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>570</x>
-      <y>510</y>
+      <y>480</y>
       <w>160</w>
       <h>60</h>
     </coordinates>
@@ -260,7 +260,7 @@ bg=#ffe7bd</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>400</x>
-      <y>440</y>
+      <y>410</y>
       <w>160</w>
       <h>60</h>
     </coordinates>
@@ -273,7 +273,7 @@ bg=#ffe7bd</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>230</x>
-      <y>510</y>
+      <y>480</y>
       <w>160</w>
       <h>60</h>
     </coordinates>
@@ -286,7 +286,7 @@ bg=#ffe7bd</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>570</x>
-      <y>440</y>
+      <y>410</y>
       <w>160</w>
       <h>60</h>
     </coordinates>
@@ -299,7 +299,7 @@ bg=#ffe7bd</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>230</x>
-      <y>440</y>
+      <y>410</y>
       <w>160</w>
       <h>60</h>
     </coordinates>
@@ -312,7 +312,7 @@ bg=#ffe7bd</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>1020</x>
-      <y>510</y>
+      <y>480</y>
       <w>120</w>
       <h>60</h>
     </coordinates>
@@ -325,7 +325,7 @@ bg=#d0c1e8</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>760</x>
-      <y>510</y>
+      <y>480</y>
       <w>120</w>
       <h>60</h>
     </coordinates>
@@ -338,7 +338,7 @@ bg=#d0c1e8</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>890</x>
-      <y>510</y>
+      <y>480</y>
       <w>120</w>
       <h>60</h>
     </coordinates>
@@ -351,7 +351,7 @@ bg=#d0c1e8</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>880</x>
-      <y>380</y>
+      <y>340</y>
       <w>120</w>
       <h>80</h>
     </coordinates>
@@ -366,7 +366,7 @@ group=21</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>760</x>
-      <y>310</y>
+      <y>270</y>
       <w>380</w>
       <h>170</h>
     </coordinates>
@@ -380,20 +380,21 @@ group=21</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>760</x>
-      <y>110</y>
+      <y>70</y>
       <w>380</w>
       <h>170</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 rdss-archivematica-channel-adapter-consumer
-bg=#d0c1e8</panel_attributes>
+bg=#d0c1e8
+group=23</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
       <x>30</x>
-      <y>510</y>
+      <y>480</y>
       <w>170</w>
       <h>60</h>
     </coordinates>
@@ -406,7 +407,7 @@ bg=#d0f0c5</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>890</x>
-      <y>420</y>
+      <y>380</y>
       <w>100</w>
       <h>30</h>
     </coordinates>
@@ -420,7 +421,7 @@ bg=#d0c1e8</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>880</x>
-      <y>180</y>
+      <y>140</y>
       <w>120</w>
       <h>80</h>
     </coordinates>
@@ -428,27 +429,29 @@ bg=#d0c1e8</panel_attributes>
 Go
 
 bg=#ad86eb
-layer=1</panel_attributes>
+layer=1
+group=23</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
       <x>890</x>
-      <y>220</y>
+      <y>180</y>
       <w>100</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>consumer
 layer=2
-bg=#d0c1e8</panel_attributes>
+bg=#d0c1e8
+group=23</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLNote</id>
     <coordinates>
       <x>30</x>
-      <y>70</y>
+      <y>30</y>
       <w>170</w>
       <h>30</h>
     </coordinates>
@@ -460,7 +463,7 @@ bg=#c5e5f0</panel_attributes>
     <id>UMLNote</id>
     <coordinates>
       <x>230</x>
-      <y>70</y>
+      <y>30</y>
       <w>500</w>
       <h>30</h>
     </coordinates>
@@ -472,7 +475,7 @@ bg=#ffe7bd</panel_attributes>
     <id>UMLNote</id>
     <coordinates>
       <x>760</x>
-      <y>70</y>
+      <y>30</y>
       <w>380</w>
       <h>30</h>
     </coordinates>
@@ -484,12 +487,25 @@ bg=#d0c1e8</panel_attributes>
     <id>UMLNote</id>
     <coordinates>
       <x>30</x>
-      <y>360</y>
+      <y>290</y>
       <w>170</w>
       <h>30</h>
     </coordinates>
     <panel_attributes>Shibboleth
 bg=#d0f0c5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>50</x>
+      <y>420</y>
+      <w>120</w>
+      <h>30</h>
+    </coordinates>
+    <panel_attributes>Shibboleth IdP
+bg=#d0f0c5
+layer=2</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

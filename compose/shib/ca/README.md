@@ -14,7 +14,7 @@ This folder contains scripts and configuration files to use OpenSSL to operate a
 Initial Setup
 ---------------
 
-The [init.sh](ca/init.sh) script initializes the Certificate Authority, creating the initial certificate and database etc. This script only needs to be run once - it doesn't need to be re-run each build.
+The [init script](ca/init.sh) initializes the Certificate Authority, creating the initial certificate and database etc. This script only needs to be run once - it doesn't need to be re-run each build.
 
 This script can be used to manage multiple domains. The CA for each domain has its files in the `domains` folder, under a sub-folder for that domain (e.g. `example.ac.uk`).
 

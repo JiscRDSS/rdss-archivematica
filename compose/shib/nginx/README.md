@@ -27,7 +27,7 @@ All of the above arguments are required; there are no defaults.
 Building
 ---------
 
-The [build.sh](build.sh) script is provided to make building images with the required arguments easier. For example:
+The [build script](build.sh) is provided to make building images with the required arguments easier. For example:
 
 	./build.sh -c /tmp/example-ca.crt -d example.com \
 		-k /tmp/sp-key.pem -s /tmp/sp-cert.pem -w /tmp/sp-web-cert.pem \

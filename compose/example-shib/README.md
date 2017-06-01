@@ -21,24 +21,24 @@ Services
 
 ### Nginx (with Shibboleth SP)
 
-The `nginx` container overrides the `dev/nginx` container defined by the main Archivematica compose config. This container uses the `arkivum/shibboleth-nginx` image, which is built using the "abstract" `shib/nginx` [Dockerfile](../shib/nginx/Dockerfile). This is prepared and built using the [build script](nginx/build.sh).
+The `nginx` container uses the `arkivum/shibboleth-nginx` image, which is built using the "abstract" `shib/nginx` [Dockerfile](../shib/nginx/Dockerfile). This is prepared and built using the [build script](nginx/build.sh).
 
-See the nginx [README](nginx/README.md) for more details.
+See the [README](nginx/README.md) for more details.
 
 ### Shibboleth IdP
 
 This container uses the `arkivum/shibboleth-idp` image, which is built using the "abstract" `shib/idp` [Dockerfile](../shib/idp/Dockerfile). This is prepared and built using its [build script](idp/build.sh).
 
-See the idp [README] (idp/README.md) for more details.
+See the [README](idp/README.md) for more details.
 
 ### Shibboleth SP1
 
 This container runs the [sp1](https://github.com/serglopatin/sp1) application to demonstrate the use of the [djangosaml2]() library to interact with a Shibboleth IdP. This is an alternative to using the Shibboleth SP FastCGI module used in the `nginx` container.
 
-See the sp1 [README] (sp/README.md) for more details.
+See the [README](sp/README.md) for more details.
 
 ### MyApp
 
 This container runs a very simple Django application. It does not offer any Shibboleth integration itself - instead it expects to be protected by Shibboleth via the nginx container, which is expected to be used as a proxy layer for this service.
 
-See the myapp [README](myapp/README.md) for more details.
+See the [README](myapp/README.md) for more details.

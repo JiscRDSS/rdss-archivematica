@@ -9,16 +9,18 @@ The following diagram gives an overview of the deployed service containers, grou
 
 In the above, the main Archivematica services are highlighted in orange. The services related to Shibboleth are in green, whilst the RDSS-specific containers are highlighted in purple. The nginx service that fronts it all is highlighted in blue. Where relevant the components deployed into each container are shown; for base services this is omitted.
 
-Configuration Sets
--------------------
+Some of these containers are required for local development only. In a production deployment, the `dynalite`, `minikine` and `minio` containers would be replaced with connections to actual DynamoDB, Kinesis and S3 services in an AWS environment. Similarly, if the Shibboleth SP in the `nginx` container is configured to use an external IdP then the `idp` and `ldap` containers would become unnecessary.
 
-There are currently three configuration sets defined:
+Service Sets
+-------------
+
+There are currently three service sets defined:
 
 1. [dev](dev), which defines the main Archivematica services and supporting web server, db, etc, suitable for use in a development environment.
 1. [example-shib](example-shib), which demonstrates Shibboleth integration, providing two demo applications, and Shibboleth Service Providers (SP) and an Identity Provider (IdP) with backing LDAP service.
 1. [am-shib](am-shib), which wraps the Archivematica services in the [dev](dev) service set in Shibboleth authentication, with an integrated SP and example IdP.
 
-These configurations are defined by [docker-compose.dev.yml](docker-compose.dev.yml), [docker-compose.example-shib.yml](docker-compose.example-shib.yml) and [docker-compose.am-shib.yml](docker-compose.am-shib.yml), respectively. You can use the [COMPOSE_FILE](https://docs.docker.com/compose/reference/envvars/) environment variable to set which `docker-compose` file or files you wish to use.
+These service sets are defined by [docker-compose.dev.yml](docker-compose.dev.yml), [docker-compose.example-shib.yml](docker-compose.example-shib.yml) and [docker-compose.am-shib.yml](docker-compose.am-shib.yml), respectively. You can use the [COMPOSE_FILE](https://docs.docker.com/compose/reference/envvars/) environment variable to set which `docker-compose` file or files you wish to use.
 
 To just configure the Archivematica dev environment, use
 
@@ -72,7 +74,7 @@ If you want to focus on just the Shibboleth services and aren't concerned with A
 
 	make all SHIBBOLETH_CONFIG=example
 
-This will bring up the services defined in [docker-compose.example-shib.yml](docker-compose.example-shib.yml), without any Archivmatica services..
+This will bring up the services defined in [docker-compose.example-shib.yml](docker-compose.example-shib.yml), without any Archivmatica services.
 
 After a successful build of the Shibboleth-enabled Archivematica services you should find you have the following services listed by `make list`:
 
@@ -134,4 +136,3 @@ Here are some other `make` commands other than `make all` that may be useful whe
 | `make watch-sp` | Watch logs from the [sp](example-shib/sp) container, if present (`example-shib` only) |
 
 Remember to append the `SHIBBOLETH_CONFIG` argument to the above commands if `make all` was run with this set, otherwise the `docker-compose` context won't be resolved properly (this is required for the `watch-idp` and `watch-sp` commands).
-

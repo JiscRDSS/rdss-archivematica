@@ -8,7 +8,7 @@ The container image isn't customized but configuration is added. In particular, 
 Building
 ---------
 
-The [build](build.sh) script processes the template for the demo user accounts and sets their domain to the configured domain name and organisation:
+The [build script](build.sh) processes the template for the demo user accounts and sets their domain to the configured domain name and organisation:
 
 	./build.sh
 

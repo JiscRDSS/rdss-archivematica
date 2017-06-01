@@ -11,7 +11,7 @@ This folder contains the definitions for services that are common to all Shibbol
 Shibboleth Identity Provider
 -----------------------------
 
-This container uses the `arkivum/example-shib-idp` image. This extends the [unicorn/shibboleth-idp](https://hub.docker.com/r/unicon/shibboleth-idp/) image, which uses CentOS 7 as its base image.
+This container uses the `arkivum/shibboleth-idp` image, which extends the [unicorn/shibboleth-idp](https://hub.docker.com/r/unicon/shibboleth-idp/) image, and uses CentOS 7 as its base image.
 
 The software run by this image is the off-the-shelf [Shibboleth IdP](https://shibboleth.net/products/identity-provider.html), which runs as a Java webapp in Jetty. The IdP does not ship with a default configuration - instead a build script is provided to create a `customized-shibboleth-idp` directory that is then expected to be modified manually to customize the IdP to meet requirements. This is fine unless the installation is being automated - we want to be able to bring up containers unattended, if need be.
 
