@@ -77,7 +77,7 @@ services:
     image: "nginx:stable-alpine"
     volumes:
       - "./dev/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
-      - "./dev/etc/nginx/archivematica.conf:/etc/nginx/conf.d/archivematica.conf:ro"
+      - "./dev/etc/nginx/conf.d:/etc/nginx/conf.d:ro"
     expose:
       - "80"
       - "8000"
