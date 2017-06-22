@@ -3,10 +3,25 @@ version: "2"
 
 volumes:
 
-  mysql_data:
+  # Internal Named Volumes
+  # These are not accessible outside of the docker host and are maintained by
+  # Docker.
   elasticsearch_data:
-  archivematica_pipeline_data:
   archivematica_storage_service_staging_data:
+  mysql_data:
+
+  # External Named Volumes
+  # These are intended to be accessible beyond the docker host (e.g. via NFS).
+  # They use bind mounts to mount a specific "local" directory on the docker
+  # host - the expectation being that these directories are actually mounted
+  # filesystems from elsewhere.
+  archivematica_pipeline_data:
+    external:
+      name: ${AM_PIPELINE_DATA_VOLUME}
+  archivematica_storage_service_default_location_data:
+    external:
+      name: ${SS_DEFAULT_LOCATION_DATA_VOLUME}
+
 
 services:
 
@@ -207,9 +222,10 @@ services:
       SS_DB_URL: "mysql://archivematica:demo@mysql/SS"
     volumes:
       - "${VOL_BASE}/../src/archivematica-storage-service/:/src/"
-      - "${VOL_BASE}/../src/archivematica-sampledata/:/home/archivematica-sampledata/"
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
       - "archivematica_storage_service_staging_data:/var/archivematica/storage_service:rw"
+      # Transfer Sources - add more if additional locations are defined
+      - "archivematica_storage_service_default_location_data:/home:rw"
     expose:
       - "8000"
     links:
