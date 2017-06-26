@@ -20,6 +20,7 @@ To allow Archivematica to interact and share data with other systems in the envi
 |---|---|
 | `archivematica_pipeline_data` | Used to store data shared across Archivematica components. Also used by external systems to input data to Archivematica, and to retrieve outputs from Archivematica (`www/AIPsStore` and `www/DIPsStore`). |
 | `archivematica_storage_service_default_location_data` | Used to provide data storage for the Storage Service. Making this external allows other systems to input data into Archivematica. |
+| `minio_export_data` | Expose the /export folder that minio uses to store its data |
 
 To create volumes for directories on the local machine use
 
@@ -31,12 +32,14 @@ The parameters for the volumes created are as follows, and may be overridden via
 |---|---|---|
 | `AM_PIPELINE_DATA` | The path on the docker host to use for Archivematica's `sharedDirectory` pipeline data. | `/tmp/am-pipeline-data`
 | `SS_LOCATION_DATA` | The path on the docker host to use for Archivematica's default location in the Storage Service. | `$(BASE_DIR)/../src` |
+| `MINIO_EXPORT_DATA` | The path on the docker host to use for Minio's /export folder | `${VOL_BASE}/dev/etc/minio` |
 
 For example, to use NFS mounts instead of the default locations
 
 	make create-volumes \
 		AM_PIPELINE_DATA=/mnt/nfs/am-pipeline-data \
-		SS_LOCATION_DATA=/mnt/nfs/am-ss-default-location-data
+		SS_LOCATION_DATA=/mnt/nfs/am-ss-default-location-data \
+                MINIO_EXPORT_DATA=/mnt/nfs/minio-export-data                
 
 Service Sets
 -------------

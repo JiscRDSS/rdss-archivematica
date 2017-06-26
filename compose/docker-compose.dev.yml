@@ -21,7 +21,9 @@ volumes:
   archivematica_storage_service_location_data:
     external:
       name: "rdss_am-ss-location-data"
-
+  minio_export_data:
+    external:
+      name: "rdss_minio_export_data"
 
 services:
 
@@ -33,7 +35,7 @@ services:
       MINIO_SECRET_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
     volumes:
       - "${VOL_BASE}/dev/etc/minio:/root/.minio"
-      - "${VOL_BASE}/dev/s3:/export"
+      - "minio_export_data:/export"
     ports:
       - "50500:9000"
     expose:

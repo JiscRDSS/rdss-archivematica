@@ -8,6 +8,7 @@ BASE_DIR ?= ${CURDIR}
 # Paths for Docker named volumes
 AM_PIPELINE_DATA ?= /tmp/am-pipeline-data
 SS_LOCATION_DATA ?= $(BASE_DIR)/../src
+MINIO_EXPORT_DATA ?= $(VOL_BASE)/dev/s3
 
 # Do we want to include any shibboleth services?
 SHIBBOLETH_IDP ?= local
@@ -48,6 +49,9 @@ create-volumes:
 	mkdir -p ${SS_LOCATION_DATA}
 	docker volume create --opt type=none --opt o=bind \
 		--opt device=$(SS_LOCATION_DATA) rdss_am-ss-location-data
+	mkdir -p ${MINIO_EXPORT_DATA}
+	docker volume create --opt type=none --opt o=bind \
+                --opt device=$(MINIO_EXPORT_DATA) rdss_minio_export_data
 
 list:
 	docker-compose ps
