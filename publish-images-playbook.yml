@@ -1,0 +1,76 @@
+---
+
+#
+# Usage:
+#
+#     $ ansible-playbook publish-images-playbook.yml --extra-vars="registry=aws_account_id.dkr.ecr.region.amazonaws.com/"
+#
+
+- hosts: "localhost"
+  connection: "local"
+
+  vars:
+    repos:
+      - name: "Archivematica repository"
+        repo: "https://github.com/JiscRDSS/archivematica"
+        version: "qa/jisc"
+        dest: "./src/archivematica"
+      - name: "Archivematica Storage Service repository"
+        repo: "https://github.com/JiscRDSS/archivematica-storage-service"
+        version: "qa/jisc"
+        dest: "./src/archivematica-storage-service"
+      - name: "RDSS Archivematica Channel Adapter"
+        repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
+        version: "master"
+        dest: "./src/rdss-archivematica-channel-adapter"
+    images:
+      - name: "{{ registry }}archivematica-mcp-server"
+        path: "./src/archivematica/src/"
+        dockerfile: "MCPServer.Dockerfile"
+        tag: "latest"
+      - name: "{{ registry }}archivematica-mcp-client"
+        path: "./src/archivematica/src/"
+        dockerfile: "MCPClient.Dockerfile"
+        tag: "latest"
+      - name: "{{ registry }}archivematica-mcp-dashboard"
+        path: "./src/archivematica/src/"
+        dockerfile: "dashboard.Dockerfile"
+        tag: "latest"
+      - name: "{{ registry }}archivematica-storage-service"
+        path: "./src/archivematica-storage-service/"
+        dockerfile: "Dockerfile"
+        tag: "latest"
+      - name: "{{ registry }}rdss-archivematica-channel-adapter"
+        tag: "latest"
+        path: "./src/rdss-archivematica-channel-adapter/"
+        dockerfile: "Dockerfile"
+
+  tasks:
+
+    - name: "Ensure that the variable registry is defined"
+      fail:
+        msg: "Variable registry is undefined"
+      when: "registry is not defined"
+
+    - name: "Install docker-py"
+      pip:
+        name: "docker-py"
+        extra_args: "--user"
+
+    - name: "Clone repositories"
+      git:
+        accept_hostkey: "yes"
+        repo: "{{ item.repo }}"
+        dest: "{{ item.dest }}"
+        version: "{{ item.version }}"
+      with_items: "{{ repos }}"
+
+    - name: "Build and publish images"
+      docker_image:
+        name: "{{ item.name }}"
+        tag: "{{ item.tag }}"
+        path: "{{ item.path }}"
+        dockerfile: "{{ item.dockerfile }}"
+        push: "yes"
+        state: "present"
+      with_items: "{{ images }}"
