@@ -1,41 +1,41 @@
 # set overall behavior
-log4j.rootCategory=DEBUG, shibd_log, warn_log
+log4j.rootCategory=INFO, shibd_log, warn_log
 
 # fairly verbose for DEBUG, so generally leave at INFO
 log4j.category.XMLTooling.XMLObject=INFO
-log4j.category.XMLTooling.KeyInfoResolver=DEBUG
+log4j.category.XMLTooling.KeyInfoResolver=INFO
 log4j.category.Shibboleth.IPRange=INFO
 log4j.category.Shibboleth.PropertySet=INFO
 
 # raise for low-level tracing of SOAP client HTTP/SSL behavior
-log4j.category.XMLTooling.libcurl=DEBUG
+log4j.category.XMLTooling.libcurl=INFO
 
 # useful categories to tune independently:
 #
 # tracing of SAML messages and security policies
-log4j.category.OpenSAML.MessageDecoder=DEBUG
-log4j.category.OpenSAML.MessageEncoder=DEBUG
-log4j.category.OpenSAML.SecurityPolicyRule=DEBUG
-log4j.category.XMLTooling.SOAPClient=DEBUG
+log4j.category.OpenSAML.MessageDecoder=INFO
+log4j.category.OpenSAML.MessageEncoder=INFO
+log4j.category.OpenSAML.SecurityPolicyRule=INFO
+log4j.category.XMLTooling.SOAPClient=INFO
 # interprocess message remoting
-log4j.category.Shibboleth.Listener=DEBUG
+log4j.category.Shibboleth.Listener=INFO
 # mapping of requests to applicationId
-log4j.category.Shibboleth.RequestMapper=DEBUG
+log4j.category.Shibboleth.RequestMapper=INFO
 # high level session cache operations
-log4j.category.Shibboleth.SessionCache=DEBUG
+log4j.category.Shibboleth.SessionCache=INFO
 # persistent storage and caching
-log4j.category.XMLTooling.StorageService=DEBUG
+log4j.category.XMLTooling.StorageService=INFO
 
 # logs XML being signed or verified if set to DEBUG
-log4j.category.XMLTooling.Signature.Debugger=DEBUG
+log4j.category.XMLTooling.Signature.Debugger=INFO
 
 # the tran log blocks the "default" appender(s) at runtime
 # Level should be left at INFO for this category
-log4j.category.Shibboleth-TRANSACTION=DEBUG
+log4j.category.Shibboleth-TRANSACTION=INFO
 # uncomment to suppress particular event types
-log4j.category.Shibboleth-TRANSACTION.AuthnRequest=DEBUG
-log4j.category.Shibboleth-TRANSACTION.Login=DEBUG
-log4j.category.Shibboleth-TRANSACTION.Logout=DEBUG
+log4j.category.Shibboleth-TRANSACTION.AuthnRequest=INFO
+log4j.category.Shibboleth-TRANSACTION.Login=INFO
+log4j.category.Shibboleth-TRANSACTION.Logout=INFO
 
 # define the appenders
 

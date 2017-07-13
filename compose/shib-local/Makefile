@@ -13,6 +13,8 @@ DOMAIN_NAME ?= example.ac.uk
 
 IDP_EXTERNAL_PORT ?= 6443
 
+IDP_LDAP_HOSTNAME ?= ldap.$(DOMAIN_NAME)
+
 NGINX_HOSTNAME ?= archivematica.$(DOMAIN_NAME)
 
 all: destroy init-ca build create-secrets up bootstrap list
