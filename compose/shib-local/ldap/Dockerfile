@@ -1,4 +1,5 @@
-FROM osixia/openldap
+# Pin against last release that used debian 8, to avoid incompatibility with debian 9
+FROM osixia/openldap@sha256:443571790e7db8dd7072d31003089fbec1acf490340173c34a39cd6f4aa345e5
 
 MAINTAINER Arkivum Limited
 
