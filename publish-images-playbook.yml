@@ -25,7 +25,7 @@
         dest: "./src/rdss-archivematica-automation-tools"
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-        version: "master"
+        version: "v0.1.2"
         dest: "./src/rdss-archivematica-channel-adapter"
       - name: "RDSS Arkivum NextCloud"
         repo: "https://github.com/JiscRDSS/rdss-arkivum-nextcloud"
