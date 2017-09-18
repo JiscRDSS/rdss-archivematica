@@ -82,7 +82,7 @@ services:
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:ro"
 
   clamavd:
-    image: "dinkel/clamavd:latest"
+    image: "artefactual/clamav:latest"
     expose:
       - "3310"
     volumes:
