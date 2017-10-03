@@ -10,6 +10,10 @@ resource "aws_ecr_repository" "mcp_client" {
   name = "rdss-archivematica/mcp-client"
 }
 
+resource "aws_ecr_repository" "automation_tools" {
+  name = "rdss-archivematica/automation-tools"
+}
+
 resource "aws_ecr_repository" "dashboard" {
   name = "rdss-archivematica/dashboard"
 }
@@ -20,4 +24,8 @@ resource "aws_ecr_repository" "storage_service" {
 
 resource "aws_ecr_repository" "channel_adapter" {
   name = "rdss-archivematica/channel-adapter"
+}
+
+resource "aws_ecr_repository" "nextcloud" {
+  name = "rdss-archivematica/nextcloud"
 }

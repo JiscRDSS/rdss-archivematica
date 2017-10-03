@@ -35,7 +35,8 @@ bootstrap-storage-service:
 					--username="test" \
 					--password="test" \
 					--email="test@test.com" \
-					--api-key="test"
+					--api-key="test" \
+					--superuser
 
 bootstrap-dashboard:
 	# Wait for services to start properly to avoid race/timing problems

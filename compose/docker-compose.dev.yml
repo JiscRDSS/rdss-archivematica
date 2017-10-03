@@ -84,7 +84,7 @@ services:
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:ro"
 
   clamavd:
-    image: "dinkel/clamavd:latest"
+    image: "artefactual/clamav:latest"
     expose:
       - "3310"
     volumes:
@@ -126,6 +126,22 @@ services:
       - "4567"
     expose:
       - "4567"
+
+  archivematica-automation-tools:
+    build: '../src/rdss-archivematica-automation-tools/'
+    environment:
+      AM_TOOLS_TRANSFER_AM_API_KEY: "test"
+      AM_TOOLS_TRANSFER_AM_URL: "http://archivematica"
+      AM_TOOLS_TRANSFER_AM_USER: "test"
+      AM_TOOLS_TRANSFER_SOURCE_DESCRIPTION: "automated workflow"
+      AM_TOOLS_TRANSFER_SS_API_KEY: "test"
+      AM_TOOLS_TRANSFER_SS_URL: "http://archivematica-storage-service:8000"
+      AM_TOOLS_TRANSFER_SS_USER: "test"
+    volumes:
+      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory"
+    links:
+      - "archivematica-dashboard"
+      - "archivematica-storage-service"
 
   archivematica-mcp-server:
     build:
@@ -193,7 +209,7 @@ services:
       ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "12345"
       ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "*"
       ARCHIVEMATICA_DASHBOARD_DASHBOARD_GEARMAN_SERVER: "gearmand:4730"
-      ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "elasticsearch:93200"
+      ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "elasticsearch:9200"
       ARCHIVEMATICA_DASHBOARD_CLIENT_USER: "archivematica"
       ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD: "demo"
       ARCHIVEMATICA_DASHBOARD_CLIENT_HOST: "mysql"

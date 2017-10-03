@@ -6,14 +6,16 @@ Integration repo for the RDSS fork of Archivematica.
 
 Currently, it is expected that the user clones the corresponding git
 repositories manually. They're expected to be located under the `src/`
-directory. You can use `make clone` to clone the repositories.
+directory. You can use `make clone` to clone these.
 
 URL | Branch | Components
 --- | ------ | ----------
 https://github.com/JiscRDSS/archivematica | qa/jisc | MCPServer, MCPClient, Dashboard
 https://github.com/JiscRDSS/archivematica-storage-service | qa/jisc | Storage Service
+https://github.com/JiscRDSS/rdss-archivematica-automation-tools | master | Automation Tools
 https://github.com/JiscRDSS/rdss-archivematica-channel-adapter | master | Channel Adapter
 https://github.com/JiscRDSS/rdss-archivematica-msgcreator | master | Msgcreator
+https://github.com/JiscRDSS/rdss-arkivum-nextcloud | master | NextCloud
 https://github.com/artefactual/archivematica-sampledata | master | Sample data
 
 ## Development environment
