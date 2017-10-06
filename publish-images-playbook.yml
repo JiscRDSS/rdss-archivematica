@@ -1,9 +1,13 @@
 ---
 
 #
+# Builds core RDSS Archivematica images intended for production deployment and
+# publishes them to the given Docker registry.
+#
 # Usage:
 #
-#     $ ansible-playbook publish-images-playbook.yml --extra-vars="registry=aws_account_id.dkr.ecr.region.amazonaws.com/"
+#     $ ansible-playbook publish-images-playbook.yml \
+#           --extra-vars="registry=aws_account_id.dkr.ecr.region.amazonaws.com/"
 #
 
 - hosts: "localhost"
