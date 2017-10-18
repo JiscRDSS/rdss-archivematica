@@ -1,5 +1,5 @@
 {
-	"version": "18",
+	"version": "19",
 	"credential": {
 		"accessKey": "AKIAIOSFODNN7EXAMPLE",
 		"secretKey": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
@@ -105,6 +105,17 @@
 				"user": "",
 				"password": "",
 				"database": ""
+			}
+		},
+		"mqtt": {
+			"1": {
+				"enable": false,
+				"broker": "",
+				"topic": "",
+				"qos": 0,
+				"clientId": "",
+				"username": "",
+				"password": ""
 			}
 		}
 	}
