@@ -131,7 +131,7 @@ services:
     build: '../src/rdss-archivematica-automation-tools/'
     environment:
       AM_TOOLS_TRANSFER_AM_API_KEY: "test"
-      AM_TOOLS_TRANSFER_AM_URL: "http://archivematica"
+      AM_TOOLS_TRANSFER_AM_URL: "http://archivematica-dashboard:8000"
       AM_TOOLS_TRANSFER_AM_USER: "test"
       AM_TOOLS_TRANSFER_SOURCE_DESCRIPTION: "automated workflow"
       AM_TOOLS_TRANSFER_SS_API_KEY: "test"
