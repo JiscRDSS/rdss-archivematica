@@ -17,7 +17,7 @@
     repos:
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-        version: "v0.2.5"
+        version: "v0.2.6"
         dest: "./src/rdss-archivematica-channel-adapter"
       - name: "RDSS Archivematica MsgCreator"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-msgcreator"
