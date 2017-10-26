@@ -11,6 +11,7 @@ ARK_STORAGE_DATA ?= /tmp/rdss/arkivum-storage
 JISC_TEST_DATA ?= /tmp/rdss/jisc-test-data
 MINIO_EXPORT_DATA ?= /tmp/rdss/minio-export-data
 SS_LOCATION_DATA ?= /tmp/rdss/am-ss-location-data
+SS_STAGING_DATA ?= /tmp/rdss/am-ss-staging-data
 
 # Do we want to include any shibboleth services?
 SHIBBOLETH_IDP ?= local
@@ -57,6 +58,9 @@ create-volumes:
 	@mkdir -p ${SS_LOCATION_DATA}/automated ${SS_LOCATION_DATA}/interactive
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(SS_LOCATION_DATA) rdss_am-ss-location-data
+	@mkdir -p ${SS_STAGING_DATA}
+	@docker volume create --opt type=none --opt o=bind \
+		--opt device=$(SS_STAGING_DATA) rdss_am-ss-staging-data
 	# Create Arkivum named volumes
 	@mkdir -p ${ARK_STORAGE_DATA}/aipingest
 	@docker volume create --opt type=none --opt o=bind \
@@ -65,10 +69,10 @@ create-volumes:
 	@mkdir -p ${JISC_TEST_DATA}
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(JISC_TEST_DATA) rdss_jisc-test-research-data
-  # Create MINIO named volumes
+	# Create MINIO named volumes
 	@mkdir -p ${MINIO_EXPORT_DATA}
 	@docker volume create --opt type=none --opt o=bind \
-    --opt device=$(MINIO_EXPORT_DATA) rdss_minio_export_data
+		--opt device=$(MINIO_EXPORT_DATA) rdss_minio_export_data
 
 
 list:

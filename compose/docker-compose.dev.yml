@@ -7,7 +7,6 @@ volumes:
   # These are not accessible outside of the docker host and are maintained by
   # Docker.
   elasticsearch_data:
-  archivematica_storage_service_staging_data:
   mysql_data:
 
   # External Named Volumes
@@ -21,6 +20,9 @@ volumes:
   archivematica_storage_service_location_data:
     external:
       name: "rdss_am-ss-location-data"
+  archivematica_storage_service_staging_data:
+    external:
+      name: "rdss_am-ss-staging-data"
   minio_export_data:
     external:
       name: "rdss_minio_export_data"
