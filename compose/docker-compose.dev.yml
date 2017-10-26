@@ -47,6 +47,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: "12345"
     volumes:
+      - "${VOL_BASE}/dev/etc/mysql/my.cnf:/etc/mysql/my.cnf:ro"
       - "mysql_data:/var/lib/mysql"
     expose:
       - "3306"
