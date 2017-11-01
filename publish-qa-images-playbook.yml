@@ -21,7 +21,7 @@
         dest: "./src/rdss-archivematica-channel-adapter"
       - name: "RDSS Archivematica MsgCreator"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-msgcreator"
-        version: "master"
+        version: "v0.1.0-rc.1"
         dest: "./src/rdss-archivematica-msgcreator"
     images:
       - name: "{{ registry }}rdss-archivematica-msgcreator"
