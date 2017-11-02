@@ -238,6 +238,7 @@ services:
       SS_GUNICORN_RELOAD: "${SS_GUNICORN_RELOAD}"
       SS_GUNICORN_RELOAD_ENGINE: "${SS_GUNICORN_RELOAD_ENGINE}"
       SS_GUNICORN_WORKERS: "${SS_GUNICORN_WORKERS}"
+      SS_PIPELINE_REMOTE_NAME: "http://archivematica-dashboard:8000/"
       DJANGO_SECRET_KEY: "12345"
       DJANGO_SETTINGS_MODULE: "storage_service.settings.local"
       DJANGO_ALLOWED_HOSTS: "*"
