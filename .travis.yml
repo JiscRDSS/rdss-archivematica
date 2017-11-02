@@ -1,0 +1,11 @@
+---
+
+# This project is a mix of languages; default to bash for now
+language: bash
+
+script:
+  # TODO Add validation/build steps here
+
+notifications:
+  email: false
+
