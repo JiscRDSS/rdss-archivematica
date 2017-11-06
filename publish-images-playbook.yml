@@ -40,11 +40,11 @@
       - name: "{{ registry }}archivematica-automation-tools"
         dockerfile: "Dockerfile"
         path: "./src/rdss-archivematica-automation-tools/"
-        tag: "latest"
+        tag: "v0.1.0-rc.1"
       - name: "{{ registry }}archivematica-mcp-server"
         path: "./src/archivematica/src/"
         dockerfile: "MCPServer.Dockerfile"
-        tag: "latest"
+        tag: "v0.1.0-rc.1"
       - name: "{{ registry }}archivematica-mcp-client"
         path: "./src/archivematica/src/"
         dockerfile: "MCPClient.Dockerfile"
@@ -52,19 +52,19 @@
       - name: "{{ registry }}archivematica-dashboard"
         path: "./src/archivematica/src/"
         dockerfile: "dashboard.Dockerfile"
-        tag: "latest"
+        tag: "v0.1.0-rc.1"
       - name: "{{ registry }}archivematica-storage-service"
         path: "./src/archivematica-storage-service/"
         dockerfile: "Dockerfile"
-        tag: "latest"
+        tag: "v0.1.0-rc.1"
       - name: "{{ registry }}rdss-archivematica-channel-adapter"
         dockerfile: "Dockerfile"
         path: "./src/rdss-archivematica-channel-adapter/"
-        tag: "latest"
+        tag: "v0.2.6"
       - name: "{{ registry }}nextcloud"
         dockerfile: "Dockerfile"
         path: "./src/rdss-arkivum-nextcloud/"
-        tag: "latest"
+        tag: "v0.1.0-rc.1"
 
   tasks:
 
@@ -79,7 +79,7 @@
         extra_args: "--user"
       with_items:
         - "setuptools"
-        - "docker-py"
+        - "docker"
 
     - name: "Clone repositories"
       git:
@@ -96,13 +96,15 @@
       when: "item.make_target is defined"
       with_items: "{{ repos }}"
 
-    - name: "Build and publish images"
-      docker_image:
-        name: "{{ item.name }}"
-        tag: "{{ item.tag }}"
-        path: "{{ item.path }}"
-        dockerfile: "{{ item.dockerfile }}"
-        push: "yes"
-        state: "present"
-        force: "yes"
+    - name: "Build and tag images"
+      command: docker build \
+        -t "{{ item.name }}:{{ item.tag }}" \
+        -t "{{ item.name }}:latest" \
+        -f "{{ item.dockerfile }}" .
+      args:
+        chdir: "{{ item.path }}"
+      with_items: "{{ images }}"
+
+    - name: "Publish images"
+      command: docker push "{{ item.name }}"
       with_items: "{{ images }}"

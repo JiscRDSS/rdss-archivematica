@@ -27,15 +27,15 @@
       - name: "{{ registry }}rdss-archivematica-msgcreator"
         dockerfile: "Dockerfile"
         path: "./src/rdss-archivematica-msgcreator/"
-        tag: "latest"
+        tag: "v0.1.0-rc.1"
       - name: "{{ registry }}dynalite"
         path: "./src/rdss-archivematica-channel-adapter/hack/minikine"
         dockerfile: "dynalite.Dockerfile"
-        tag: "latest"
+        tag: "v0.2.6"
       - name: "{{ registry }}minikine"
         path: "./src/rdss-archivematica-channel-adapter/hack/minikine"
         dockerfile: "minikine.Dockerfile"
-        tag: "latest"
+        tag: "v0.2.6"
 
 
   tasks:
@@ -51,7 +51,7 @@
         extra_args: "--user"
       with_items:
         - "setuptools"
-        - "docker-py"
+        - "docker"
 
     - name: "Clone repositories"
       git:
@@ -61,13 +61,15 @@
         version: "{{ item.version }}"
       with_items: "{{ repos }}"
 
-    - name: "Build and publish images"
-      docker_image:
-        name: "{{ item.name }}"
-        tag: "{{ item.tag }}"
-        path: "{{ item.path }}"
-        dockerfile: "{{ item.dockerfile }}"
-        push: "yes"
-        state: "present"
-        force: "yes"
+    - name: "Build and tag images"
+      command: docker build \
+        -t "{{ item.name }}:{{ item.tag }}" \
+        -t "{{ item.name }}:latest" \
+        -f "{{ item.dockerfile }}" .
+      args:
+        chdir: "{{ item.path }}"
+      with_items: "{{ images }}"
+
+    - name: "Publish images"
+      command: docker push "{{ item.name }}"
       with_items: "{{ images }}"
