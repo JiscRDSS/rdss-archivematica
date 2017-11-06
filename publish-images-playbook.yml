@@ -1,8 +1,8 @@
 ---
 
 #
-# Builds core RDSS Archivematica images intended for production deployment and
-# publishes them to the given Docker registry.
+# Builds core RDSSARK images intended for production deployment and publishes
+# them to the given Docker registry.
 #
 # Usage:
 #
@@ -14,57 +14,60 @@
   connection: "local"
 
   vars:
-    repos:
-      - name: "Archivematica repository"
+
+    projects:
+
+      - name: "Archivematica (JiscRDSS fork)"
         repo: "https://github.com/JiscRDSS/archivematica"
         version: "v0.1.0-rc.1"
         dest: "./src/archivematica"
-      - name: "Archivematica Storage Service repository"
+        images:
+          - name: "{{ registry }}archivematica-dashboard"
+            path: "./src/archivematica/src/"
+            dockerfile: "dashboard.Dockerfile"
+          - name: "{{ registry }}archivematica-mcp-server"
+            path: "./src/archivematica/src/"
+            dockerfile: "MCPServer.Dockerfile"
+          - name: "{{ registry }}archivematica-mcp-client"
+            path: "./src/archivematica/src/"
+            dockerfile: "MCPClient.Dockerfile"
+
+      - name: "Archivematica Storage Service (JiscRDSS fork)"
         repo: "https://github.com/JiscRDSS/archivematica-storage-service"
         version: "v0.1.0-rc.1"
         dest: "./src/archivematica-storage-service"
+        images:
+          - name: "{{ registry }}archivematica-storage-service"
+            path: "./src/archivematica-storage-service/"
+            dockerfile: "Dockerfile"
+
       - name: "RDSS Archivematica Automation Tools"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-automation-tools.git"
         version: "v0.1.0-rc.1"
         dest: "./src/rdss-archivematica-automation-tools"
+        images:
+          - name: "{{ registry }}archivematica-automation-tools"
+            path: "./src/rdss-archivematica-automation-tools/"
+            dockerfile: "Dockerfile"
+
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
         version: "v0.2.6"
         dest: "./src/rdss-archivematica-channel-adapter"
+        images:
+          - name: "{{ registry }}rdss-archivematica-channel-adapter"
+            path: "./src/rdss-archivematica-channel-adapter/"
+            dockerfile: "Dockerfile"
+
       - name: "RDSS Arkivum NextCloud"
         repo: "https://github.com/JiscRDSS/rdss-arkivum-nextcloud"
         version: "v0.1.0-rc.1"
         dest: "./src/rdss-arkivum-nextcloud"
         make_target: "build-files-move-app"
-    images:
-      - name: "{{ registry }}archivematica-automation-tools"
-        dockerfile: "Dockerfile"
-        path: "./src/rdss-archivematica-automation-tools/"
-        tag: "v0.1.0-rc.1"
-      - name: "{{ registry }}archivematica-mcp-server"
-        path: "./src/archivematica/src/"
-        dockerfile: "MCPServer.Dockerfile"
-        tag: "v0.1.0-rc.1"
-      - name: "{{ registry }}archivematica-mcp-client"
-        path: "./src/archivematica/src/"
-        dockerfile: "MCPClient.Dockerfile"
-        tag: "latest"
-      - name: "{{ registry }}archivematica-dashboard"
-        path: "./src/archivematica/src/"
-        dockerfile: "dashboard.Dockerfile"
-        tag: "v0.1.0-rc.1"
-      - name: "{{ registry }}archivematica-storage-service"
-        path: "./src/archivematica-storage-service/"
-        dockerfile: "Dockerfile"
-        tag: "v0.1.0-rc.1"
-      - name: "{{ registry }}rdss-archivematica-channel-adapter"
-        dockerfile: "Dockerfile"
-        path: "./src/rdss-archivematica-channel-adapter/"
-        tag: "v0.2.6"
-      - name: "{{ registry }}nextcloud"
-        dockerfile: "Dockerfile"
-        path: "./src/rdss-arkivum-nextcloud/"
-        tag: "v0.1.0-rc.1"
+        images:
+          - name: "{{ registry }}nextcloud"
+            path: "./src/rdss-arkivum-nextcloud/"
+            dockerfile: "Dockerfile"
 
   tasks:
 
@@ -87,24 +90,28 @@
         repo: "{{ item.repo }}"
         dest: "{{ item.dest }}"
         version: "{{ item.version }}"
-      with_items: "{{ repos }}"
+      with_items: "{{ projects }}"
 
     - name: "Prepare source"
       make:
         chdir: "{{ item.dest }}"
         target: "{{ item.make_target}}"
       when: "item.make_target is defined"
-      with_items: "{{ repos }}"
+      with_items: "{{ projects }}"
 
     - name: "Build and tag images"
       command: docker build \
-        -t "{{ item.name }}:{{ item.tag }}" \
-        -t "{{ item.name }}:latest" \
-        -f "{{ item.dockerfile }}" .
+        -t "{{ item.1.name }}:{{ item.0.version }}" \
+        -t "{{ item.1.name }}:latest" \
+        -f "{{ item.1.dockerfile }}" .
       args:
-        chdir: "{{ item.path }}"
-      with_items: "{{ images }}"
+        chdir: "{{ item.1.path }}"
+      with_subelements:
+        - "{{ projects }}"
+        - images
 
     - name: "Publish images"
-      command: docker push "{{ item.name }}"
-      with_items: "{{ images }}"
+      command: docker push "{{ item.1.name }}"
+      with_subelements:
+        - "{{ projects }}"
+        - images

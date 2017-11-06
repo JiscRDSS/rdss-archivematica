@@ -1,8 +1,8 @@
 ---
 
 #
-# Builds supporting RDSS Archivematica images used for QA and publishes them to
-# the given Docker registry.
+# Builds supporting RDSSARK images used for QA and publishes them to the given
+# Docker registry.
 #
 # Usage:
 #
@@ -14,29 +14,29 @@
   connection: "local"
 
   vars:
-    repos:
+
+    projects:
+
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
         version: "v0.2.6"
         dest: "./src/rdss-archivematica-channel-adapter"
+        images:
+          - name: "{{ registry }}dynalite"
+            path: "./src/rdss-archivematica-channel-adapter/hack/minikine"
+            dockerfile: "dynalite.Dockerfile"
+          - name: "{{ registry }}minikine"
+            path: "./src/rdss-archivematica-channel-adapter/hack/minikine"
+            dockerfile: "minikine.Dockerfile"
+
       - name: "RDSS Archivematica MsgCreator"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-msgcreator"
         version: "v0.1.0-rc.1"
         dest: "./src/rdss-archivematica-msgcreator"
-    images:
-      - name: "{{ registry }}rdss-archivematica-msgcreator"
-        dockerfile: "Dockerfile"
-        path: "./src/rdss-archivematica-msgcreator/"
-        tag: "v0.1.0-rc.1"
-      - name: "{{ registry }}dynalite"
-        path: "./src/rdss-archivematica-channel-adapter/hack/minikine"
-        dockerfile: "dynalite.Dockerfile"
-        tag: "v0.2.6"
-      - name: "{{ registry }}minikine"
-        path: "./src/rdss-archivematica-channel-adapter/hack/minikine"
-        dockerfile: "minikine.Dockerfile"
-        tag: "v0.2.6"
-
+        images:
+          - name: "{{ registry }}rdss-archivematica-msgcreator"
+            dockerfile: "Dockerfile"
+            path: "./src/rdss-archivematica-msgcreator/"
 
   tasks:
 
@@ -59,17 +59,21 @@
         repo: "{{ item.repo }}"
         dest: "{{ item.dest }}"
         version: "{{ item.version }}"
-      with_items: "{{ repos }}"
+      with_items: "{{ projects }}"
 
     - name: "Build and tag images"
       command: docker build \
-        -t "{{ item.name }}:{{ item.tag }}" \
-        -t "{{ item.name }}:latest" \
-        -f "{{ item.dockerfile }}" .
+        -t "{{ item.1.name }}:{{ item.0.version }}" \
+        -t "{{ item.1.name }}:latest" \
+        -f "{{ item.1.dockerfile }}" .
       args:
-        chdir: "{{ item.path }}"
-      with_items: "{{ images }}"
+        chdir: "{{ item.1.path }}"
+      with_subelements:
+        - "{{ projects }}"
+        - images
 
     - name: "Publish images"
-      command: docker push "{{ item.name }}"
-      with_items: "{{ images }}"
+      command: docker push "{{ item.1.name }}"
+      with_subelements:
+        - "{{ projects }}"
+        - images
