@@ -3,8 +3,14 @@
 # This project is a mix of languages; default to bash for now
 language: bash
 
+install:
+  # Install ansible-lint for testing Ansible scripts
+  - pip install --user ansible-lint
+
 script:
-  # TODO Add validation/build steps here
+  # Validate our Ansible playbooks
+  - ansible-lint -p *-playbook.yml
+  # TODO Add additional validation/build steps here
 
 notifications:
   email: false
