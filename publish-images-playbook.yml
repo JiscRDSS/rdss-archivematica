@@ -90,28 +90,40 @@
         repo: "{{ item.repo }}"
         dest: "{{ item.dest }}"
         version: "{{ item.version }}"
+      register: "git_clone"
       with_items: "{{ projects }}"
 
     - name: "Prepare source"
       make:
-        chdir: "{{ item.dest }}"
-        target: "{{ item.make_target}}"
-      when: "item.make_target is defined"
-      with_items: "{{ projects }}"
+        chdir: "{{ item.item.dest }}"
+        target: "{{ item.item.make_target}}"
+      when: item.changed and item.item.make_target is defined
+      with_items: "{{ git_clone.results }}"
+      tags:
+        # Ignore false ANSIBLE0016 claiming this task should be a handler
+        - skip_ansible_lint
 
     - name: "Build and tag images"
       command: docker build \
-        -t "{{ item.1.name }}:{{ item.0.version }}" \
+        -t "{{ item.1.name }}:{{ item.0.item.version }}" \
         -t "{{ item.1.name }}:latest" \
         -f "{{ item.1.dockerfile }}" .
       args:
         chdir: "{{ item.1.path }}"
+      when: item.0.changed
       with_subelements:
-        - "{{ projects }}"
-        - images
+        - "{{ git_clone.results }}"
+        - item.images
+      tags:
+        # Ignore false ANSIBLE0016 claiming this task should be a handler
+        - skip_ansible_lint
 
     - name: "Publish images"
       command: docker push "{{ item.1.name }}"
+      when: item.0.changed
       with_subelements:
-        - "{{ projects }}"
-        - images
+        - "{{ git_clone.results }}"
+        - item.images
+      tags:
+        # Ignore false ANSIBLE0016 claiming this task should be a handler
+        - skip_ansible_lint
