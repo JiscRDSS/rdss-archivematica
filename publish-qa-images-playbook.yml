@@ -63,10 +63,10 @@
       with_items: "{{ projects }}"
 
     - name: "Build and tag images"
-      command: docker build \
-        -t "{{ item.1.name }}:{{ item.0.item.version }}" \
-        -t "{{ item.1.name }}:latest" \
-        -f "{{ item.1.dockerfile }}" .
+      command: "docker build
+        -t {{ item.1.name }}:{{ item.0.item.version }}
+        -t {{ item.1.name }}:latest
+        -f {{ item.1.dockerfile }} ."
       args:
         chdir: "{{ item.1.path }}"
       when: item.0.changed
