@@ -185,6 +185,7 @@ services:
       ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ELASTICSEARCHSERVER: "elasticsearch:9200"
       ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_MCPARCHIVEMATICASERVER: "gearmand:4730"
       ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_CLAMAV_SERVER: "clamavd:3310"
+      ARCHIVEMATICA_MCPCLIENT_EMAIL_DEFAULT_FROM_EMAIL: "${AM_DEFAULT_FROM_EMAIL}"
     volumes:
       - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
       - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"
@@ -217,6 +218,7 @@ services:
       ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD: "demo"
       ARCHIVEMATICA_DASHBOARD_CLIENT_HOST: "mysql"
       ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE: "MCP"
+      ARCHIVEMATICA_DASHBOARD_EMAIL_DEFAULT_FROM_EMAIL: "${AM_DEFAULT_FROM_EMAIL}"
     volumes:
       - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
       - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"
