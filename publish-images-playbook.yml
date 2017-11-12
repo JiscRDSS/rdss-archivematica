@@ -73,8 +73,8 @@
 
     - name: "Ensure that the variable registry is defined"
       fail:
-        msg: "Variable registry is undefined"
-      when: "registry is not defined"
+        msg: "Variable registry is undefined or empty"
+      when: "(registry is not defined) or (registry | trim == '')"
 
     - name: "Install playbook dependencies"
       pip:
@@ -92,6 +92,8 @@
         version: "{{ item.version }}"
       register: "git_clone"
       with_items: "{{ projects }}"
+      tags:
+        - "clone"
 
     - name: "Prepare source"
       make:
@@ -100,6 +102,7 @@
       when: item.changed and item.item.make_target is defined
       with_items: "{{ git_clone.results }}"
       tags:
+        - "build"
         # Ignore false ANSIBLE0016 claiming this task should be a handler
         - skip_ansible_lint
 
@@ -115,6 +118,7 @@
         - "{{ git_clone.results }}"
         - item.images
       tags:
+        - "build"
         # Ignore false ANSIBLE0016 claiming this task should be a handler
         - skip_ansible_lint
 
@@ -125,5 +129,6 @@
         - "{{ git_clone.results }}"
         - item.images
       tags:
+        - "publish"
         # Ignore false ANSIBLE0016 claiming this task should be a handler
         - skip_ansible_lint

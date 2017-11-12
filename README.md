@@ -2,21 +2,22 @@
 
 Integration repo for the RDSS fork of Archivematica.
 
-## Source management
+## Usage
 
-Currently, it is expected that the user clones the corresponding git
-repositories manually. They're expected to be located under the `src/`
-directory. You can use `make clone` to clone these.
+This project uses a Makefile to drive the build. Run `make help` to see a list
+of targets with descriptions, e.g.:
 
-URL | Branch | Components
---- | ------ | ----------
-https://github.com/JiscRDSS/archivematica | qa/jisc | MCPServer, MCPClient, Dashboard
-https://github.com/JiscRDSS/archivematica-storage-service | qa/jisc | Storage Service
-https://github.com/JiscRDSS/rdss-archivematica-automation-tools | master | Automation Tools
-https://github.com/JiscRDSS/rdss-archivematica-channel-adapter | master | Channel Adapter
-https://github.com/JiscRDSS/rdss-archivematica-msgcreator | master | Msgcreator
-https://github.com/JiscRDSS/rdss-arkivum-nextcloud | master | NextCloud
-https://github.com/artefactual/archivematica-sampledata | master | Sample data
+```
+$ make help
+build-images                   Build Docker images.
+clone                          Clone source code repositories.
+help                           Print this help message.
+publish                        Publish Docker images to a registry.
+```
+
+`publish` expects a `REGISTRY` variable to be defined, e.g.:
+
+    $ make publish REGISTRY=aws_account_id.dkr.ecr.region.amazonaws.com/
 
 ## Development environment
 
