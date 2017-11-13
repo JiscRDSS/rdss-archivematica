@@ -2,7 +2,7 @@
 
 BASE_DIR ?= ${CURDIR}
 
-DEFAULT_COMPOSE_FILE = $(shell realpath ../docker-compose.dev.yml)
+DEFAULT_COMPOSE_FILE = $(shell realpath ../docker-compose.qa.yml)
 
 COMPOSE_FILE ?= "${DEFAULT_COMPOSE_FILE}"
 

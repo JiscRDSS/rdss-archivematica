@@ -43,7 +43,7 @@ create-secrets:
 		./create-secrets.sh
 
 destroy:
-	# Stop containers and remove volumes (include all compose configs because we depend on Archivematica 'dev')
+	# Stop containers and remove volumes (include all compose configs because we depend on Archivematica 'qa')
 	COMPOSE_FILE=$(COMPOSE_FILE) docker-compose down --volumes
 
 list:

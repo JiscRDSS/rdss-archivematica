@@ -1,7 +1,10 @@
 .DEFAULT_GOAL := build
 
+# The environment to build for, one of 'dev' or 'qa'. Defaults to 'qa'.
+ENV ?= qa
+
 # The directories to use as part of the docker-compose build. May be a list.
-COMPOSE_DIRS=dev
+COMPOSE_DIRS ?= $(ENV)
 
 BASE_DIR ?= ${CURDIR}
 
@@ -35,6 +38,11 @@ endif
 override COMPOSE_FILE ?= $(shell echo \
 	"$(foreach DIR, $(COMPOSE_DIRS),${CURDIR}/docker-compose.$(DIR).yml)"\
 	| tr ' ' ':')
+ifeq ("$(ENV)", "dev")
+	# Include qa config because dev overrides/extends this
+	COMPOSE_FILE_2 := "$(COMPOSE_FILE):$(shell realpath ${CURDIR}/docker-compose.qa.yml)"
+	override COMPOSE_FILE="$(COMPOSE_FILE_2)"
+endif
 export COMPOSE_FILE
 
 all: destroy build create-secrets up bootstrap list
@@ -46,6 +54,13 @@ build clean destroy:
 	# Process each of the relevant compose dirs
 	$(foreach DIR, $(COMPOSE_DIRS), $(MAKE) -C $(DIR) $@ ;)
 	@sleep 10
+
+check-vars:
+	@echo "ENV = '$(ENV)'"
+	@echo "SHIBBOLETH_CONFIG = '$(SHIBBOLETH_CONFIG)'"
+	@echo "SHIBBOLETH_IDP = '$(SHIBBOLETH_IDP)'"
+	@echo "COMPOSE_DIRS = '$(COMPOSE_DIRS)'"
+	@echo "COMPOSE_FILE = '$(COMPOSE_FILE)'"
 
 config:
 	docker-compose config
@@ -74,17 +89,11 @@ create-volumes:
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(MINIO_EXPORT_DATA) rdss_minio_export_data
 
-
 list:
 	docker-compose ps
 
 up:
 	docker-compose up -d
-	
-validate:
-	@echo "SHIBBOLETH_CONFIG = $(SHIBBOLETH_CONFIG)"
-	@echo "SHIBBOLETH_IDP = $(SHIBBOLETH_IDP)"
-	@echo "COMPOSE_DIRS = $(COMPOSE_DIRS)"
 
 watch:
 	docker-compose logs -f
@@ -95,4 +104,4 @@ watch-idp:
 watch-nginx:
 	docker-compose logs -f nginx
 
-.PHONY: all bootstrap build clean create-volumes create-secrets config destroy list watch watch-idp watch-nginx up
+.PHONY: all bootstrap build check-vars clean create-volumes create-secrets config destroy list watch watch-idp watch-nginx up

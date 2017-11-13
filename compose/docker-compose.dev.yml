@@ -1,329 +1,55 @@
 ---
 version: "2"
 
-volumes:
-
-  # Internal Named Volumes
-  # These are not accessible outside of the docker host and are maintained by
-  # Docker.
-  elasticsearch_data:
-  mysql_data:
-
-  # External Named Volumes
-  # These are intended to be accessible beyond the docker host (e.g. via NFS).
-  # They use bind mounts to mount a specific "local" directory on the docker
-  # host - the expectation being that these directories are actually mounted
-  # filesystems from elsewhere.
-  archivematica_pipeline_data:
-    external:
-      name: "rdss_am-pipeline-data"
-  archivematica_storage_service_location_data:
-    external:
-      name: "rdss_am-ss-location-data"
-  archivematica_storage_service_staging_data:
-    external:
-      name: "rdss_am-ss-staging-data"
-  minio_export_data:
-    external:
-      name: "rdss_minio_export_data"
+#
+# Dev environment configuration for RDSSARK services
+#
+# This compose file is intended to be used with docker-compose.qa.yml, the
+# definitions here just add build config.
+#
 
 services:
-
-  minio:
-    image: "minio/minio:latest"
-    command: "server /export"
-    environment:
-      MINIO_ACCESS_KEY: "AKIAIOSFODNN7EXAMPLE"
-      MINIO_SECRET_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-    volumes:
-      - "${VOL_BASE}/dev/etc/minio:/root/.minio"
-      - "minio_export_data:/export"
-    ports:
-      - "50500:9000"
-    expose:
-      - "9000"
-
-  mysql:
-    image: "percona:5.6"
-    user: "mysql"
-    environment:
-      MYSQL_ROOT_PASSWORD: "12345"
-    volumes:
-      - "${VOL_BASE}/dev/etc/mysql/my.cnf:/etc/mysql/my.cnf:ro"
-      - "mysql_data:/var/lib/mysql"
-    expose:
-      - "3306"
-
-  elasticsearch:
-    image: "elasticsearch:1.7-alpine"
-    command: "elasticsearch -Des.node.name=TestNode -Des.network.host=0.0.0.0"
-    privileged: yes
-    volumes:
-      - "elasticsearch_data:/usr/share/elasticsearch/data"
-    expose:
-      - "9200"
-
-  redis:
-    image: "redis:3.2-alpine"
-    command: '--save "" --appendonly no'  # Persistency disabled
-    user: "redis"
-    expose:
-      - "6379"
-
-  gearmand:
-    image: "artefactual/gearmand:1.1.15-alpine"
-    command: "--queue-type=redis --redis-server=redis --redis-port=6379"
-    user: "gearman"
-    expose:
-      - "4730"
-    links:
-      - "redis"
-
-  fits:
-    image: "artefactual/fits-ngserver:0.8.4"
-    expose:
-      - "2113"
-    volumes:
-      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:ro"
-
-  clamavd:
-    image: "artefactual/clamav:latest"
-    expose:
-      - "3310"
-    volumes:
-      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:ro"
-
-  nginx:
-    image: "nginx:stable-alpine"
-    volumes:
-      - "${VOL_BASE}/dev/etc/nginx/nginx.conf:/etc/nginx/nginx.conf:ro"
-      - "${VOL_BASE}/dev/etc/nginx/incs/:/etc/nginx/incs/:ro"
-      - "${VOL_BASE}/dev/etc/nginx/conf.d/archivematica.conf:/etc/nginx/conf.d/archivematica.conf:ro"
-      - "${VOL_BASE}/dev/etc/nginx/conf.d/default.conf:/etc/nginx/conf.d/default.conf:ro"
-    expose:
-      - "80"
-      - "8000"
-    ports:
-      - "80"
-      - "8000"
 
   dynalite:
     build:
       context: "../src/rdss-archivematica-channel-adapter/hack/minikine"
       dockerfile: "dynalite.Dockerfile"
-    ports:
-      - "4567"
-    expose:
-      - "4567"
 
   minikine:
     build:
       context: "../src/rdss-archivematica-channel-adapter/hack/minikine"
       dockerfile: "minikine.Dockerfile"
-    environment:
-      MINIKINE_STREAM_MAIN: "main"
-      MINIKINE_STREAM_INVALID: "invalid"
-      MINIKINE_STREAM_ERROR: "error"
-      MINIKINE_STREAM_SHARDS: "4"
-    ports:
-      - "4567"
-    expose:
-      - "4567"
 
   archivematica-automation-tools:
     build: '../src/rdss-archivematica-automation-tools/'
-    environment:
-      AM_TOOLS_TRANSFER_AM_API_KEY: "test"
-      AM_TOOLS_TRANSFER_AM_URL: "http://archivematica-dashboard:8000"
-      AM_TOOLS_TRANSFER_AM_USER: "test"
-      AM_TOOLS_TRANSFER_SOURCE_DESCRIPTION: "automated workflow"
-      AM_TOOLS_TRANSFER_SS_API_KEY: "test"
-      AM_TOOLS_TRANSFER_SS_URL: "http://archivematica-storage-service:8000"
-      AM_TOOLS_TRANSFER_SS_USER: "test"
-    volumes:
-      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory"
-    links:
-      - "archivematica-dashboard"
-      - "archivematica-storage-service"
 
   archivematica-mcp-server:
     build:
       context: "../src/archivematica/src"
       dockerfile: "MCPServer.Dockerfile"
-    environment:
-      DJANGO_SECRET_KEY: "12345"
-      DJANGO_SETTINGS_MODULE: "settings.common"
-      ARCHIVEMATICA_MCPSERVER_CLIENT_USER: "archivematica"
-      ARCHIVEMATICA_MCPSERVER_CLIENT_PASSWORD: "demo"
-      ARCHIVEMATICA_MCPSERVER_CLIENT_HOST: "mysql"
-      ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE: "MCP"
-      ARCHIVEMATICA_MCPSERVER_MCPSERVER_MCPARCHIVEMATICASERVER: "gearmand:4730"
-    volumes:
-      - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
-      - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"
-      - "${VOL_BASE}/../src/archivematica/src/MCPServer/:/src/MCPServer/"
-      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
-    links:
-      - "mysql"
-      - "gearmand"
 
   archivematica-mcp-client:
     build:
       context: "../src/archivematica/src"
       dockerfile: "MCPClient.Dockerfile"
-    environment:
-      DJANGO_SECRET_KEY: "12345"
-      DJANGO_SETTINGS_MODULE: "settings.common"
-      NAILGUN_SERVER: "fits"
-      NAILGUN_PORT: "2113"
-      ARCHIVEMATICA_MCPCLIENT_CLIENT_USER: "archivematica"
-      ARCHIVEMATICA_MCPCLIENT_CLIENT_PASSWORD: "demo"
-      ARCHIVEMATICA_MCPCLIENT_CLIENT_HOST: "mysql"
-      ARCHIVEMATICA_MCPCLIENT_CLIENT_DATABASE: "MCP"
-      ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ARCHIVEMATICACLIENTMODULES: "/src/MCPClient/lib/archivematicaClientModules"
-      ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_CLIENTSCRIPTSDIRECTORY: "/src/MCPClient/lib/clientScripts/"
-      ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_ELASTICSEARCHSERVER: "elasticsearch:9200"
-      ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_MCPARCHIVEMATICASERVER: "gearmand:4730"
-      ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_CLAMAV_SERVER: "clamavd:3310"
-      ARCHIVEMATICA_MCPCLIENT_EMAIL_DEFAULT_FROM_EMAIL: "${AM_DEFAULT_FROM_EMAIL}"
-    volumes:
-      - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
-      - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"
-      - "${VOL_BASE}/../src/archivematica/src/MCPClient/:/src/MCPClient/"
-      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
-    links:
-      - "fits"
-      - "clamavd"
-      - "mysql"
-      - "gearmand"
-      - "elasticsearch"
-      - "archivematica-storage-service"
 
   archivematica-dashboard:
     build:
       context: "../src/archivematica/src"
       dockerfile: "dashboard.Dockerfile"
-    environment:
-      FORWARDED_ALLOW_IPS: "*"  # Specific to Gunicorn
-      AM_GUNICORN_ACCESSLOG: "${AM_GUNICORN_ACCESSLOG}"
-      AM_GUNICORN_RELOAD: "${AM_GUNICORN_RELOAD}"
-      AM_GUNICORN_RELOAD_ENGINE: "${AM_GUNICORN_RELOAD_ENGINE}"
-      AM_GUNICORN_WORKERS: "${AM_GUNICORN_WORKERS}"
-      DJANGO_SETTINGS_MODULE: "settings.local"
-      ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_SECRET_KEY: "12345"
-      ARCHIVEMATICA_DASHBOARD_DASHBOARD_DJANGO_ALLOWED_HOSTS: "*"
-      ARCHIVEMATICA_DASHBOARD_DASHBOARD_GEARMAN_SERVER: "gearmand:4730"
-      ARCHIVEMATICA_DASHBOARD_DASHBOARD_ELASTICSEARCH_SERVER: "elasticsearch:9200"
-      ARCHIVEMATICA_DASHBOARD_CLIENT_USER: "archivematica"
-      ARCHIVEMATICA_DASHBOARD_CLIENT_PASSWORD: "demo"
-      ARCHIVEMATICA_DASHBOARD_CLIENT_HOST: "mysql"
-      ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE: "MCP"
-      ARCHIVEMATICA_DASHBOARD_EMAIL_DEFAULT_FROM_EMAIL: "${AM_DEFAULT_FROM_EMAIL}"
-    volumes:
-      - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
-      - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"
-      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
-    expose:
-      - "8000"
-    links:
-      - "mysql"
-      - "gearmand"
-      - "elasticsearch"
-      - "archivematica-storage-service"
 
   archivematica-storage-service:
     build:
       context: "../src/archivematica-storage-service"
-    environment:
-      FORWARDED_ALLOW_IPS: "*"  # Specific to Gunicorn
-      SS_GUNICORN_ACCESSLOG: "${SS_GUNICORN_ACCESSLOG}"
-      SS_GUNICORN_RELOAD: "${SS_GUNICORN_RELOAD}"
-      SS_GUNICORN_RELOAD_ENGINE: "${SS_GUNICORN_RELOAD_ENGINE}"
-      SS_GUNICORN_WORKERS: "${SS_GUNICORN_WORKERS}"
-      SS_PIPELINE_REMOTE_NAME: "http://archivematica-dashboard:8000/"
-      DJANGO_SECRET_KEY: "12345"
-      DJANGO_SETTINGS_MODULE: "storage_service.settings.local"
-      DJANGO_ALLOWED_HOSTS: "*"
-      SS_DB_URL: "mysql://archivematica:demo@mysql/SS"
-    volumes:
-      - "${VOL_BASE}/../src/archivematica-storage-service/:/src/"
-      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
-      - "archivematica_storage_service_staging_data:/var/archivematica/storage_service:rw"
-      - "archivematica_storage_service_location_data:/home:rw"
-    expose:
-      - "8000"
-    links:
-      - "mysql"
 
   rdss-archivematica-channel-adapter-consumer:
     build:
       context: "../src/rdss-archivematica-channel-adapter"
-    entrypoint: "go run main.go consumer"
-    environment:
-      RDSS_ARCHIVEMATICA_ADAPTER_LOGGING.LEVEL: "debug"
-      RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.URL: "http://archivematica-dashboard:8000"
-      RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.USER: "test"
-      RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.KEY: "test"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.ENDPOINT: "https://minio:9000"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.FORCE_PATH_STYLE: "true"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.INSECURE_SKIP_VERIFY: "true"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.ACCESS_KEY: "AKIAIOSFODNN7EXAMPLE"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.SECRET_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.REGION: "eu-west-2"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.MAIN: "main"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.INVALID: "invalid"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.ERROR: "error"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.REPOSITORY.BACKEND: "dynamodb"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.REPOSITORY.DYNAMODB_TLS: "false"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.REPOSITORY.DYNAMODB_ENDPOINT: "http://dynalite:4567"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.REPOSITORY.DYNAMODB_TABLE: "rdss_am_messages"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.BACKEND: "kinesis"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.TLS: "false"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT: "http://minikine:4567"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.TLS_DYNAMODB: "false"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT_DYNAMODB: "http://dynalite:4567"
-      AWS_REGION: "kinalite-does-not-care"
-      AWS_ACCESS_KEY: "kinesis-does-not-care"
-      AWS_SECRET_KEY: "kinesis-does-not-care"
-    links:
-      - "archivematica-dashboard"
-      - "minikine"
-      - "dynalite"
-    volumes:
-      - "${VOL_BASE}/../src/rdss-archivematica-channel-adapter:/go/src/github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
-    ports:
-      - "6060" # See net/http/pprof
 
   rdss-archivematica-channel-adapter-publisher:
     build:
       context: "../src/rdss-archivematica-channel-adapter"
-    entrypoint: "go run main.go publisher"
-    environment:
-      RDSS_ARCHIVEMATICA_ADAPTER_LOGGING.LEVEL: "debug"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.MAIN: "main"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.INVALID: "invalid"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.ERROR: "error"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.BACKEND: "kinesis"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT: "http://minikine:4567"
-      AWS_REGION: "kinalite-does-not-care"
-      AWS_ACCESS_KEY: "kinesis-does-not-care"
-      AWS_SECRET_KEY: "kinesis-does-not-care"
-    links:
-      - "archivematica-dashboard"
-      - "minikine"
-    volumes:
-      - "${VOL_BASE}/../src/rdss-archivematica-channel-adapter:/go/src/github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-    ports:
-      - "6060" # See net/http/pprof
 
   rdss-archivematica-msgcreator:
     build:
       context: "../src/rdss-archivematica-msgcreator"
-    entrypoint: "go run main.go -addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint=http://minikine:4567 -kinesis-stream=main -kinesis-region=eu-west-2 -s3-access-key=AKIAIOSFODNN7EXAMPLE -s3-secret-key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY -s3-region=eu-west-2 -s3-endpoint=https://minio:9000"
-    links:
-      - "minikine"
-    volumes:
-      - "${VOL_BASE}/../src/rdss-archivematica-msgcreator:/go/src/github.com/JiscRDSS/rdss-archivematica-msgcreator"
-    expose:
-      - "8000"

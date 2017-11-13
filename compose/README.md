@@ -50,15 +50,17 @@ For example, to use remote mounts instead of the default locations
 Service Sets
 -------------
 
-There are currently four service sets defined:
+There are currently five service sets defined:
 
-1. [dev](dev), which defines the main Archivematica services and supporting web server, db, etc, suitable for use in a development environment.
-1. [am-shib](am-shib), which wraps the Archivematica services in the [dev](dev) service set in Shibboleth authentication.
+1. [qa](qa), which defines the main Archivematica services and supporting web server, db, etc, suitable for use in a qa environment.
+1. [dev](dev), which extends `qa` to build the images from local files, rather than expecting to pull existing images.
+1. [am-shib](am-shib), which wraps the Archivematica services in the [qa](qa) service set in Shibboleth authentication.
 1. [shib-local](shib-local), which provides a local example Shibboleth IdP with backing LDAP directory.
 1. [nextcloud](nextcloud), which provides a NextCloud instance, tailored for the RDSS platform.
 
 These service sets are defined by the following `docker-compose` configuration files:
 
+1. [docker-compose.qa.yml](docker-compose.qa.yml)
 1. [docker-compose.dev.yml](docker-compose.dev.yml)
 1. [docker-compose.am-shib.yml](docker-compose.am-shib.yml)
 1. [docker-compose.shib-local.yml](docker-compose.shib-local.yml)
@@ -118,13 +120,13 @@ Building
 
 To build all containers required to bring up a development version of Archivematica, use
 
-	make all
+	make all ENV=dev
 
-This will create all the services defined in [docker-compose.dev.yml](docker-compose.dev.yml), which is symlinked by [docker-compose.yml](docker-compose.yml). There is no Shibboleth integration in this usage, so if you're not interested in Shibboleth, use this.
+This will create all the services defined in [docker-compose.qa.yml](docker-compose.qa.yml), which is symlinked by [docker-compose.yml](docker-compose.yml). With `ENV=dev` specified, the docker images will be built by `docker-compose`, rather than expecting the images to exist already. Omitting `ENV=dev` or setting `ENV=qa` will cause the build to fail unless the required images exist (e.g. having been built using the [Ansible playbook](../publish-images-playbook.yml).
 
-To enable Shibboleth integration, use
+There is no Shibboleth integration in this usage. To enable Shibboleth, use this:
 
-	make all SHIBBOLETH_CONFIG=archivematica
+	make all ENV=dev SHIBBOLETH_CONFIG=archivematica
 
 This will include additional services defined in [docker-compose.am-shib.yml](docker-compose.am-shib.yml) in addition to those in [docker-compose.dev.yml](docker-compose.dev.yml).
 
@@ -132,7 +134,7 @@ By default this will include the local example Shibboleth IdP in [docker-compose
 
 To enable Shibboleth integration and NextCloud, use
 
-	make all SHIBBOLETH_CONFIG=archivematica NEXTCLOUD_ENABLED=true
+	make all ENV=dev SHIBBOLETH_CONFIG=archivematica NEXTCLOUD_ENABLED=true
 
 After a successful build of the Shibboleth-enabled Archivematica services and NextCloud service you should find you have the following services listed by `make list`:
 
@@ -195,6 +197,18 @@ Here are some other `make` commands other than `make all` that may be useful whe
 
 Remember to append the `SHIBBOLETH_CONFIG` argument to the above commands if `make all` was run with this set, otherwise the `docker-compose` context won't be resolved properly (this is required for the `watch-idp` command).
 
+Makefile Variables
+-------------------
+
+The following makefile variables are supported by this build, in addition to those described above.
+
+| Variable | Description |
+|---|---|
+| `NEXTCLOUD_ENABLED` | Whether or not to include the NextCloud service in the deployed containers. Default is `false`. Set to `true` to enable. |
+| `SHIBBOLETH_CONFIG` | The Shibboleth profile to use. Currently only `archivematica` is supported. Default is undefined, causing no Shibboleth support to be enabled. |
+| `SHIBBOLETH_IDP` | The shibboleth IdP profile to use. Currently only `local` is supported, which is the default if `SHIBBOLETH_CONFIG` is set. Setting to another value will prevent the local Shibboleth IdP ([shib-local](shib-local)) from being included. |
+
+
 Environment Variables
 ----------------------
 
@@ -203,9 +217,7 @@ The following environment variables are supported by this build.
 | Variable | Description |
 |---|---|
 | `DOMAIN_NAME` | The domain name to use when configuring Shibboleth. |
-| `NEXTCLOUD_ENABLED` | Whether or not to include the NextCloud service in the deployed containers. Default is `false`. Set to `true` to enable. |
-| `SHIBBOLETH_CONFIG` | The Shibboleth profile to use. Currently only `archivematica` is supported. Default is undefined, causing no Shibboleth support to be enabled. |
-| `SHIBBOLETH_IDP` | The shibboleth IdP profile to use. Currently only `local` is supported, which is the default if `SHIBBOLETH_CONFIG` is set. Setting to another value will prevent the local Shibboleth IdP ([shib-local](shib-local)) from being included. |
+| `REGISTRY` | The name and port of the Docker registry to pull our applications' images from. Default is `''`, which means that no Docker registry will be used; all images will be expected to be local. This is mostly for use in QA deployments, where we deploy a Docker registry server on `localhost:5000/`. |
 | `VOL_BASE` | The path to use as the base for specifying volume paths in `docker-compose` configurations. Default is `'.'`, which gets correctly interpreted when build machine is the same as docker host. When deploying to a remote docker host (e.g. via `docker-machine`), this must be set to the path of the equivalent base path on the docker host, e.g. `/home/ubuntu/rdss-archivematica/compose` if using a standard Ubuntu AMI on EC2). |
 
 See also the individual [idp](shib-local/idp), [ldap](shib-local/ldap) and [nginx](am-shib/nginx) services for additional environment variables used by those specific services.
