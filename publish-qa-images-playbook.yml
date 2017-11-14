@@ -17,26 +17,28 @@
 
     projects:
 
+      # Need to check this out to a separate folder to force images to be built
+      # after main images playbook has been executed
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
         version: "v0.2.6"
-        dest: "./src/rdss-archivematica-channel-adapter"
+        dest: "./src/qa/rdss-archivematica-channel-adapter"
         images:
           - name: "{{ registry }}dynalite"
-            path: "./src/rdss-archivematica-channel-adapter/hack/minikine"
+            path: "./src/qa/rdss-archivematica-channel-adapter/hack/minikine"
             dockerfile: "dynalite.Dockerfile"
           - name: "{{ registry }}minikine"
-            path: "./src/rdss-archivematica-channel-adapter/hack/minikine"
+            path: "./src/qa/rdss-archivematica-channel-adapter/hack/minikine"
             dockerfile: "minikine.Dockerfile"
 
       - name: "RDSS Archivematica MsgCreator"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-msgcreator"
         version: "v0.1.0-rc.1"
-        dest: "./src/rdss-archivematica-msgcreator"
+        dest: "./src/qa/rdss-archivematica-msgcreator"
         images:
           - name: "{{ registry }}rdss-archivematica-msgcreator"
             dockerfile: "Dockerfile"
-            path: "./src/rdss-archivematica-msgcreator/"
+            path: "./src/qa/rdss-archivematica-msgcreator/"
 
   tasks:
 
