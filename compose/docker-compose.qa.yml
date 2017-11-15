@@ -326,6 +326,6 @@ services:
     links:
       - "minikine"
     volumes:
-      - "${VOL_BASE}/../src/rdss-archivematica-msgcreator:/go/src/github.com/JiscRDSS/rdss-archivematica-msgcreator"
+      - "${VOL_BASE}/../src/qa/rdss-archivematica-msgcreator:/go/src/github.com/JiscRDSS/rdss-archivematica-msgcreator"
     expose:
       - "8000"
