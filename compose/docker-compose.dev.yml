@@ -52,4 +52,4 @@ services:
 
   rdss-archivematica-msgcreator:
     build:
-      context: "../src/rdss-archivematica-msgcreator"
+      context: "../src/qa/rdss-archivematica-msgcreator"
