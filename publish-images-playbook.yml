@@ -52,7 +52,7 @@
 
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-        version: "v0.2.6"
+        version: "dev/rdss-siegfried-service"
         dest: "./src/rdss-archivematica-channel-adapter"
         images:
           - name: "{{ registry }}rdss-archivematica-channel-adapter"

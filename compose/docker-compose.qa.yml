@@ -291,6 +291,7 @@ services:
       - "archivematica-dashboard"
       - "minikine"
       - "dynalite"
+      - "rdss-siegfried-service"
     volumes:
       - "${VOL_BASE}/../src/rdss-archivematica-channel-adapter:/go/src/github.com/JiscRDSS/rdss-archivematica-channel-adapter"
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
@@ -329,3 +330,10 @@ services:
       - "${VOL_BASE}/../src/qa/rdss-archivematica-msgcreator:/go/src/github.com/JiscRDSS/rdss-archivematica-msgcreator"
     expose:
       - "8000"
+
+  rdss-siegfried-service:
+    image: "artefactual/rdss-siegfried-service-amd64:v0.2.3"
+    expose:
+      - "8080"
+    volumes:
+      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:ro"
