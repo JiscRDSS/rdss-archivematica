@@ -162,9 +162,6 @@ services:
       ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE: "MCP"
       ARCHIVEMATICA_MCPSERVER_MCPSERVER_MCPARCHIVEMATICASERVER: "gearmand:4730"
     volumes:
-      - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
-      - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"
-      - "${VOL_BASE}/../src/archivematica/src/MCPServer/:/src/MCPServer/"
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
     links:
       # TODO Replace this with reference to AWS RDS hosted MySQL for QA
@@ -189,9 +186,6 @@ services:
       ARCHIVEMATICA_MCPCLIENT_MCPCLIENT_CLAMAV_SERVER: "clamavd:3310"
       ARCHIVEMATICA_MCPCLIENT_EMAIL_DEFAULT_FROM_EMAIL: "${AM_DEFAULT_FROM_EMAIL}"
     volumes:
-      - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
-      - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"
-      - "${VOL_BASE}/../src/archivematica/src/MCPClient/:/src/MCPClient/"
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
     links:
       - "fits"
@@ -222,8 +216,6 @@ services:
       ARCHIVEMATICA_DASHBOARD_CLIENT_DATABASE: "MCP"
       ARCHIVEMATICA_DASHBOARD_EMAIL_DEFAULT_FROM_EMAIL: "${AM_DEFAULT_FROM_EMAIL}"
     volumes:
-      - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
-      - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
     expose:
       - "8000"
@@ -249,7 +241,6 @@ services:
       DJANGO_ALLOWED_HOSTS: "*"
       SS_DB_URL: "mysql://archivematica:demo@mysql/SS"
     volumes:
-      - "${VOL_BASE}/../src/archivematica-storage-service/:/src/"
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
       - "archivematica_storage_service_staging_data:/var/archivematica/storage_service:rw"
       - "archivematica_storage_service_location_data:/home:rw"
@@ -262,7 +253,7 @@ services:
   # TODO Change this to use AWS servicesfor QA but still use mock for dev
   rdss-archivematica-channel-adapter-consumer:
     image: '${REGISTRY}rdss-archivematica-channel-adapter:${RDSS_CHANADAPTER_VERSION}'
-    entrypoint: "go run main.go consumer"
+    command: "consumer"
     environment:
       RDSS_ARCHIVEMATICA_ADAPTER_LOGGING.LEVEL: "debug"
       RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.URL: "http://archivematica-dashboard:8000"
@@ -294,7 +285,6 @@ services:
       - "minikine"
       - "dynalite"
     volumes:
-      - "${VOL_BASE}/../src/rdss-archivematica-channel-adapter:/go/src/github.com/JiscRDSS/rdss-archivematica-channel-adapter"
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
     ports:
       - "6060" # See net/http/pprof
@@ -302,7 +292,7 @@ services:
   # TODO Change this to use AWS servicesfor QA but still use mock for dev
   rdss-archivematica-channel-adapter-publisher:
     image: '${REGISTRY}rdss-archivematica-channel-adapter:${RDSS_CHANADAPTER_VERSION}'
-    entrypoint: "go run main.go publisher"
+    command: "publisher"
     environment:
       RDSS_ARCHIVEMATICA_ADAPTER_LOGGING.LEVEL: "debug"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.MAIN: "main"
@@ -316,18 +306,14 @@ services:
     links:
       - "archivematica-dashboard"
       - "minikine"
-    volumes:
-      - "${VOL_BASE}/../src/rdss-archivematica-channel-adapter:/go/src/github.com/JiscRDSS/rdss-archivematica-channel-adapter"
     ports:
       - "6060" # See net/http/pprof
 
   # TODO Change this to use AWS service for QA but still use mock for dev
   rdss-archivematica-msgcreator:
     image: '${REGISTRY}rdss-archivematica-msgcreator:${RDSS_MSGCREATOR_VERSION}'
-    entrypoint: "go run main.go -addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint=http://minikine:4567 -kinesis-stream=main -kinesis-region=eu-west-2 -s3-access-key=AKIAIOSFODNN7EXAMPLE -s3-secret-key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY -s3-region=eu-west-2 -s3-endpoint=https://minio:9000"
+    command: "-addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint=http://minikine:4567 -kinesis-stream=main -kinesis-region=eu-west-2 -s3-access-key=AKIAIOSFODNN7EXAMPLE -s3-secret-key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY -s3-region=eu-west-2 -s3-endpoint=https://minio:9000"
     links:
       - "minikine"
-    volumes:
-      - "${VOL_BASE}/../src/qa/rdss-archivematica-msgcreator:/go/src/github.com/JiscRDSS/rdss-archivematica-msgcreator"
     expose:
       - "8000"
