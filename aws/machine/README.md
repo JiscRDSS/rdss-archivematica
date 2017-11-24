@@ -20,7 +20,7 @@ If you are a Linux user you need to install them [separately](https://docs.docke
 
 However, before attempting any deployment you will need the following:
 
-1. Acess to an AWS account (root or IAM credentials are fine)
+1. Access to an AWS account (root or IAM credentials are fine)
 1. A pre-existing VPC configured in which to deploy to
 1. A pre-existing subnet within the VPC in which to deploy to
 1. Ideally, a pre-existing registered domain that you have DNS management access for.
@@ -78,7 +78,7 @@ Before use, you will need to fill out the [configuration template](etc/deploymen
 
 1. `NFS_INSTANCE_TYPE`: The EC2 instance type to use for the NFS server. Defaults to `t2.nano` so most deployments will want to change this.
 1. `NFS_STORAGE_SIZE`: The size of the EBS volume to provision for use by the NFS server for storage, in GB. Default is `10`, so most deployments will want to change this.
-1. `NFS_STORAGE_VOLUME_TYPE`: Volume type of the EBS volume for use by the NFS server for storage. Defaults to 'st1'.
+1. `NFS_STORAGE_VOLUME_TYPE`: Volume type of the EBS volume for use by the NFS server for storage. Defaults to `gp2`, so if you're using a size larger than 500GB then you should change this to `st1' or 'sc1'.
 
 ### Application Security Parameters
 
