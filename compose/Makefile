@@ -77,6 +77,9 @@ create-volumes:
 	@mkdir -p ${SS_STAGING_DATA}
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(SS_STAGING_DATA) rdss_am-ss-staging-data
+	# Ensure Archivematica dirs are owned by archivematica (333)
+	@chown -R 333:333 ${AM_PIPELINE_DATA} ${SS_LOCATION_DATA} ${SS_STAGING_DATA}
+	@chmod -R a=rwX,+t ${SS_LOCATION_DATA}
 	# Create Arkivum named volumes
 	@mkdir -p ${ARK_STORAGE_DATA}/aipingest
 	@docker volume create --opt type=none --opt o=bind \
