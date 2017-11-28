@@ -19,7 +19,7 @@
 
       - name: "Archivematica (JiscRDSS fork)"
         repo: "https://github.com/JiscRDSS/archivematica"
-        version: "v0.1.1"
+        version: "v0.2.0-rc1"
         dest: "./src/archivematica"
         images:
           - name: "{{ registry }}archivematica-dashboard"
@@ -52,7 +52,7 @@
 
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-        version: "v0.2.6"
+        version: "v0.3.0"
         dest: "./src/rdss-archivematica-channel-adapter"
         images:
           - name: "{{ registry }}rdss-archivematica-channel-adapter"
