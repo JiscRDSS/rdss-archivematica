@@ -2,8 +2,6 @@ ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 ANSIBLE_PLAYBOOK := $(shell command -v ansible-playbook 2> /dev/null)
 
-VERSION = $(shell git describe --tags --always --dirty)
-
 check-ansible-playbook:
 ifndef ANSIBLE_PLAYBOOK
 	$(error "ansible-playbook is not available, please install Ansible.")
@@ -13,21 +11,21 @@ build: build-images
 
 clone: check-ansible-playbook  ## Clone source code repositories.
 	ansible-playbook \
-		--extra-vars="registry=$(REGISTRY) rdss_version=$(VERSION)" \
+		--extra-vars="registry=$(REGISTRY)" \
 		--tags=clone \
 			$(ROOT_DIR)/publish-images-playbook.yml \
 			$(ROOT_DIR)/publish-qa-images-playbook.yml
 
 build-images: check-ansible-playbook  ## Build Docker images.
 	ansible-playbook \
-		--extra-vars="registry=$(REGISTRY) rdss_version=$(VERSION)" \
+		--extra-vars="registry=$(REGISTRY)" \
 		--tags=clone,build \
 			$(ROOT_DIR)/publish-images-playbook.yml \
 			$(ROOT_DIR)/publish-qa-images-playbook.yml
 
 publish: check-ansible-playbook  ## Publish Docker images to a registry.
 	ansible-playbook \
-		--extra-vars="registry=$(REGISTRY) rdss_version=$(VERSION)" \
+		--extra-vars="registry=$(REGISTRY)" \
 			$(ROOT_DIR)/publish-images-playbook.yml \
 			$(ROOT_DIR)/publish-qa-images-playbook.yml
 

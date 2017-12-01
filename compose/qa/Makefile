@@ -6,14 +6,12 @@ DEFAULT_COMPOSE_FILE = $(shell realpath ../docker-compose.qa.yml)
 
 COMPOSE_FILE ?= "${DEFAULT_COMPOSE_FILE}"
 
-VERSION = $(shell git describe --tags --always --dirty)
-
 all: destroy bootstrap
 	docker-compose ps
 
 build:
 	# Specify compose file explicitly, we don't want to build any other container sets
-	VERSION=$(VERSION) COMPOSE_FILE=$(DEFAULT_COMPOSE_FILE) docker-compose build
+	COMPOSE_FILE=$(DEFAULT_COMPOSE_FILE) docker-compose build
 
 bootstrap: build bootstrap-storage-service bootstrap-dashboard  bootstrap-dashboard-frontend restart-mcp-services
 

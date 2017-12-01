@@ -219,10 +219,6 @@ services:
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
     expose:
       - "8000"
-    build:
-      args:
-        ARCHIVEMATICA_VERSION: "${VERSION}"
-        AGENT_CODE: "${VERSION}"
     links:
       # TODO Replace this with reference to AWS RDS hosted MySQL for QA
       - "mysql"
