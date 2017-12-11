@@ -29,6 +29,14 @@ SSH_KEY_PATH=${SSH_KEY_PATH:-~/.ssh/id_rsa_MyAwsKey}
 # numerical to match what Jisc use.
 PROJECT_ID=${PROJECT_ID:-"0000"}
 
+# IAM instance profile to use, needed if using CloudWatch log.
+#For example: IAM_PROFILE=${IAM_PROFILE:-"ec2-CloudWatch"}
+IAM_PROFILE=${IAM_PROFILE:-""}
+
+# Wheter or not to use the CloudWatch Log. If enabled, use a IAM_PROFILE that alloes 
+# to write on CloudWatch.
+CLOUDWATCH_ENABLED=${CLOUDWATCH_ENABLED:-false}
+
 # Environment this deployment is for. Should be one of 'dev', 'uat', or 'prod'.
 ENVIRONMENT=${ENVIRONMENT:-"dev"}
 

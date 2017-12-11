@@ -134,6 +134,10 @@ deploy_dockerhost()
         docker_check_registry && \
         prepare_dockerhost && \
         deploy_containers
+    if [ "${CLOUDWATCH_ENABLED}" == "true" ]; then
+        #Configure Cloudwatch on docker-host
+        docker_machine_configure_cloudwatch
+    fi
     if [ ! -z "${ARKIVUM_ENABLED}" ] ; then
         # Add the Arkivum mount to the docker host
         remote_mount_arkivum "${arkivum_host}"
