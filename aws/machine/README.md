@@ -59,6 +59,8 @@ Before use, you will need to fill out the [configuration template](etc/deploymen
 1. `PROJECT_ID`: The id for this deployment, for example `235`
 1. `ENVIRONMENT`: The environment for the deployment - one of `dev`, `uat` or `prod`
 1. `RDSSARK_VERSION`: The branch of the `rdss-archivematica` project to deploy. This may be a version tag, e.g. `v0.2.0`. Default is `master`.
+1. `IAM_PROFILE`: The IAM instance profile to use, it is needed if using CloudWatch.
+1. `CLOUDWATCH_ENABLED`: Enable the Amazon CloudWatch log. Defaults none.
 
 ### Arkivum Appliance Parameters
 
@@ -99,6 +101,10 @@ If you wish to override some or all configuration options using environment vari
 
 Again, see the [configuration template](etc/deployment.conf.template) for the full list of settings that can be overriden.
 
+## CloudWatch Log configuration
+
+Access to Amazon CloudWatch requires credentials. The easiest way is to create an IAM role that allows it. Follow this link to configure it: [Authentication and Access Control for Amazon CloudWatch](http://docs.aws.amazon.com/AmazonECS/latest/developerguide/using_cloudwatch_logs.html)
+
 ## Connecting to Deployed Services
 
 The deployment script will output the public IP addresses for each of the Arkivum appliance, NFS server and Docker host instances that have been deployed for the configured project id and environment.
@@ -120,6 +126,10 @@ By default the teardown script **will not** remove EBS volumes that are not set 
     PUBLIC_DOMAIN_NAME=mydomain.net DESTROY_VOLUMES=yes PROJECT_ID=1234 ./teardown.sh
 
 **WARNING: ALL DATA FOR THE GIVEN `PROJECT_ID` AND `ENVIRONMENT` WILL BE DESTROYED BY THIS COMMAND!!**
+
+The teardown script **will not** remove the CloudWatch log group by default either. To override this, use the `DESTROY_CLOUDWATCH_LOG` environment variable:
+
+    PUBLIC_DOMAIN_NAME=mydomain.net DESTROY_VOLUMES=yes  PROJECT_ID=1234 ./teardown.sh
 
 # Known Issues / TODO
 

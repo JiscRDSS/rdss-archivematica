@@ -12,6 +12,9 @@
 # To also remove the EBS storage used by the NFS server (removing ALL data!)
 #    DESTROY_VOLUMES=yes PROJECT_ID=1234 ./teardown.sh
 #
+# To also remove the CloudWatch log group
+#    DESTROY_VOLUMES=yes DESTROY_CLOUDWATCH_LOG=yes PROJECT_ID=1234 ./teardown.sh
+
 
 # shellcheck disable=SC2034
 PROGNAME="$(basename "${BASH_SOURCE[0]}" | cut -d. -f1)"
@@ -157,6 +160,11 @@ main()
     fi
     # Tear down the hosted zones
     teardown_hosted_zones
+    # Remove CloudWatch log-group if DESTROY_CLOUDWATCH_LOG is enabled
+    if [ ! -z "${DESTROY_CLOUDWATCH_LOG}" ] ; then
+        log_alert "DESTROY_CLOUDWATCH IS SET - LOG GROUP WILL BE DESTROYED!!!"
+        aws logs delete-log-group --log-group-name "${PROJECT_ID}-${ENVIRONMENT}"
+    fi
     log_info "<<<<<< TEAR DOWN COMPLETE <<<<<"
     log_info "Done."
 }

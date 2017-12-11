@@ -91,6 +91,7 @@ aws_ec2_create_instance()
                 --security-group-ids "${sg_id}" \
                 --subnet-id "${subnet_id}" \
                 --associate-public-ip-address \
+                --iam-instance-profile Name="${IAM_PROFILE}" \
                 --query 'Instances[0].InstanceId' \
                 --output text)"
         else
@@ -104,6 +105,7 @@ aws_ec2_create_instance()
                 --subnet-id "${subnet_id}" \
                 --user-data "${user_data}" \
                 --associate-public-ip-address \
+                --iam-instance-profile Name="${IAM_PROFILE}" \
                 --query 'Instances[0].InstanceId' \
                 --output text)"
         fi
@@ -140,7 +142,12 @@ aws_ec2_create_instance()
             done
         # Add a new private host entry for the instance
         local -r priv_ip="$(aws_ec2_get_private_ip_for_instance_name "${name}")"
+        local -r pub_ip="$(aws_ec2_get_public_ip_for_instance_name "${name}")"
         aws_r53_add_host "${PRIVATE_HOSTED_ZONE}" "${hostname}" "${priv_ip}"
+    fi
+    if [ "${CLOUDWATCH_ENABLED}" == "true" ]; then    
+        log_info "Configuring CloudWatch on '${name}' ..."
+        local -r cloudwatch_output="$(aws_configure_cloudwatch ${pub_ip} ${name})"
     fi
     # Output the instance id for callers to pick up
     echo "${instance_id}"
@@ -910,6 +917,38 @@ aws_vpc_get_subnet()
         --output text
 }
 
+#Configure System log on the CloudWatch if enabled.
+aws_configure_cloudwatch()
+{
+    local -r pub_ip="$1"
+    local -r instance_name="$2"
+    local -r ssh_check="ssh -o ConnectTimeout=1 -o StrictHostKeyChecking=no -o BatchMode=yes"
+    local -r ssh_connect="ssh -t -i ${SSH_KEY_PATH} ec2-user@${pub_ip}"
+    local -r awslog_conf_path="/etc/awslogs/awslogs.conf"
+    local -r awscli_conf_path="/etc/awslogs/awscli.conf"
+    local -r log_group_name="${PROJECT_ID}-${ENVIRONMENT}"
+    # Probe SSH connection until it's avalable 
+    X_READY=''
+    while [ ! $X_READY ]; do
+       sleep 10
+       set +e
+       OUT=$(${ssh_check} ec2-user@${pub_ip} 2>&1 | grep 'Permission denied' )
+       [[ $? = 0 ]] && X_READY='ready'
+       set -e
+    done 
+    sleep 10
+    ${ssh_check} ec2-user@${pub_ip} 2>&1 | grep 'Permission denied'
+    scp -i "${SSH_KEY_PATH}" etc/awscli.conf.aws ec2-user@"${pub_ip}":/tmp/awscli.conf
+    scp -i "${SSH_KEY_PATH}" etc/awslogs.conf.aws ec2-user@"${pub_ip}":/tmp/awslogs.conf
+    ${ssh_connect} \
+    "sudo yum install -y awslogs && \
+    sudo mv /tmp/aws*.conf /etc/awslogs/ && \
+    sudo sed -i 's/hostname_template/${instance_name}/g' ${awslog_conf_path} && \
+    sudo sed -i 's/log_group_template/"${log_group_name}"/g' ${awslog_conf_path} && \
+    sudo sed -i 's/region_template/"${AWS_REGION}"/g' ${awscli_conf_path} && \
+    sudo chkconfig awslogs on && \
+    sudo service awslogs restart"
+}
 _LIB_AWS_SH="LOADED"
 log_debug "Loaded lib-aws"
 fi # END

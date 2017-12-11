@@ -106,18 +106,39 @@ docker_machine_provision()
             ;;
         "NotExist")
             # Provision new EC2 instance to run docker
-            docker-machine create \
-                --driver amazonec2 \
-                --amazonec2-region "${AWS_REGION}" \
-                --amazonec2-instance-type "${DOCKERHOST_INSTANCE_TYPE}" \
-                --amazonec2-root-size "${DOCKERHOST_ROOT_SIZE:-16}" \
-                --amazonec2-security-group "${DOCKERHOST_INSTANCE}" \
-                --amazonec2-ssh-keypath "${SSH_KEY_PATH}" \
-                --amazonec2-tags \
-                     "Name,${DOCKERHOST_INSTANCE},Environment,${ENVIRONMENT},ProjectId,${PROJECT_ID}" \
-                --amazonec2-vpc-id "${VPC_ID}" \
-                --engine-storage-driver overlay2 \
+	    if [ "${CLOUDWATCH_ENABLED}" == "true" ] ; then
+                docker-machine create \
+                    --driver amazonec2 \
+                    --amazonec2-region "${AWS_REGION}" \
+                    --amazonec2-instance-type "${DOCKERHOST_INSTANCE_TYPE}" \
+                    --amazonec2-iam-instance-profile "${IAM_PROFILE}" \
+                    --amazonec2-root-size "${DOCKERHOST_ROOT_SIZE:-16}" \
+                    --amazonec2-security-group "${DOCKERHOST_INSTANCE}" \
+                    --amazonec2-ssh-keypath "${SSH_KEY_PATH}" \
+                    --amazonec2-tags \
+                        "Name,${DOCKERHOST_INSTANCE},Environment,${ENVIRONMENT},ProjectId,${PROJECT_ID}" \
+                    --amazonec2-vpc-id "${VPC_ID}" \
+                    --engine-opt log-driver=awslogs \
+                    --engine-opt log-opt="awslogs-region=${AWS_REGION}" \
+                    --engine-opt log-opt="awslogs-group=${PROJECT_ID}-${ENVIRONMENT}" \
+                    --engine-opt log-opt="awslogs-create-group=true" \
+                    --engine-opt log-opt="tag='{{.Name}}'" \
+		"${DOCKERHOST_INSTANCE}" && docker_machine_wait_for_status "Starting"
+            else
+	        docker-machine create \
+                    --driver amazonec2 \
+                    --amazonec2-region "${AWS_REGION}" \
+                    --amazonec2-instance-type "${DOCKERHOST_INSTANCE_TYPE}" \
+                    --amazonec2-iam-instance-profile "${IAM_PROFILE}" \
+                    --amazonec2-root-size "${DOCKERHOST_ROOT_SIZE:-16}" \
+                    --amazonec2-security-group "${DOCKERHOST_INSTANCE}" \
+                    --amazonec2-ssh-keypath "${SSH_KEY_PATH}" \
+                    --amazonec2-tags \
+                        "Name,${DOCKERHOST_INSTANCE},Environment,${ENVIRONMENT},ProjectId,${PROJECT_ID}" \
+                    --amazonec2-vpc-id "${VPC_ID}" \
+                    --engine-storage-driver overlay2 \
                 "${DOCKERHOST_INSTANCE}" && docker_machine_wait_for_status "Starting"
+            fi
             instance_id="$(aws_ec2_get_id_for_instance_name "${DOCKERHOST_INSTANCE}")"
             log_debug "Dockerhost '${DOCKERHOST_INSTANCE}' has instance id '${instance_id}'"
             # If we got an instance id (or ids) then iterate through them to confirm
@@ -316,6 +337,20 @@ docker_machine_wait_for_status()
     echo "${status}"
 }
 
+#Configure System log on the CloudWatch if enabled.
+docker_machine_configure_cloudwatch()
+{
+    local -r tmp_awslog_conf="/tmp/awslogs.conf.docker-host"
+    docker-machine scp etc/awslogs.conf.docker-host \
+       "${DOCKERHOST_INSTANCE}":/tmp/awslogs.conf.docker-host
+    sleep 10   
+    docker-machine ssh "${DOCKERHOST_INSTANCE}" \
+       "curl https://s3.amazonaws.com/aws-cloudwatch/downloads/latest/awslogs-agent-setup.py -O && \
+       sudo sed -i 's/log_group_template/${PROJECT_ID}-${ENVIRONMENT}/g' ${tmp_awslog_conf} && \
+       sudo python ./awslogs-agent-setup.py -n -r ${AWS_REGION} -c ${tmp_awslog_conf} && \
+       sudo service awslogs restart && \
+       sudo update-rc.d awslogs defaults"
+}
 
 _LIB_DOCKER_SH="LOADED"
 log_debug "Loaded lib-docker"
