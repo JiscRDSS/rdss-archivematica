@@ -46,12 +46,6 @@ bootstrap-storage-service:
 					--email="test@test.com" \
 					--api-key="test" \
 					--superuser
-	# Create RDSS storage locations
-	docker-compose exec archivematica-storage-service \
-		python /rdss/create-storage-locations.py \
-			--base-url http://localhost:8000 \
-			--api-user test \
-			--api-key test
 
 bootstrap-dashboard:
 	# Wait for MySQL to be ready
@@ -85,6 +79,12 @@ bootstrap-dashboard:
 					--ss-url="http://archivematica-storage-service:8000" \
 					--ss-user="test" \
 					--ss-api-key="test"
+	# Create RDSS storage locations
+	docker-compose exec archivematica-storage-service \
+		python /rdss/create-storage-locations.py \
+			--base-url http://localhost:8000 \
+			--api-user test \
+			--api-key test
 
 bootstrap-dashboard-frontend:
 	docker-compose run --rm --no-deps \

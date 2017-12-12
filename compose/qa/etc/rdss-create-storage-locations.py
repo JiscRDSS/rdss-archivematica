@@ -94,7 +94,7 @@ if not automated_exists or not interactive_exists:
 
     # Get the URI of the space. In RDSS we only have one.
     space_uri = requests.get(
-            '%s/api/v2/space/' % args.base_uri,
+            '%s/api/v2/space/' % args.base_url,
             headers={
                 'Authorization': 'ApiKey %s:%s' % (
                     args.api_user,
