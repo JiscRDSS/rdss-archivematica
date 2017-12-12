@@ -12,7 +12,7 @@ BASE_DIR ?= ${CURDIR}
 AM_AUTOTOOLS_DATA ?= /tmp/rdss/am-autotools-data
 AM_PIPELINE_DATA ?= /tmp/rdss/am-pipeline-data
 ARK_STORAGE_DATA ?= /tmp/rdss/arkivum-storage
-ELASTICASEARCH_DATA ?= /tmp/rdss/elasticsearch-data
+ELASTICSEARCH_DATA ?= /tmp/rdss/elasticsearch-data
 JISC_TEST_DATA ?= /tmp/rdss/jisc-test-data
 MINIO_EXPORT_DATA ?= /tmp/rdss/minio-export-data
 MYSQL_DATA ?= /tmp/rdss/mysql-data
@@ -48,6 +48,10 @@ ifeq ("$(ENV)", "dev")
 endif
 export COMPOSE_FILE
 
+# What version are we building?
+VERSION ?= $(shell git describe --tags --always --dirty)
+export VERSION
+
 all: destroy build create-secrets up bootstrap list
 
 bootstrap create-secrets:
@@ -64,45 +68,46 @@ check-vars:
 	@echo "SHIBBOLETH_IDP = '$(SHIBBOLETH_IDP)'"
 	@echo "COMPOSE_DIRS = '$(COMPOSE_DIRS)'"
 	@echo "COMPOSE_FILE = '$(COMPOSE_FILE)'"
+	@echo "VERSION = '$(VERSION)'"
 
 config:
 	docker-compose config
 
 create-volumes:
 	# Create Archivematica named volumes
-	@mkdir -p ${AM_AUTOTOOLS_DATA}
+	@mkdir -p $(AM_AUTOTOOLS_DATA)
 	@docker volume create --opt type=none --opt o=bind \
-                --opt device=$(AM_AUTOTOOLS_DATA) rdss_am-autotools-data
+		--opt device=$(AM_AUTOTOOLS_DATA) rdss_am-autotools-data
 	@mkdir -p ${AM_PIPELINE_DATA}
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(AM_PIPELINE_DATA) rdss_am-pipeline-data
 	@mkdir -p ${SS_LOCATION_DATA}/automated ${SS_LOCATION_DATA}/interactive
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(SS_LOCATION_DATA) rdss_am-ss-location-data
-	@mkdir -p ${SS_STAGING_DATA}
+	@mkdir -p $(SS_STAGING_DATA)
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(SS_STAGING_DATA) rdss_am-ss-staging-data
 	# Ensure Archivematica dirs are owned by archivematica (333)
-	@chown -R 333:333 ${AM_PIPELINE_DATA} ${SS_LOCATION_DATA} ${SS_STAGING_DATA}
-	@chmod -R a=rwX,+t ${SS_LOCATION_DATA}
+	@chown -R 333:333 $(AM_PIPELINE_DATA) $(SS_LOCATION_DATA) $(SS_STAGING_DATA)
+	@chmod -R a=rwX,+t $(SS_LOCATION_DATA)
 	# Create Arkivum named volumes
-	@mkdir -p ${ARK_STORAGE_DATA}/aipingest
+	@mkdir -p $(ARK_STORAGE_DATA)/aipingest
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(ARK_STORAGE_DATA) rdss_arkivum-storage
 	# Create ElasticSearch named volume
-	@mkdir -p ${ELASTICSEARCH_DATA}
+	@mkdir -p $(ELASTICSEARCH_DATA)
 	@docker volume create --opt type=none --opt o=bind \
-                --opt device=$(ELASTICSEARCH_DATA) rdss_elasticsearch-data
+		--opt device=$(ELASTICSEARCH_DATA) rdss_elasticsearch-data
 	# Create Jisc named volumes
-	@mkdir -p ${JISC_TEST_DATA}
+	@mkdir -p $(JISC_TEST_DATA)
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(JISC_TEST_DATA) rdss_jisc-test-research-data
 	# Create MINIO named volume
-	@mkdir -p ${MINIO_EXPORT_DATA}
+	@mkdir -p $(MINIO_EXPORT_DATA)
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(MINIO_EXPORT_DATA) rdss_minio_export_data
 	# Create MySQL named volume
-	@mkdir -p ${MYSQL_DATA}
+	@mkdir -p $(MYSQL_DATA)
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(MYSQL_DATA) rdss_mysql_data
 

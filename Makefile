@@ -2,7 +2,7 @@ ROOT_DIR := $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST))))
 
 ANSIBLE_PLAYBOOK := $(shell command -v ansible-playbook 2> /dev/null)
 
-VERSION = $(shell git describe --tags --always --dirty)
+VERSION ?= $(shell git describe --tags --always --dirty)
 
 check-ansible-playbook:
 ifndef ANSIBLE_PLAYBOOK
