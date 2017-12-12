@@ -15,3 +15,13 @@ ${JRE_HOME}/bin/keytool -import -noprompt -trustcacerts -alias ${DOMAIN_NAME} \
 	-file /secrets/${DOMAIN_NAME}-ca.crt \
 	-keystore  ${JRE_HOME}/lib/security/cacerts \
 	-storepass changeit
+
+# Wait for all metadata providers to be available
+for m in $(grep metadataURL /opt/shibboleth-idp/conf/metadata-providers.xml | \
+	sed -r 's/.+="([^"]+).*/\1/') ; do
+	until curl -s -k "${m}" >/dev/null ; do
+		echo "Waiting for ${m} to become available..."
+		sleep 8
+	done
+	echo "Metadata available: ${m}"
+done
