@@ -28,6 +28,8 @@ To allow Archivematica and NextCloud to interact and share data with other syste
 | `rdss_nextcloud-data` | Used to store data and state for NextCloud. |
 | `rdss_nextcloud-themes` | Used to store "themes" for NextCloud. |
 
+### Creating External Volumes
+
 To create volumes for directories on the local machine use
 
 	sudo make create-volumes
@@ -64,6 +66,16 @@ For example, to use remote mounts instead of the default locations
 		NEXTCLOUD_THEMES=/mnt/nfs/nextcloud-themes \
 		SS_LOCATION_DATA=/mnt/nfs/am-ss-default-location-data \
 		SS_STAGING_DATA=/mnt/nfs/am-ss-staging-data
+
+### Destroying External Volumes
+
+After the containers have been torn down using `make destroy`, the external volumes will, by default, remain in place, both as Docker volumes and also in terms of the files remaining intact within the defined locations.
+
+If you wish to destroy the Docker volumes and the data within each of the locations, use the following:
+
+	sudo make destroy-volumes
+
+This must be used with caution, which is why you will be prompted to confirm you really wish to carry out the action. Saying "yes" will remove all traces of your data - so is only suitable for development and test environments or if you **really know what you are doing**!
 
 Service Sets
 -------------
