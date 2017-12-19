@@ -13,6 +13,7 @@ all: destroy bootstrap
 	docker-compose ps
 
 build:
+	# Specify compose file explicitly, we don't want to build any other container sets
 	COMPOSE_FILE=$(DEFAULT_COMPOSE_FILE) docker-compose build
 
 bootstrap: build bootstrap-storage-service bootstrap-dashboard bootstrap-dashboard-frontend restart-mcp-services
@@ -24,10 +25,9 @@ bootstrap-storage-service:
 			echo "Waiting for mysql to be ready..." ; \
 			sleep 8 ; \
 	done
-	# Create Storage Service database (wiping existing) and grant default access
+	# Create Storage Service database if required and grant default access
 	docker-compose exec mysql mysql -hlocalhost -uroot -p12345 -e "\
-		DROP DATABASE IF EXISTS SS; \
-		CREATE DATABASE SS; \
+		CREATE DATABASE IF NOT EXISTS SS; \
 		GRANT ALL ON SS.* TO 'archivematica'@'%' IDENTIFIED BY 'demo';"
 	# Run Storage Service database migrations
 	docker-compose run \
@@ -54,10 +54,9 @@ bootstrap-dashboard:
 			echo "Waiting for mysql to be ready..." ; \
 			sleep 8 ; \
 	done
-	# Create Dashboard database (wiping existing) and grant default access
+	# Create Dashboard database if required and grant default access
 	docker-compose exec mysql mysql -hlocalhost -uroot -p12345 -e "\
-		DROP DATABASE IF EXISTS MCP; \
-		CREATE DATABASE MCP; \
+		CREATE DATABASE IF NOT EXISTS MCP; \
 		GRANT ALL ON MCP.* TO 'archivematica'@'%' IDENTIFIED BY 'demo';"
 	# Run Dashboard database migrations
 	docker-compose run \
@@ -65,12 +64,13 @@ bootstrap-dashboard:
 		--entrypoint /src/dashboard/src/manage.py \
 			archivematica-dashboard \
 				migrate --noinput
-	# Add initial Dashboard user account
+	# Set agent code in Dashboard
 	docker-compose run \
 		--rm \
 		--entrypoint /src/dashboard/src/manage.py \
 			archivematica-dashboard \
 				set_agent_code --agent-code=$(VERSION)
+	# Add initial Dashboard user account
 	docker-compose run \
 		--rm \
 		--entrypoint /src/dashboard/src/manage.py \
