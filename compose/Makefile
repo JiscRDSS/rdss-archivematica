@@ -119,6 +119,48 @@ create-volumes:
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(NEXTCLOUD_THEMES) rdss_nextcloud-themes
 
+destroy-volumes:
+	@echo -n "WARNING! About to delete all data on all volumes! Continue? [yes/no]: " ; \
+	read yn ; \
+	case "$${yn}" in \
+		[Yy][Ee][Ss] ) \
+			docker volume rm \
+				rdss_am-autotools-data \
+				rdss_am-pipeline-data \
+				rdss_am-ss-location-data \
+				rdss_am-ss-staging-data \
+				rdss_arkivum-storage \
+				rdss_elasticsearch-data \
+				rdss_jisc-test-research-data \
+				rdss_minio_export_data \
+				rdss_mysql_data \
+				rdss_nextcloud-data \
+				rdss_nextcloud-themes && \
+				echo "Removed all Docker volumes. " ; \
+			if docker volume list | grep rdss_ >/dev/null ; then \
+				echo "Cannot remove files: docker volumes still in use." ; \
+				exit ;\
+			else \
+				rm -vRf \
+					$(AM_AUTOTOOLS_DATA) \
+					$(AM_PIPELINE_DATA) \
+					$(ARK_STORAGE_DATA) \
+					$(ELASTICSEARCH_DATA) \
+					$(MINIO_EXPORT_DATA) \
+					$(MYSQL_DATA) \
+					$(NEXTCLOUD_DATA) \
+					$(NEXTCLOUD_THEMES) \
+					$(SS_LOCATION_DATA) \
+					$(SS_STAGING_DATA) && \
+				echo "Removed all files." ; \
+			fi ; \
+			;; \
+		[Nn][Oo] ) \
+			;; \
+		*) \
+			echo "Invalid answer, must be 'yes' or 'no'." ;; \
+	esac ; \
+
 list:
 	docker-compose ps
 
