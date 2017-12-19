@@ -2,13 +2,6 @@ version: '2'
 
 volumes:
 
-  # Named volumes for NextCloud persistence
-  nextcloud_apps:
-  nextcloud_config:
-  nextcloud_data:
-  nextcloud_sessions:
-  nextcloud_themes:
-
   # Named external volumes for NextCloud external storage locations for RDSS
   archivematica_pipeline_data:
     external:
@@ -25,6 +18,12 @@ volumes:
   mysql_data:
     external:
       name: "rdss_mysql_data"
+  nextcloud_data:
+    external:
+      name: "rdss_nextcloud-data"
+  nextcloud_themes:
+    external:
+      name: "rdss_nextcloud-themes"
 
 services:
 
@@ -43,6 +42,18 @@ services:
       - "mysql_data:/var/lib/mysql"
     expose:
       - "3306"
+
+  # This is a duplicate definition of the `redis` service from the qa compose
+  # config. We could just use that, however that requires us to depend on the
+  # qa config, which isn't right in all circumstances. Therefore we repeat the
+  # definition, and if the qa config is also included then only one instance
+  # will be created.
+  redis:
+      image: "redis:3.2-alpine"
+      command: '--save "" --appendonly no'  # Persistency disabled
+      user: "redis"
+      expose:
+        - "6379"
 
   nextcloud:
     image: "arkivum/rdss-nextcloud"
@@ -69,11 +80,8 @@ services:
         s3-jisc-test-research:/mnt/jisc-test-research-data"
     volumes:
       # Nextcloud app volumes
-      - "nextcloud_apps:/apps2"
-      - "nextcloud_config:/config"
-      - "nextcloud_data:/data"
+      - "nextcloud_data:/var/lib/nextcloud"
       - "nextcloud_themes:/nextcloud/themes"
-      - "nextcloud_sessions:/php/session"
       # External storage locations
       - "archivematica_pipeline_data:/mnt/am-pipeline-data"
       - "archivematica_storage_service_location_data:/mnt/am-ss-default-location-data"
@@ -83,5 +91,7 @@ services:
       - "${NEXTCLOUD_EXTERNAL_IP}:${NEXTCLOUD_EXTERNAL_PORT}:8888"
     depends_on:
       - "mysql"
+      - "redis"
     links:
       - "mysql"
+      - "redis"

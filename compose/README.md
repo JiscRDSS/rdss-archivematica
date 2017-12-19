@@ -18,34 +18,52 @@ To allow Archivematica and NextCloud to interact and share data with other syste
 
 | Volume | Description |
 |---|---|
+| `rdss_am-autotools_data` | Used to store data and state for the Automation Tools. |
 | `rdss_am-pipeline_data` | Used to store data shared across Archivematica components. Also used by external systems to input data to Archivematica, and to retrieve outputs from Archivematica (`www/AIPsStore` and `www/DIPsStore`). |
 | `rdss_am-ss-location-data` | Used to provide data storage for the Storage Service. Making this external allows other systems to input data into Archivematica. |
+| `rdss_am-ss-staging-data` | Used to provide data storage for the Storage Service. |
 | `rdss_arkivum-storage` | Used to access storage on an Arkivum appliance (if available). |
 | `rdss_jisc-test-research-data` | Used to access the Jisc RDSS S3 bucket for test research data. |
 | `rdss_minio_export_data` | Expose the `/export` folder that Minio uses to store its data |
+| `rdss_nextcloud-data` | Used to store data and state for NextCloud. |
+| `rdss_nextcloud-themes` | Used to store "themes" for NextCloud. |
 
 To create volumes for directories on the local machine use
 
-	make create-volumes
+	sudo make create-volumes
+
+The reason for using `sudo` is because some of the volume directories may need their permissions changed, so that they are owned by the `333` user that Archivematica uses for its data.
 
 The parameters for the volumes created are as follows, and may be overridden via Makefile arguments:
 
 | Parameter | Description | Default |
 |---|---|---|
-| `AM_PIPELINE_DATA` | The path on the docker host to use for Archivematica's `sharedDirectory` pipeline data. | `/tmp/rdss/am-pipeline-data`
-| `ARK_STORAGE_DATA` | The path on the docker host to use for Arkivum appliance storage. | `/tmp/rdss/arkivum-storage` |
-| `JISC_TEST_DATA` | The path on the docker host to use for accessing the Jisc RDSS S3 bucket for test research data. | `/tmp/rdss/jisc-test-data` |
-| `MINIO_EXPORT_DATA` | The path on the docker host to use for Minio's `/export` folder | `/tmp/rdss/minio-export-data` |
-| `SS_LOCATION_DATA` | The path on the docker host to use for Archivematica's default location in the Storage Service. | `/tmp/rdss/am-ss-location-data` |
+| `AM_AUTOTOOLS_DATA` | Path on the docker host to use for Automation Tools data and state. | `/tmp/rdss/am-autotools-data` |
+| `AM_PIPELINE_DATA` | Path on the docker host to use for Archivematica's `sharedDirectory` pipeline data. | `/tmp/rdss/am-pipeline-data` |
+| `ARK_STORAGE_DATA` | Path on the docker host to use for Arkivum appliance storage. | `/tmp/rdss/arkivum-storage` |
+| `ELASTICSEARCH_DATA` | Path on the docker host to use for ElasticSearch data. | `/tmp/rdss/elasticsearch-data` |
+| `JISC_TEST_DATA` | Path on the docker host to use for accessing the Jisc RDSS S3 bucket for test research data. | `/tmp/rdss/jisc-test-data` |
+| `MINIO_EXPORT_DATA` | Path on the docker host to use for Minio's `/export` folder | `/tmp/rdss/minio-export-data` |
+| `MYSQL_DATA` | Path on the docker host to use for MySQL data. | `/tmp/rdss/mysql-data` |
+| `NEXTCLOUD_DATA` | Path on the docker host to use use for NextCloud data and state. | `/tmp/rdss/nextcloud-data` |
+| `NEXTCLOUD_THEMES` | Path on the docker host to use for NextCloud "theme" data. | `/tmp/rdss/nextcloud-themes` |
+| `SS_LOCATION_DATA` | Path on the docker host to use for Archivematica's default location in the Storage Service. | `/tmp/rdss/am-ss-location-data` |
+| `SS_STAGING_DATA` | Path on the docker host to use for Storage Service staging data. | `/tmp/rdss/am-ss-staging-data` |
 
 For example, to use remote mounts instead of the default locations
 
-	make create-volumes \
+	sudo make create-volumes \
+		AM_AUTOTOOLS_DATA=/mnt/nfs/am-autotools-data \
 		AM_PIPELINE_DATA=/mnt/nfs/am-pipeline-data \
 		ARK_STORAGE_DATA=/mnt/astor \
+		ELASTICSEARCH_DATA=/mnt/nfs/elasticsearch-data \
 		JISC_TEST_DATA=/mnt/s3/jisc-rdss-test-research-data \
-    MINIO_EXPORT_DATA=/mnt/nfs/minio-export-data \
-		SS_LOCATION_DATA=/mnt/nfs/am-ss-default-location-data
+		MINIO_EXPORT_DATA=/mnt/nfs/minio-export-data \
+		MYSQL_DATA=/mnt/nfs/mysql-data \
+		NEXTCLOUD_DATA=/mnt/nfs/nextcloud-data \
+		NEXTCLOUD_THEMES=/mnt/nfs/nextcloud-themes \
+		SS_LOCATION_DATA=/mnt/nfs/am-ss-default-location-data \
+		SS_STAGING_DATA=/mnt/nfs/am-ss-staging-data
 
 Service Sets
 -------------

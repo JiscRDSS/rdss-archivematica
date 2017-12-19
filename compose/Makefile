@@ -16,6 +16,8 @@ ELASTICSEARCH_DATA ?= /tmp/rdss/elasticsearch-data
 JISC_TEST_DATA ?= /tmp/rdss/jisc-test-data
 MINIO_EXPORT_DATA ?= /tmp/rdss/minio-export-data
 MYSQL_DATA ?= /tmp/rdss/mysql-data
+NEXTCLOUD_DATA ?= /tmp/rdss/nextcloud-data
+NEXTCLOUD_THEMES ?= /tmp/rdss/nextcloud-themes
 SS_LOCATION_DATA ?= /tmp/rdss/am-ss-location-data
 SS_STAGING_DATA ?= /tmp/rdss/am-ss-staging-data
 
@@ -110,6 +112,12 @@ create-volumes:
 	@mkdir -p $(MYSQL_DATA)
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(MYSQL_DATA) rdss_mysql_data
+	# Create NextCloud named volumes
+	@mkdir -p $(NEXTCLOUD_DATA) $(NEXTCLOUD_THEMES)
+	@docker volume create --opt type=none --opt o=bind \
+		--opt device=$(NEXTCLOUD_DATA) rdss_nextcloud-data
+	@docker volume create --opt type=none --opt o=bind \
+		--opt device=$(NEXTCLOUD_THEMES) rdss_nextcloud-themes
 
 list:
 	docker-compose ps
