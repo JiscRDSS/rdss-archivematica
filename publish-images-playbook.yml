@@ -19,7 +19,7 @@
 
       - name: "Archivematica (JiscRDSS fork)"
         repo: "https://github.com/JiscRDSS/archivematica"
-        version: "v0.3.0"
+        version: "v0.4.0"
         dest: "./src/archivematica"
         images:
           - name: "{{ registry }}archivematica-dashboard"
