@@ -75,11 +75,15 @@ deploy_containers() {
     docker-machine ssh "${DOCKERHOST_INSTANCE}" \
         "cd ~/src/rdss-archivematica/compose && \
         sudo make create-volumes \
+            AM_AUTOTOOLS_DATA=/mnt/am-autotools-data \
             AM_PIPELINE_DATA=/mnt/nfs/am-pipeline-data \
             ARK_STORAGE_DATA=/mnt/astor \
+            ELASTICSEARCH_DATA=/mnt/elasticsearch-data \
             JISC_TEST_DATA=/mnt/s3/jisc-rdss-test-research-data \
             MINIO_EXPORT_DATA=/mnt/nfs/minio-export-data \
             MYSQL_DATA=/mnt/mysql-data \
+            NEXTCLOUD_DATA=/mnt/nfs/nextcloud-data \
+            NEXTCLOUD_THEMES=/mnt/nfs/nextcloud-themes \
             SS_LOCATION_DATA=/mnt/nfs/am-ss-default-location-data \
             SS_STAGING_DATA=/mnt/nfs/am-ss-staging-data"
     # Use docker machine to run make to deploy the containers
