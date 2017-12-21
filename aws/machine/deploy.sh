@@ -300,7 +300,7 @@ prepare_dockerhost()
             git clone --branch '${RDSSARK_VERSION}' \
                 ${RDSS_ARCHIVEMATICA_REPO} ${clone_dir} && \
             ansible-playbook  \
-                --extra-vars='registry=localhost:5000/' \
+                --extra-vars='registry=localhost:5000/ rdss_version=${RDSSARK_VERSION}' \
                 ${clone_dir}/publish-images-playbook.yml \
                 ${clone_dir}/publish-qa-images-playbook.yml"
 }
