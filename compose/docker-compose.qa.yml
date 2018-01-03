@@ -67,6 +67,9 @@ services:
   elasticsearch:
     image: "elasticsearch:1.7-alpine"
     command: "elasticsearch -Des.node.name=TestNode -Des.network.host=0.0.0.0"
+    environment:
+      - "ES_MIN_MEM=${ES_HEAP_SIZE}"
+      - "ES_MAX_MEM=${ES_HEAP_SIZE}"
     privileged: yes
     volumes:
       - "elasticsearch_data:/usr/share/elasticsearch/data"
