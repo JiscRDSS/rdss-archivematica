@@ -21,7 +21,7 @@
       # after main images playbook has been executed
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-        version: "v0.3.0"
+        version: "v0.4.0"
         dest: "./src/qa/rdss-archivematica-channel-adapter"
         images:
           - name: "{{ registry }}dynalite"
