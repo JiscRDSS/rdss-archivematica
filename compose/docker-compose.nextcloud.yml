@@ -56,7 +56,7 @@ services:
         - "6379"
 
   nextcloud:
-    image: "arkivum/rdss-nextcloud"
+    image: "nextcloud"
     build:
       context: "../src/rdss-arkivum-nextcloud/"
     hostname: "nextcloud"
