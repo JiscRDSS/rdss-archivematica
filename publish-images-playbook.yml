@@ -61,7 +61,7 @@
 
       - name: "RDSS Arkivum NextCloud"
         repo: "https://github.com/JiscRDSS/rdss-arkivum-nextcloud"
-        version: "v0.2.4"
+        version: "v0.2.5"
         dest: "./src/rdss-arkivum-nextcloud"
         make_target: "build-files-move-app"
         images:
