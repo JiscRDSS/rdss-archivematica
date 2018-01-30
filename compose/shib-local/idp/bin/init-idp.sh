@@ -1,13 +1,14 @@
 #!/bin/bash
 
-DOMAIN_NAME=${DOMAIN_NAME:-"example.ac.uk"}
+DOMAIN_NAME="${DOMAIN_NAME:-example.ac.uk}"
 
-IDP_HOSTNAME=${IDP_HOSTNAME:-"idp.${DOMAIN_NAME}"}
-IDP_LDAP_HOSTNAME=${IDP_LDAP_HOSTNAME:-"ldap.${DOMAIN_NAME}"}
+IDP_HOSTNAME="${IDP_HOSTNAME:-idp.${DOMAIN_NAME}}"
+IDP_LDAP_HOSTNAME="${IDP_LDAP_HOSTNAME:-ldap.${DOMAIN_NAME}}"
 
-IDP_DOMAIN=${DOMAIN_NAME}
+IDP_DOMAIN="${DOMAIN_NAME}"
 IDP_DOMAIN_BASEDN="$(echo -n DC=${IDP_DOMAIN} | sed 's#[.]#,DC=#g')"
-IDP_EXTERNAL_PORT=${IDP_EXTERNAL_PORT:-4443}
+IDP_EXTERNAL_PORT="${IDP_EXTERNAL_PORT:-4443}"
+IDP_KEYSTORE_PASSWORD="${IDP_KEYSTORE_PASSWORD:-12345}"
 
 export JAVA_HOME=/opt/jre-home
 export PATH=$PATH:$JAVA_HOME/bin
@@ -17,6 +18,7 @@ sed "s|[\$]{IDP_DOMAIN_BASEDN}|${IDP_DOMAIN_BASEDN}|g" /setup/conf/idp.propertie
 	sed "s|[\$]{IDP_DOMAIN}|${IDP_DOMAIN}|g" | \
 	sed "s|[\$]{IDP_EXTERNAL_PORT}|${IDP_EXTERNAL_PORT}|g" | \
 	sed "s|[\$]{IDP_HOSTNAME}|${IDP_HOSTNAME}|g" | \
+	sed "s|[\$]{IDP_KEYSTORE_PASSWORD}|${IDP_KEYSTORE_PASSWORD}|g" | \
 	sed "s|[\$]{IDP_LDAP_HOSTNAME}|${IDP_LDAP_HOSTNAME}|g" > /tmp/idp.properties
 
 # Change into the Shibboleth IdP bin directory ready for the build
@@ -30,8 +32,8 @@ rm -r ../conf/
 	-Didp.noprompt \
 	-Didp.target.dir=/opt/shibboleth-idp \
 	-Didp.host.name=${IDP_HOSTNAME} \
-	-Didp.keystore.password=12345 \
-	-Didp.sealer.password=12345 \
+	-Didp.keystore.password=${IDP_KEYSTORE_PASSWORD} \
+	-Didp.sealer.password=${IDP_KEYSTORE_PASSWORD} \
 	-Didp.merge.properties=/tmp/idp.properties \
 	metadata-gen
 

@@ -253,6 +253,7 @@ The following makefile variables are supported by this build, in addition to tho
 
 | Variable | Description |
 |---|---|
+| `GENERATE_SSL_CERTS` | Whether or not to auto-generate SSL keys and certificates for the [am-shib](am-shib) and [shib-local](shib-local) container sets. Default is `true`, if set to `false` then you must provide the key and certificate files using the defined environment variables described in those modules' readme documentation. |
 | `NEXTCLOUD_ENABLED` | Whether or not to include the NextCloud service in the deployed containers. Default is `false`. Set to `true` to enable. |
 | `SHIBBOLETH_CONFIG` | The Shibboleth profile to use. Currently only `archivematica` is supported. Default is undefined, causing no Shibboleth support to be enabled. |
 | `SHIBBOLETH_IDP` | The shibboleth IdP profile to use. Currently only `local` is supported, which is the default if `SHIBBOLETH_CONFIG` is set. Setting to another value will prevent the local Shibboleth IdP ([shib-local](shib-local)) from being included. |

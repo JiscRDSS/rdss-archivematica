@@ -69,20 +69,20 @@
         <ApplicationOverride id="am-dash"
           entityID="https://${AM_DASHBOARD_HOST:-dashboard.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
             <!-- Trust credentials config -->
-            <CredentialResolver type="File" key="/secrets/nginx/am-dash-key.pem">
+            <CredentialResolver type="File" key="${AM_DASHBOARD_SSL_KEY_FILE:-/secrets/nginx/am-dash-key.pem}">
               <Certificate>
-                <Path>/secrets/nginx/am-dash-cert.pem</Path>
-                <Path>/secrets/nginx/sp-ca-cert.pem</Path>
+                <Path>${AM_DASHBOARD_SSL_CERT_FILE:-/secrets/nginx/am-dash-cert.pem}</Path>
+                <Path>${AM_DASHBOARD_SSL_CA_CERT_FILE:-/secrets/nginx/sp-ca-cert.pem}</Path>
               </Certificate>
             </CredentialResolver>
         </ApplicationOverride>
         <ApplicationOverride id="am-ss"
           entityID="https://${AM_STORAGE_SERVICE_HOST:-ss.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
             <!-- Trust credentials config -->
-            <CredentialResolver type="File" key="/secrets/nginx/am-ss-key.pem">
+            <CredentialResolver type="File" key="${AM_STORAGE_SERVICE_SSL_KEY_FILE:-/secrets/nginx/am-ss-key.pem}">
               <Certificate>
-                <Path>/secrets/nginx/am-ss-cert.pem</Path>
-                <Path>/secrets/nginx/sp-ca-cert.pem</Path>
+                <Path>${AM_STORAGE_SERVICE_SSL_CERT_FILE:-/secrets/nginx/am-ss-cert.pem}</Path>
+                <Path>${AM_STORAGE_SERVICE_SSL_CA_CERT_FILE:-/secrets/nginx/sp-ca-cert.pem}</Path>
               </Certificate>
             </CredentialResolver>
         </ApplicationOverride>

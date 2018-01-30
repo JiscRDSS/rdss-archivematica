@@ -15,18 +15,19 @@ services:
     image: "arkivum/shibboleth-idp:${DOMAIN_NAME}"
     build:
       context: "./shib-local/build/idp/"
-    container_name: "idp.${DOMAIN_NAME}"
     hostname: "idp"
     domainname: "${DOMAIN_NAME}"
     networks:
-      - "shibnet"
+      shibnet:
+        aliases:
+          - "idp.${DOMAIN_NAME}"
     environment:
       DOMAIN_NAME: "${DOMAIN_NAME}"
-      JETTY_BROWSER_SSL_KEYSTORE_PASSWORD: "12345"
-      JETTY_BACKCHANNEL_SSL_KEYSTORE_PASSWORD: "12345"
       # Deployment settings
       AM_EXTERNAL_PORT: "${AM_EXTERNAL_PORT}"
+      IDP_HOSTNAME: "idp.${DOMAIN_NAME}"
       IDP_EXTERNAL_PORT: "${IDP_EXTERNAL_PORT}"
+      IDP_KEYSTORE_PASSWORD: "12345"
     volumes:
       - "idp_logs:/opt/shibboleth-idp/logs"
       # Shibboleth IdP customizations

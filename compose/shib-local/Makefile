@@ -81,6 +81,7 @@ create-secrets:
 		--volume "$(VOL_BASE)/shib-local/idp/:/src/idp:ro" \
 		--volume "$(VOL_BASE)/shib-local/build/secrets/idp:/build" \
 		--env DOMAIN_NAME="$(DOMAIN_NAME)" \
+		--env GENERATE_SSL_CERTS="$(GENERATE_SSL_CERTS)" \
 		--workdir "/src/idp" \
 		rawmind/alpine-base:3.5-1 \
 		./create-secrets.sh

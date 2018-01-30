@@ -14,6 +14,8 @@ DOMAIN_NAME ?= "example.ac.uk"
 
 LDAP_DOMAIN = $(shell echo -n dc=$(DOMAIN_NAME) | sed 's/[.]/,dc=/g')
 
+GENERATE_SSL_CERTS ?= "true"
+
 all: destroy clean build create-secrets up bootstrap list
 
 # This is needed by upstream makefile
@@ -38,6 +40,7 @@ create-secrets:
 		--volume "$(VOL_BASE)/am-shib/nginx/:/src/nginx:ro" \
 		--volume "$(VOL_BASE)/am-shib/build/secrets/nginx:/build" \
 		--env DOMAIN_NAME="$(DOMAIN_NAME)" \
+		--env GENERATE_SSL_CERTS="$(GENERATE_SSL_CERTS)" \
 		--workdir "/src/nginx" \
 		rawmind/alpine-base:3.5-1 \
 		./create-secrets.sh

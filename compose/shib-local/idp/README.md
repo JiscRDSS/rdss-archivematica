@@ -69,14 +69,17 @@ Environment Variables
 
 The following environment variables are used by this service:
 
-| Variable | Description |
+| Variable | Description | Default Value |
 |---|---|
-| AM_DASHBOARD_HOST | The hostname for the Archivematica Dashboard. Default value is `dashboard.archivematica.example.ac.uk`. |
-| AM_EXTERNAL_PORT | The external port that the Archivematica Dashboard should be exposed on - required . Default is 443. |
-| AM_STORAGE_SERVICE_HOST | The hostname for the Archivematica Storage Service. Default value is `ss.archivematica.example.ac.uk`. |
-| DOMAIN_NAME | The domain name to use for this IdP. This becomes the Shibboleth "scope", i.e. the domain that is 'managed' by this IdP. Default value is `example.ac.uk` |
-| IDP_EXTERNAL_PORT | The external port that the IdP is exposed on. Default is 4443. |
-
+| `AM_DASHBOARD_HOST` | Hostname for the Archivematica Dashboard. | `dashboard.archivematica.example.ac.uk`. |
+| `AM_EXTERNAL_PORT` | External port that the Archivematica Dashboard should be exposed on - required . | `443` |
+| `AM_STORAGE_SERVICE_HOST` | Hostname for the Archivematica Storage Service. | `ss.archivematica.example.ac.uk` |
+| `DOMAIN_NAME` | Domain name to use for this IdP. This becomes the Shibboleth "scope", i.e. the domain that is 'managed' by this IdP. | `example.ac.uk` |
+| `IDP_EXTERNAL_PORT` | External port that the IdP is exposed on. | `4443` |
+| `IDP_SSL_CA_CERT_FILE` | Path of the CA certificate file to secure the IdP with. | `/secrets/${DOMAIN_NAME}-ca.crt` |
+| `IDP_SSL_CERT_FILE` | Path of the certificate file to secure the IdP with. | `/secrets/${DOMAIN_NAME}.crt` |
+| `IDP_SSL_KEY_FILE` | Path of the private key file to secure the IdP with. | `/secrets/${DOMAIN_NAME}.key` |
+| `IDP_SSL_KEYSTORE_PASSWORD` | Password to use for the IdP's internal keystore. | `12345` |
 
 ## Important Note
 
@@ -84,6 +87,31 @@ Previous versions supported additional environment variables that are no longer 
 
 * `AM_DASHBOARD_EXTERNAL_PORT` and `AM_STORAGE_SERVICE_EXTERNAL_PORT` have now been replaced by `AM_EXTERNAL_PORT`
 * `NGINX_HOSTNAME` has been replaced by `AM_DASHBOARD_HOST` and `AM_STORAGE_SERVICE_HOST`
+
+SSL Certificates
+-----------------
+
+The IdP is secured using SSL certificates. If none are provided, a private key and the associated self-signed certificates are generated and used.
+
+To use a custom key and certificates, you must set the `IDP_SSL_*` parameters on the container, and mount the referenced files into the container instance. For example, using docker-compose:
+
+```
+services:
+  idp:
+    environment:
+      IDP_SSL_KEY_FILE: '/secrets/my-private-key.pem'
+      IDP_SSL_CERT_FILE: '/secrets/my-certificate.pem'
+      IDP_SSL_CA_CERT_FILE: '/secrets/my-ca-certificate.pem'
+    volumes:
+      - '/keys/my-private-key.pem:/secrets/my-private-key.pem:ro'
+      - '/keys/my-certificate.pem:/secrets/my-certificate.pem:ro'
+      - '/keys/my-ca-certificate.pem:/secret/my-ca-certificate.pem:ro'
+```
+
+Note that if your certificate chain requires intermediate certificates then these should be bundled into the file given by the `IDP_SSL_CA_CERT_FILE` variable.
+
+All key and certificate files must be in PEM format.
+
 
 UI Customization
 -----------------

@@ -6,12 +6,12 @@ idp.ldap.basedn=${IDP_DOMAIN_BASEDN}
 idp.ldap.host=${IDP_LDAP_HOSTNAME}
 
 # Security
-idp.signing.key= /secrets/idp-signing.key
-idp.signing.cert= /secrets/idp-signing.crt
-idp.encryption.key= /secrets/idp-encryption.key
-idp.encryption.cert= /secrets/idp-encryption.crt
-idp.sealer.keyPassword=12345
-idp.sealer.storePassword=12345
+idp.signing.key = /etc/pki/shibboleth-idp/idp-signing.key
+idp.signing.cert = /etc/pki/shibboleth-idp/idp-signing.crt
+idp.encryption.key = /etc/pki/shibboleth-idp/idp-encryption.key
+idp.encryption.cert = /etc/pki/shibboleth-idp/idp-encryption.crt
+idp.sealer.keyPassword = ${IDP_KEYSTORE_PASSWORD}
+idp.sealer.storePassword = ${IDP_KEYSTORE_PASSWORD}
 
 # Relax requirement for authn request to be encrypted (for testing only)
 idp.encryption.optional = true

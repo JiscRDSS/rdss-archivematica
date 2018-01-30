@@ -11,8 +11,8 @@ server {
 
 	include /etc/nginx/conf.d/am-shib.inc;
 
-	ssl_certificate     /secrets/nginx/am-dash-web-cert.pem;
-	ssl_certificate_key /secrets/nginx/am-dash-key.pem;
+	ssl_certificate     ${AM_DASHBOARD_SSL_WEB_CERT_FILE:-/secrets/nginx/am-dash-web-cert.pem};
+	ssl_certificate_key ${AM_DASHBOARD_SSL_KEY_FILE:-/secrets/nginx/am-dash-key.pem};
 
 	client_max_body_size 256M;
 
@@ -84,8 +84,8 @@ server {
 
 	include /etc/nginx/conf.d/am-shib.inc;
 
-	ssl_certificate     /secrets/nginx/am-ss-web-cert.pem;
-	ssl_certificate_key /secrets/nginx/am-ss-key.pem;
+	ssl_certificate     ${AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE:-/secrets/nginx/am-ss-web-cert.pem};
+	ssl_certificate_key ${AM_STORAGE_SERVICE_SSL_KEY_FILE:-/secrets/nginx/am-ss-key.pem};
 
 	client_max_body_size 256M;
 

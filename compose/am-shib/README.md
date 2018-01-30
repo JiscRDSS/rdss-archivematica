@@ -70,7 +70,15 @@ The following environment variables are used by these service containers:
 | Variable | Description |
 |---|---|
 | AM_DASHBOARD_EXTERNAL_PORT | The external port that the Archivematica Dashboard should be exposed on. Default is 443. |
+| AM_DASHBOARD_SSL_CA_CERT_FILE | The CA certificate file to secure the Archivematica Dashboard with for Shibboleth communications. | `/secrets/nginx/sp-ca-cert.pem` |
+| AM_DASHBOARD_SSL_CERT_FILE | The certificate file to secure the Archivematica Dashboard with for Shibboleth communications. | `/secrets/nginx/am-dash-cert.pem` |
+| AM_DASHBOARD_SSL_KEY_FILE | The private key file to secure the Archivematica Dashboard service with. | `/secrets/nginx/am-dash-key.pem` |
+| AM_DASHBOARD_SSL_WEB_CERT_FILE | The certificate file to secure the Archivematica Dashboard web service with. | `/secrets/nginx/am-dash-web-cert.pem` |
 | AM_STORAGE_SERVICE_EXTERNAL_PORT | The external port that the Archivematica Storage Service should be exposed on. Default is 8443 |
+| AM_STORAGE_SERVICE_SSL_CA_CERT_FILE | The CA certificate file to secure the Archivematica Storage Service with for Shibboleth communications. | `/secrets/nginx/sp-ca-cert.pem` |
+| AM_STORAGE_SERVICE_SSL_CERT_FILE | The certificate file to secure the Archivematica Storage Service with for Shibboleth communications. | `/secrets/nginx/am-ss-cert.pem` |
+| AM_STORAGE_SERVICE_SSL_KEY_FILE | The private key file to secure the Archivematica Storage Service service with. | `/secrets/nginx/am-ss-key.pem` |
+| AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE | The certificate file to secure the Archivematica Storage Service web service with. | `/secrets/nginx/am-ss-web-cert.pem` |
 | NGINX_EXTERNAL_IP | The external IP address that `nginx` should bind to. Default is `0.0.0.0`, meaning the service is available on all interfaces. |
 | SHIBBOLETH_IDP_ENTITY_ID | The `entityID` of the IdP that the SP should use for authentication. By default it will use the local Shibboleth IdP service. |
 | SHIBBOLETH_IDP_METADATA_URL | The URL of the IdP metadata that the SP should use for authentication. By default it will contact the local Shibboleth IdP service to obtain its metadata. |
@@ -88,6 +96,54 @@ The [shibboleth2.xml template](nginx/templates/shibboleth2.xml.tpl) includes acc
 Users without either of these entitlements will currently be denied access to Archivematica services.
 
 From a Shibboleth point of view, the Dashboard and the Storage Service are treated as two seperate applications, each with their own SP and `entityID`.
+
+
+SSL Certificates
+-----------------
+
+The certificates and private keys that should be used to secure the Shibboleth services can be specified using the `AM_DASHBOARD_SSL_*` and `AM_STORAGE_SERVICE_SSL_*` environment variables described above. If none of these values are set, default keys and self-signed certificates will be generated and used by the Compose bootstrap process.
+
+The environment variables must be applied to the `nginx` container, because that is where the SSL layer is applied. For example, using docker-compose:
+
+```
+services:
+  nginx:
+    environment:
+      AM_DASHBOARD_SSL_KEY_FILE:            '/secrets/dash-private-key.pem'
+      AM_DASHBOARD_SSL_CERT_FILE:           '/secrets/dash-sp-certificate.pem'
+      AM_DASHBOARD_SSL_WEB_CERT_FILE:       '/secrets/dash-web-certificate.pem'
+      AM_DASHBOARD_SSL_CA_CERT_FILE:        '/secrets/ca-certificate.pem'
+      AM_STORAGE_SERVICE_SSL_KEY_FILE:      '/secrets/ss-private-key.pem'
+      AM_STORAGE_SERVICE_SSL_CERT_FILE:     '/secrets/ss-sp-certificate.pem'
+      AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE: '/secrets/ss-web-certificate.pem'
+      AM_STORAGE_SERVICE_SSL_CA_CERT_FILE:  '/secrets/ca-certificate.pem'
+    volumes:
+      - '/keys/dash/private-key.pem:/secrets/dash-private-key.pem:ro'
+      - '/keys/dash/sp-certificate.pem:/secrets/dash-sp-certificate.pem:ro'
+      - '/keys/dash/web-certificate.pem:/secrets/dash-web-certificate.pem:ro'
+      - '/keys/ss/private-key.pem:/secrets/ss-private-key.pem:ro'
+      - '/keys/ss/sp-certificate.pem:/secrets/ss-sp-certificate.pem:ro'
+      - '/keys/ss/web-certificate.pem:/secrets/ss-web-certificate.pem:ro'
+      - '/keys/ca-certificate.pem:/secrets/ca-certificate.pem:ro'
+```
+
+There are two different types of service being secured by SSL: the Shibboleth SP for each application, and the Nginx virtual host for each application. Each application is expected to have a different hostname, which means different CNs, which requires different certificates to secure it (unless using a wildcard certificate, but we cannot assume this). 
+
+In addition, the application SP certificates must include the "subject alt name" of the host, as a "DNS" entry in the certificate metadata. This means that they must be seperate to those used by `nginx`. If using OpenSSL to create the SP certificates then the following must be added to the OpenSSL config:
+
+Currently, any intermediate certificates should be bundled in the CA certificate files.
+
+All key and certificate files must be in PEM format.
+
+```[ req_ext ]
+subjectAltName = @alt_names
+
+[ alt_names ]
+DNS.1 = ${hostname}```
+
+This is exactly as they are used in the [create-secrets.sh](create-secrets.sh) script, in which the OpenSSL config is generated (hence the use of `${hostname}` instead of a static value).
+
+
 
 Diagnostics
 ------------

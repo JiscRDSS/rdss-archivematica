@@ -1,33 +1,35 @@
 #!/bin/bash
 
-# Can be overridden by environment variables
-DOMAIN_NAME=${DOMAIN_NAME:-"example.ac.uk"}
-AM_DASHBOARD_HOST=${AM_DASHBOARD_HOST:-"dashboard.archivematica.${DOMAIN_NAME}"}
-AM_STORAGE_SERVICE_HOST=${AM_STORAGE_SERVICE_HOST:-"ss.archivematica.${DOMAIN_NAME}"}
-
-
 #
 # Globals
 #
 
+BUILD_DIR="${BUILD_DIR:-/build}"
+CA_DIR="${CA_DIR:-/src/ca}"
+DOMAIN_NAME="${DOMAIN_NAME:-example.ac.uk}"
+
+GENERATE_SSL_CERTS="${GENERATE_SSL_CERTS:-true}"
+
 CA_PEM_CERT="${DOMAIN_NAME}-ca.crt"
 
 SHIB_SP_CA_CERT="sp-ca-cert.pem"
+SHIB_SP_CA_BUNDLE="sp-ca-bundle.pem"
 
-AM_DASH_CERT="am-dash-cert.pem"
-AM_DASH_CSR="${AM_DASHBOARD_HOST}.csr"
-AM_DASH_KEY="am-dash-key.pem"
-AM_DASH_WEB_CERT="am-dash-web-cert.pem"
-AM_DASH_WEB_CSR="web.${AM_DASHBOARD_HOST}.csr"
+AM_DASHBOARD_HOST="${AM_DASHBOARD_HOST:-dashboard.archivematica.${DOMAIN_NAME}}"
+AM_STORAGE_SERVICE_HOST="${AM_STORAGE_SERVICE_HOST:-ss.archivematica.${DOMAIN_NAME}}"
 
-AM_SS_CERT="am-ss-cert.pem"
-AM_SS_CSR="${AM_STORAGE_SERVICE_HOST}.csr"
-AM_SS_KEY="am-ss-key.pem"
-AM_SS_WEB_CERT="am-ss-web-cert.pem"
-AM_SS_WEB_CSR="web.${AM_STORAGE_SERVICE_HOST}.csr"
+AM_DASHBOARD_CERT="am-dash-cert.pem"
+AM_DASHBOARD_CSR="${AM_DASHBOARD_HOST}.csr"
+AM_DASHBOARD_KEY="am-dash-key.pem"
+AM_DASHBOARD_WEB_CERT="am-dash-web-cert.pem"
+AM_DASHBOARD_WEB_CSR="web.${AM_DASHBOARD_HOST}.csr"
 
-CA_DIR="/src/ca"
-BUILD_DIR="/build"
+AM_STORAGE_SERVICE_CERT="am-ss-cert.pem"
+AM_STORAGE_SERVICE_CSR="${AM_STORAGE_SERVICE_HOST}.csr"
+AM_STORAGE_SERVICE_KEY="am-ss-key.pem"
+AM_STORAGE_SERVICE_WEB_CERT="am-ss-web-cert.pem"
+AM_STORAGE_SERVICE_WEB_CSR="web.${AM_STORAGE_SERVICE_HOST}.csr"
+
 
 #
 # Helper functions
@@ -137,60 +139,67 @@ EOF
 	rm -f /tmp/csr.conf
 }
 
+generate_ssl_certs()
+{
+	#
+	# AM Dashboard
+	#
+	# Create private key
+	create_key "${BUILD_DIR}/${AM_DASHBOARD_KEY}"
+	# Create SP CSR
+	create_sp_csr "${AM_DASHBOARD_HOST}" \
+		"${BUILD_DIR}/${AM_DASHBOARD_KEY}" \
+		"${BUILD_DIR}/${AM_DASHBOARD_HOST}.csr"
+	# Sign SP CSR
+	create_signed_cert "${AM_DASHBOARD_HOST}" \
+		"${BUILD_DIR}/${AM_DASHBOARD_CSR}" \
+		"${BUILD_DIR}/${AM_DASHBOARD_CERT}"
+	# Create CSR for nginx SSL
+	create_web_csr "${AM_DASHBOARD_HOST}" \
+		"${BUILD_DIR}/${AM_DASHBOARD_KEY}" \
+		"${BUILD_DIR}/${AM_DASHBOARD_WEB_CSR}"
+	# Sign nginx CSR
+	create_signed_cert "${AM_DASHBOARD_HOST}" \
+		"${BUILD_DIR}/${AM_DASHBOARD_WEB_CSR}" \
+		"${BUILD_DIR}/${AM_DASHBOARD_WEB_CERT}"
+
+	#
+	# AM Storage Service
+	#
+	# Create private key
+	create_key "${BUILD_DIR}/${AM_STORAGE_SERVICE_KEY}"
+	# Create SP CSR
+	create_sp_csr "${AM_STORAGE_SERVICE_HOST}" \
+		"${BUILD_DIR}/${AM_STORAGE_SERVICE_KEY}" \
+		"${BUILD_DIR}/${AM_STORAGE_SERVICE_HOST}.csr"
+	# Sign SP CSR
+	create_signed_cert "${AM_STORAGE_SERVICE_HOST}" \
+		"${BUILD_DIR}/${AM_STORAGE_SERVICE_CSR}" \
+		"${BUILD_DIR}/${AM_STORAGE_SERVICE_CERT}"
+	# Create CSR for nginx SSL
+	create_web_csr "${AM_STORAGE_SERVICE_HOST}" \
+		"${BUILD_DIR}/${AM_STORAGE_SERVICE_KEY}" \
+		"${BUILD_DIR}/${AM_STORAGE_SERVICE_WEB_CSR}"
+	# Sign nginx CSR
+	create_signed_cert "${AM_STORAGE_SERVICE_HOST}" \
+		"${BUILD_DIR}/${AM_STORAGE_SERVICE_WEB_CSR}" \
+		"${BUILD_DIR}/${AM_STORAGE_SERVICE_WEB_CERT}"
+
+	# Copy CA cert and create bundle
+	cp -p "${CA_DIR}/domains/${DOMAIN_NAME}/certs/${CA_PEM_CERT}" \
+		"${BUILD_DIR}/${SHIB_SP_CA_CERT}"
+	cp -p "${BUILD_DIR}/${SHIB_SP_CA_CERT}" "${BUILD_DIR}/${SHIB_SP_CA_BUNDLE}"
+}
+
 #
 # Entry point
 #
 
 main()
 {
-	mkdir -p ${BUILD_DIR}
-	#
-	# AM Dashboard
-	#
-	# Create private key
-	create_key "${BUILD_DIR}/${AM_DASH_KEY}"
-	# Create SP CSR
-	create_sp_csr "${AM_DASHBOARD_HOST}" \
-		"${BUILD_DIR}/${AM_DASH_KEY}" \
-		"${BUILD_DIR}/${AM_DASHBOARD_HOST}.csr"
-	# Sign SP CSR
-	create_signed_cert "${AM_DASHBOARD_HOST}" \
-		"${BUILD_DIR}/${AM_DASH_CSR}" \
-		"${BUILD_DIR}/${AM_DASH_CERT}"
-	# Create CSR for nginx SSL
-	create_web_csr "${AM_DASHBOARD_HOST}" \
-		"${BUILD_DIR}/${AM_DASH_KEY}" \
-		"${BUILD_DIR}/${AM_DASH_WEB_CSR}"
-	# Sign nginx CSR
-	create_signed_cert "${AM_DASHBOARD_HOST}" \
-		"${BUILD_DIR}/${AM_DASH_WEB_CSR}" \
-		"${BUILD_DIR}/${AM_DASH_WEB_CERT}"
-
-	#
-	# AM Storage
-	#
-	# Create private key
-	create_key "${BUILD_DIR}/${AM_SS_KEY}"
-	# Create SP CSR
-	create_sp_csr "${AM_STORAGE_SERVICE_HOST}" \
-		"${BUILD_DIR}/${AM_SS_KEY}" \
-		"${BUILD_DIR}/${AM_STORAGE_SERVICE_HOST}.csr"
-	# Sign SP CSR
-	create_signed_cert "${AM_STORAGE_SERVICE_HOST}" \
-		"${BUILD_DIR}/${AM_SS_CSR}" \
-		"${BUILD_DIR}/${AM_SS_CERT}"
-	# Create CSR for nginx SSL
-	create_web_csr "${AM_STORAGE_SERVICE_HOST}" \
-		"${BUILD_DIR}/${AM_SS_KEY}" \
-		"${BUILD_DIR}/${AM_SS_WEB_CSR}"
-	# Sign nginx CSR
-	create_signed_cert "${AM_STORAGE_SERVICE_HOST}" \
-		"${BUILD_DIR}/${AM_SS_WEB_CSR}" \
-		"${BUILD_DIR}/${AM_SS_WEB_CERT}"
-
-	# Copy CA cert
-	cp -p "${CA_DIR}/domains/${DOMAIN_NAME}/certs/${CA_PEM_CERT}" \
-		"${BUILD_DIR}/${SHIB_SP_CA_CERT}"
+	if [ "${GENERATE_SSL_CERTS}" == "true" ] ; then
+		mkdir -p "${BUILD_DIR}" && generate_ssl_certs
+	fi
 }
 
 main
