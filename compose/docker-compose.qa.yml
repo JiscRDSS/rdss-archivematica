@@ -99,7 +99,7 @@ services:
     expose:
       - "2113"
     volumes:
-      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:ro"
+      - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
 
   clamavd:
     image: "artefactual/clamav:latest"
