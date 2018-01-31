@@ -148,6 +148,16 @@ Building
 
 *Before building, make sure you create the required volumes (see above)*
 
+The Docker Compose build has two modes: `dev` and `qa`.
+
+The `qa` mode will attempt to use pre-built images available from a given registry - you _must_ set the `REGISTRY` environment variable when building in `qa` mode. The `dev` mode does not require a registry, and instead builds each of the images itself. This takes longer, but can be useful if making changes as part of development.
+
+It is also possible to build the `qa` containers and then use `docker-compose` commands to modify or rebuild specific containers in the deployed set. This can be useful when only working on one or two services, since they can be modified individually without having to custom build all the other containers every time, which can save a lot of time.
+
+The `qa` build is the default as this is the quickest and the one used by our default deployment.
+
+### Development Build
+
 To build all containers required to bring up a development version of Archivematica, use
 
 	make all ENV=dev
@@ -200,6 +210,16 @@ After a successful build of the Shibboleth-enabled Archivematica services and Ne
 
 Notice that the `idp.example.ac.uk` and `rdss_nginx_1` containers have specific ports exposed - this is because Shibboleth requires well-known URLs for the Service Provider and Identity Provider.
 
+### QA Build
+
+To build all containers required to bring up a development version of Archivematica, use
+
+	make all REGISTRY=localhost:5000/
+	
+You should replace `localhost:5000/` with whatever registry address you wish to use, but if you've followed the advice in the [main README documentation](../README.md) and are using a local `registry` Docker container, this will be the correct value.
+
+### Customising The Build
+
 If you wish to change the ports used to something other than the default then you can change them using the environment variables defined in the [.env](.env) file in this folder, which is used by `docker-compose` during the build, or by overriding them via environment variables:
 
 	NGINX_EXTERNAL_PORT=3443 make all SHIBBOLETH_CONFIG=archivematica
@@ -223,7 +243,6 @@ Here are some other `make` commands other than `make all` that may be useful whe
 | `make watch` | Watch logs from all containers |
 | `make watch-idp` | Watch logs from the [idp](shib-local/idp) container, if present |
 | `make watch-idp` | Watch logs from the `nginx` container |
-
 
 Remember to append the `SHIBBOLETH_CONFIG` argument to the above commands if `make all` was run with this set, otherwise the `docker-compose` context won't be resolved properly (this is required for the `watch-idp` command).
 
