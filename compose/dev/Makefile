@@ -46,6 +46,7 @@ bootstrap-storage-service:
 					--email="test@test.com" \
 					--api-key="test" \
 					--superuser
+	docker-compose restart archivematica-storage-service
 
 bootstrap-dashboard:
 	# Wait for MySQL to be ready
