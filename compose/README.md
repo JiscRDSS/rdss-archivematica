@@ -253,7 +253,7 @@ The following makefile variables are supported by this build, in addition to tho
 
 | Variable | Description |
 |---|---|
-| `GENERATE_SSL_CERTS` | Whether or not to auto-generate SSL keys and certificates for the [am-shib](am-shib) and [shib-local](shib-local) container sets. Default is `true`, if set to `false` then you must provide the key and certificate files using the defined environment variables described in those modules' readme documentation. |
+| `GENERATE_SSL_CERTS` | Whether or not to auto-generate SSL keys and certificates for the [am-shib](am-shib) and [shib-local](shib-local) container sets. Default is `true`, if set to `false` then you must provide the key and certificate files using the defined environment variables described in those modules' readme documentation (see [Custom SSL Certificates](#CustomSSLCertificates), below). |
 | `NEXTCLOUD_ENABLED` | Whether or not to include the NextCloud service in the deployed containers. Default is `false`. Set to `true` to enable. |
 | `SHIBBOLETH_CONFIG` | The Shibboleth profile to use. Currently only `archivematica` is supported. Default is undefined, causing no Shibboleth support to be enabled. |
 | `SHIBBOLETH_IDP` | The shibboleth IdP profile to use. Currently only `local` is supported, which is the default if `SHIBBOLETH_CONFIG` is set. Setting to another value will prevent the local Shibboleth IdP ([shib-local](shib-local)) from being included. |
@@ -280,3 +280,83 @@ Some of the configuration of these services may be considered "secret", i.e. dat
 These secrets are created by the `create-secrets.sh` script in the relevant folder for each service. This script is run as part of the `make` build process.
 
 Currently they are stored as normal files and mounted to the `/secrets` directory within each service container, but in future this may change to use the [Docker Secrets](https://docs.docker.com/engine/swarm/secrets/) functionality, or its equivalent for other platforms (e.g. [Vault](https://www.vaultproject.io/) for AWS deployment).
+
+Custom SSL Certificates
+------------------------
+
+As already mentioned, it is possible to specify custom certificates for the `nginx` and `idp` services to use for securing web and Shibboleth connection.
+
+This is easiest to explain using a concrete example. Let's say we have the following organisational structure:
+
+* Root CA: `storytellersweb.net` - Story Tellers Network
+  * Intermediate CA: `nurserytimes.net` - Nursery Times
+    * Domain: `dishandspoon.co.uk` - Dish and Spoon Limited
+
+For this example, our application service hosts would be `dashboard.archivematica.dishandspoon.co.uk` and `ss.archivematica.dishandspoon.co.uk`, with our local IdP on `idp.dishandspoon.co.uk`.
+
+The [shib-custom-pki](shib-custom-pki) folder contains scripts for generating the required keys and certificates, in particular the [create-test-certs](shib-custom-pki/create-test-certs.sh) script. Here's some example usage:
+
+	# Define the root, intermediate and service domains
+	export ROOT_DOMAIN_NAME="storytellersweb.net"
+	export ROOT_DOMAIN_ORG="Story Tellers Network"
+	export CA_DOMAIN_NAME="nurserytimes.net"
+	export CA_DOMAIN_ORG="Nursery Times"
+	export DOMAIN_NAME="dishandspoon.co.uk"
+	export DOMAIN_ORG="Dish and Spoon Ltd"
+	export DOMAIN_ORGANISATION="${DOMAIN_ORG}"
+	
+	# Create the custom certs
+	pushd shib-custom-pki && ./create-test-certs.sh ; popd
+	
+	# Bring up the compose environment without generating default certs
+	make all SHIBBOLETH_CONFIG=archivematica GENERATE_CERTS=false
+	
+	# Reconfigure to use custom pki files
+	docker-compose \
+	    -f docker-compose.qa.yml \
+	    -f docker-compose.am-shib.yml \
+	    -f docker-compose.shib-local.yml \
+	    -f docker-compose.am-shib-custom.yml \
+	    -f docker-compose.shib-local-custom.yml \
+	    up -d --build --no-deps --force-recreate \
+	    nginx idp
+
+The above is also available in [test-custom-certs.sh](test-custom-certs.sh). Note the use of `docker-compose.am-shib-custom.yml` and `docker-compose.shib-local-custom.yml`, which override the `nginx` and `idp` services to set the necessary environment variables to customise the certs and keys used.
+
+For the `nginx` service:
+
+	---
+	version: "2"
+	
+	services:
+	
+	# This extends the `nginx` definition in `am-shib` to add custom PKI files
+	nginx:
+	    environment:
+		    AM_DASHBOARD_SSL_CA_CERT_FILE: "/etc/pki/shibboleth-sp/ca.crt"
+		    AM_DASHBOARD_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-dash.crt"
+		    AM_DASHBOARD_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-dash.key"
+		    AM_DASHBOARD_SSL_WEB_CERT_FILE: "/etc/pki/shibboleth-sp/am-dash-web.crt"
+		    AM_STORAGE_SERVICE_SSL_CA_CERT_FILE: "/etc/pki/shibboleth-sp/ca.crt"
+		    AM_STORAGE_SERVICE_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss.crt"
+		    AM_STORAGE_SERVICE_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-ss.key"
+		    AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss-web.crt"
+	    volumes:
+		    - "${VOL_BASE}/shib-custom-pki/build/${DOMAIN_NAME}/:/etc/pki/shibboleth-sp/:ro"
+
+For the `idp` service:
+
+	---
+	version: "2"
+	
+	services:
+	
+	# This extends the `idp` definition in `shib-local` to add custom PKI files
+	idp:
+	    environment:
+		    IDP_SSL_CA_CERT_FILE: "/etc/pki/shib-custom-pki/ca.crt"
+		    IDP_SSL_CERT_FILE: "/etc/pki/shib-custom-pki/idp.crt"
+		    IDP_SSL_KEY_FILE: "/etc/pki/shib-custom-pki/idp.key"
+		    IDP_SSL_PASSWORD: "topsecret"
+	    volumes:
+		    - "${VOL_BASE}/shib-custom-pki/build/${DOMAIN_NAME}/:/etc/pki/shib-custom-pki/:ro"

@@ -1,0 +1,14 @@
+---
+version: "2"
+
+services:
+
+  # This extends the `idp` definition in `shib-local` to add custom PKI files
+  idp:
+    environment:
+      IDP_SSL_CA_CERT_FILE: "/etc/pki/shib-custom-pki/ca.crt"
+      IDP_SSL_CERT_FILE: "/etc/pki/shib-custom-pki/idp.crt"
+      IDP_SSL_KEY_FILE: "/etc/pki/shib-custom-pki/idp.key"
+      IDP_SSL_PASSWORD: "topsecret"
+    volumes:
+      - "${VOL_BASE}/shib-custom-pki/build/${DOMAIN_NAME}/:/etc/pki/shib-custom-pki/:ro"
