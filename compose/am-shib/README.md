@@ -22,9 +22,7 @@ The [Dockerfile](nginx/Dockerfile) used to build the image takes a number of arg
 
 | Argument | Description |
 |---|---|
-| DOMAIN_NAME | The domain that the service is part of, e.g. `example.ac.uk`. |
 | NGINX_CONF_TEMPLATE_FILE | Path of the nginx config template file, which will be used to create `/etc/nginx/conf.d/am-shib.conf`. This is specifically concerned with Shibboleth-enabled services, not anything else that may be hosted by `nginx`. |
-| SHIBBOLETH_ATTRCHECKER_TEMPLATE_FILE | Path of the Shibboleth 'attrChecker' template file, which will be used to update `/etc/shibboleth/attrChecker.html`. |
 | SHIBBOLETH_CONF_TEMPLATE_FILE | Path of the Shibboleth config template file, which will be used to create `/etc/shibboleth/shibboleth2.xml`. |
 
 All of the above arguments are required; there are no defaults.
@@ -32,22 +30,23 @@ All of the above arguments are required; there are no defaults.
 Configuration
 --------------
 
-The files in [etc](etc) that configure this service are grouped by the process to which they relate - one of `nginx`, the `shibd` SP, or `supervisor`.
+The files in [etc](nginx/rootfs/etc) that configure this service are grouped by the process to which they relate - one of `nginx`, the `shibd` SP, or `supervisor`.
 
-* [nginx](etc/nginx)
-	* [am-shib.inc](etc/nginx/am-shib.inc) includes some common SSL/Shibboleth settings for nginx
-	* [archivematica.conf](etc/nginx/archivematica.conf) overrides the default, non-Shibboleth nginx configuration for Archivematica, enabling alternatives to be set.
-	* [shib_clear_headers](etc/nginx/shib_clear_headers) clears HTTP headers related to Shibboleth, to avoid spoofing etc
-	* [shib_fastcgi_params](etc/nginx/shib_fastcgi_params) defines a number of FastCGI parameters specific to Shibboleth
-* [shibd](etc/sp)
-	* [attrChecker.pl](etc/sp/attrChecker.pl) may be used to update `attrChecker.html` based on the SP's metadata.
-	* [attribute-map.xml](etc/sp/attribute-map.xml) defines how attributes from the IdP are interpreted. See [official documentation](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPAttributeExtractor) for more details.
-	* [attribute-policy.xml](etc/sp/attribute-policy.xml) defines what validation is done on the attributes from an IdP. See the [official documentation](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPAttributeFilter) for more details.
-	* [console.logger](etc/sp/console.logger) configures logging for the Shibboleth SP console tools (see [Diagnostics](#diagnostics), below).
-	* [security-policy.xml](etc/sp/security-policy.xml) overrides the default security policy in terms of trusting signatures etc. See [Security Policies](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSecurityPolicies) documentation for more on this.
-	* [shibd.logger](etc/sp/shibd.logger) configures logging for the Shibd daemon process, which responds to the FastCGI calls. This configuration causes all logging to go to `stdout` and `stderr`, so that `docker logs` can pick them up.
-* [supervisor](etc/supervisor)
-	* [shibboleth.conf](etc/supervisor/shibboleth.conf), which adds an additional SP handler to the Supervisor, to accomodate both the Dashboard and Storage services.
+* [nginx](nginx/rootfs/etc/nginx)
+	* [am-shib.inc](nginx/rootfs/etc/nginx/conf.d/am-shib.inc) includes some common SSL/Shibboleth settings for nginx
+	* [archivematica.conf](nginx/rootfs/etc/nginx/conf.d/archivematica.conf) overrides the default, non-Shibboleth nginx configuration for Archivematica, enabling alternatives to be set.
+	* [shib_clear_headers](nginx/rootfs/etc/nginx/shib_clear_headers) clears HTTP headers related to Shibboleth, to avoid spoofing etc
+	* [shib_fastcgi_params](nginx/rootfs/etc/nginx/shib_fastcgi_params) defines a number of FastCGI parameters specific to Shibboleth
+* [shibboleth](nginx/rootfs/etc/shibboleth)
+	* [attrChecker.html](nginx/rootfs/etc/shibboleth/attrChecker.html) | HTML page to present when checking attributes has failed.
+	* [attrChecker.pl](nginx/rootfs/etc/shibboleth/attrChecker.pl) may be used to update `attrChecker.html` based on the SP's metadata.
+	* [attribute-map.xml](nginx/rootfs/etc/shibboleth/attribute-map.xml) defines how attributes from the IdP are interpreted. See [official documentation](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPAttributeExtractor) for more details.
+	* [attribute-policy.xml](nginx/rootfs/etc/shibboleth/attribute-policy.xml) defines what validation is done on the attributes from an IdP. See the [official documentation](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPAttributeFilter) for more details.
+	* [console.logger](nginx/rootfs/etc/shibboleth/console.logger) configures logging for the Shibboleth SP console tools (see [Diagnostics](#diagnostics), below).
+	* [security-policy.xml](nginx/rootfs/etc/shibboleth/security-policy.xml) overrides the default security policy in terms of trusting signatures etc. See [Security Policies](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSecurityPolicies) documentation for more on this.
+	* [shibd.logger](nginx/rootfs/etc/shibboleth/shibd.logger) configures logging for the Shibd daemon process, which responds to the FastCGI calls. This configuration causes all logging to go to `stdout` and `stderr`, so that `docker logs` can pick them up.
+* [supervisor](nginx/rootfs/etc/supervisor)
+	* [shibboleth.conf](nginx/rootfs/etc/supervisor/conf.d/shibboleth.conf), which adds an additional SP handler to the Supervisor, to accomodate both the Dashboard and Storage services.
 
 Template Files
 ---------------
@@ -57,7 +56,6 @@ This service makes use of several templated configuration files. These are refer
 | Variable | Description | Default File |
 |---|---|---|
 | NGINX_CONFIG_TEMPLATE_FILE | Provides the template for the `/etc/nginx/conf.d/am-shib.conf` file. This is expected to include configuration for interfacing with the SP FastCGI module, as well as defining which locations are protected by Shibboleth in their configuration. | [am-shib.conf.tpl](nginx/templates/am-shib.conf.tpl) |
-| SHIBBOLETH_ATTRCHECKER_TEMPLATE_FILE | Provides the template for the `/etc/shibboleth/attrChecker.html` file. See [attrChecker](#attrchecker) below for more information. | [attrChecker.html.tpl](nginx/templates/attrChecker.html.tpl) |
 | SHIBBOLETH_CONFIG_TEMPLATE_FILE | Provides the template for the `/etc/shibboleth/shibboleth2.xml` file. This configures how the SP functions; see the [SP configuration documentation](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPConfiguration) for full details of what can be in this configuration file. | [shibboleth2.xml.tpl](nginx/templates/shibboleth2.xml.tpl]) |
 
 These templates are interpreted using [envplate](https://github.com/kreuzwerker/envplate) at instantiation time, since `envplate` is used as the `ENTRYPOINT` for the parent `virtualstaticvoid/shibboleth-nginx` image. This is why they are included at build time via the Dockerfile, rather than at run-time via a volume mount. If a volume were used then the original would be overwritten, since `envplate` uses in-place substitutions.
@@ -135,13 +133,15 @@ Currently, any intermediate certificates should be bundled in the CA certificate
 
 All key and certificate files must be in PEM format.
 
-```[ req_ext ]
+```
+[ req_ext ]
 subjectAltName = @alt_names
 
 [ alt_names ]
-DNS.1 = ${hostname}```
+DNS.1 = ${hostname}
+```
 
-This is exactly as they are used in the [create-secrets.sh](create-secrets.sh) script, in which the OpenSSL config is generated (hence the use of `${hostname}` instead of a static value).
+This is exactly as they are used in the [create-secrets.sh](nginx/create-secrets.sh) script, in which the OpenSSL config is generated (hence the use of `${hostname}` instead of a static value).
 
 
 
@@ -182,7 +182,7 @@ When using this tool, extra log output can be obtained by modifying the `console
 
 ### ResolverTest
 
-The `resovlvertest` tool can be used to test what attributes the SP receives from the IdP and what survive the various filters etc. Its full documentation is [here](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPresolvertest).
+The `resolvertest` tool can be used to test what attributes the SP receives from the IdP and what survive the various filters etc. Its full documentation is [here](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPresolvertest).
 
 As an example, here's how you might check what happens when the SP tries to resolve the attributes for the user `aa` for the `archivematica-dashboard` application:
 

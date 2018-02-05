@@ -10,9 +10,7 @@ services:
     build:
       context: "./am-shib/nginx/"
       args:
-        - DOMAIN_NAME
         - NGINX_CONF_TEMPLATE_FILE=templates/am-shib.conf.tpl
-        - SHIBBOLETH_ATTRCHECKER_TEMPLATE_FILE=templates/attrChecker.html.tpl
         - SHIBBOLETH_CONF_TEMPLATE_FILE=templates/shibboleth2.xml.tpl
     networks:
       default:
@@ -34,46 +32,7 @@ services:
       # Deployment settings
       AM_EXTERNAL_PORT:
     volumes:
-      #
-      # Nginx
-      #
-      # Add Shibboleth FastCGI config
-      - "${VOL_BASE}/am-shib/etc/nginx/shib_clear_headers:/etc/nginx/shib_clear_headers:ro"
-      - "${VOL_BASE}/am-shib/etc/nginx/shib_fastcgi_params:/etc/nginx/shib_fastcgi_params:ro"
-      # Override the default nginx archivematica config with ones for Shibboleth
-      - "${VOL_BASE}/am-shib/etc/nginx/archivematica.conf:/etc/nginx/conf.d/archivematica.conf:ro"
-      - "${VOL_BASE}/am-shib/etc/nginx/am-shib.inc:/etc/nginx/conf.d/am-shib.inc:ro"
-      #
-      # Shibboleth
-      #
-      # Add Shibboleth customizations
-      - "${VOL_BASE}/am-shib/etc/sp/attribute-map.xml:/etc/shibboleth/attribute-map.xml:ro"
-      - "${VOL_BASE}/am-shib/etc/sp/attribute-policy.xml:/etc/shibboleth/attribute-policy.xml:ro"
-      - "${VOL_BASE}/am-shib/etc/sp/attrChecker.pl:/etc/shibboleth/attrChecker.pl:ro"
-      - "${VOL_BASE}/am-shib/etc/sp/console.logger:/etc/shibboleth/console.logger:ro"
-      - "${VOL_BASE}/am-shib/etc/sp/security-policy.xml:/etc/shibboleth/security-policy.xml:ro"
-      - "${VOL_BASE}/am-shib/etc/sp/shibd.logger:/etc/shibboleth/shibd.logger"
-      #
-      # Supervisor
-      #
-      # Override the default Supervisor config to add additional programs
-      - "${VOL_BASE}/am-shib/etc/supervisor/shibboleth.conf:/etc/supervisor/conf.d/shibboleth.conf:ro"
-      #
-      # Secrets
-      #
       - "${VOL_BASE}/am-shib/build/secrets/:/secrets/:ro"
-      #
-      # Bootstrap
-      #
-      - "${VOL_BASE}/am-shib/nginx/bootstrap.sh:/usr/sbin/bootstrap.sh:ro"
-    command: ["/usr/local/bin/ep",
-      "-v", "/etc/nginx/conf.d/am-shib.conf", "/etc/shibboleth/shibboleth2.xml",
-      "--",
-      "/bin/sh", "-c",
-      "bootstrap.sh && /usr/bin/supervisord --nodaemon --configuration /etc/supervisor/supervisord.conf"
-    ]
-    expose:
-      - "443"
     ports:
       - "${NGINX_EXTERNAL_IP}:${AM_EXTERNAL_PORT}:443"
     depends_on:

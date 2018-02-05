@@ -22,20 +22,27 @@ RUN useradd -s /bin/nologin nginx && usermod -G _shibd nginx && \
     ln -s /dev/stdout /var/log/shibboleth/shibd.log && \
     ln -s /dev/stderr /var/log/shibboleth/shibd_warn.log
 
-# Templates
+# Process configs using envplate and bootstrap before passing to supervisor
+CMD ["/usr/local/bin/ep", \
+      "-v", "/etc/nginx/conf.d/am-shib.conf", "/etc/shibboleth/shibboleth2.xml", \
+      "--", \
+      "/bin/sh", "-c", \
+      "bootstrap.sh && /usr/bin/supervisord --nodaemon --configuration /etc/supervisor/supervisord.conf" \
+    ]
 
-# Specifies the domain that our image is in, e.g. example.com. Required.
-ARG DOMAIN_NAME
+# Listen on 443
+EXPOSE 443
+
+# Copy rootfs files
+COPY rootfs /
+
+# Templates
 
 # Specifies the path of the nginx config template file. Required.
 ARG NGINX_CONF_TEMPLATE_FILE
-
-# Specifies the path of the Shibboleth 'attrChecker' template file. Required.
-ARG SHIBBOLETH_ATTRCHECKER_TEMPLATE_FILE
 
 # Specifies the path of the Shibboleth config template file. Required.
 ARG SHIBBOLETH_CONF_TEMPLATE_FILE
 
 COPY $NGINX_CONF_TEMPLATE_FILE /etc/nginx/conf.d/am-shib.conf
-COPY $SHIBBOLETH_ATTRCHECKER_TEMPLATE_FILE /etc/shibboleth/attrChecker.html
 COPY $SHIBBOLETH_CONF_TEMPLATE_FILE /etc/shibboleth/shibboleth2.xml
