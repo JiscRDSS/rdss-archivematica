@@ -56,35 +56,92 @@
            <Handler type="AttributeChecker" Location="/AttrChecker" attributes="cn entitlement eppn givenName mail sn"
                 template="attrChecker.html" flushSession="true" showAttributeValues="true"/>
         </Sessions>
-        <!-- Metadata config -->
-        <MetadataProvider type="XML"
-            uri="${SHIBBOLETH_IDP_METADATA_URL:-https://idp.example.ac.uk:4443/idp/shibboleth}"
-            backingFilePath="idp-metadata.xml"
-            minRefreshDelay="10" maxRefreshDelay="5000" refreshDelayFactory="0.1"/>
+        <!-- Metadata provider -->
+        <MetadataProvider type="Dynamic"
+            minCacheDuration="10" refreshDelayFactory="0.1">
+                <Subst>${SHIBBOLETH_METADATA_URL_SUBST:-http://mdq.ukfederation.org.uk/entities/$entityID}</Subst>
+                <MetadataFilter type="RequireValidUntil" maxValidityInterval="2592000"/>
+                <MetadataFilter type="Signature" certificate="${SHIBBOLETH_METADATA_SIGNING_CERT:-ukfederation-mdq.pem}"/>
+                <TrustEngine type="Chaining">
+                <TrustEngine type="ExplicitKey"/>
+                <TrustEngine type="StaticPKIX">
+                    <!-- Use Dashboard key and cert when fetching IdP metadata -->
+                    <CredentialResolver type="File" use="TLS">
+                         <Key>
+                             <Path>${AM_DASHBOARD_SSL_KEY_FILE:-/secrets/nginx/am-dash-key.pem}</Path>
+                         </Key>
+                         <Certificate>
+                             <Path>${AM_DASHBOARD_SSL_CERT_FILE:-/secrets/nginx/am-dash-cert.pem}</Path>
+                             <Path>${AM_DASHBOARD_SSL_CA_BUNDLE_FILE:-/secrets/nginx/sp-ca-bundle.pem}</Path>
+                        </Certificate>
+                    </CredentialResolver>
+                </TrustEngine>
+                <TrustEngine type="PKIX"/>
+            </TrustEngine>
+        </MetadataProvider>
         <!-- Attributes config -->
         <AttributeExtractor type="XML" validate="true" reloadChanges="true" path="attribute-map.xml"/>
         <AttributeResolver type="Query" subjectMatch="true"/>
         <AttributeFilter type="XML" validate="true" reloadChanges="true" path="attribute-policy.xml"/>
-        <!-- Archivematica applications -->
+        <!-- Archivematica Dashboard application -->
         <ApplicationOverride id="am-dash"
           entityID="https://${AM_DASHBOARD_HOST:-dashboard.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
             <!-- Trust credentials config -->
-            <CredentialResolver type="File" key="${AM_DASHBOARD_SSL_KEY_FILE:-/secrets/nginx/am-dash-key.pem}">
+            <CredentialResolver type="File">
+              <Key>
+                <Path>${AM_DASHBOARD_SSL_KEY_FILE:-/secrets/nginx/am-dash-key.pem}</Path>
+              </Key>
               <Certificate>
                 <Path>${AM_DASHBOARD_SSL_CERT_FILE:-/secrets/nginx/am-dash-cert.pem}</Path>
-                <Path>${AM_DASHBOARD_SSL_CA_CERT_FILE:-/secrets/nginx/sp-ca-cert.pem}</Path>
+                <Path>${AM_DASHBOARD_SSL_CA_BUNDLE_FILE:-/secrets/nginx/sp-ca-bundle.pem}</Path>
               </Certificate>
             </CredentialResolver>
+            <!-- Trust engine -->
+            <TrustEngine type="Chaining">
+                <TrustEngine type="ExplicitKey"/>
+                    <TrustEngine type="StaticPKIX">
+                        <CredentialResolver type="File" use="TLS">
+                             <Key>
+                                 <Path>${AM_DASHBOARD_SSL_KEY_FILE:-/secrets/nginx/am-dash-key.pem}</Path>
+                             </Key>
+                             <Certificate>
+                                 <Path>${AM_DASHBOARD_SSL_CERT_FILE:-/secrets/nginx/am-dash-cert.pem}</Path>
+                                 <Path>${AM_DASHBOARD_SSL_CA_BUNDLE_FILE:-/secrets/nginx/sp-ca-bundle.pem}</Path>
+                            </Certificate>
+                        </CredentialResolver>
+                    </TrustEngine>
+                <TrustEngine type="PKIX"/>
+            </TrustEngine>
         </ApplicationOverride>
+        <!-- Archivematica Storage Service application -->
         <ApplicationOverride id="am-ss"
           entityID="https://${AM_STORAGE_SERVICE_HOST:-ss.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
             <!-- Trust credentials config -->
-            <CredentialResolver type="File" key="${AM_STORAGE_SERVICE_SSL_KEY_FILE:-/secrets/nginx/am-ss-key.pem}">
+            <CredentialResolver type="File">
+              <Key>
+                <Path>${AM_STORAGE_SERVICE_SSL_KEY_FILE:-/secrets/nginx/am-ss-key.pem}</Path>
+              </Key>
               <Certificate>
                 <Path>${AM_STORAGE_SERVICE_SSL_CERT_FILE:-/secrets/nginx/am-ss-cert.pem}</Path>
-                <Path>${AM_STORAGE_SERVICE_SSL_CA_CERT_FILE:-/secrets/nginx/sp-ca-cert.pem}</Path>
+                <Path>${AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE:-/secrets/nginx/sp-ca-bundle.pem}</Path>
               </Certificate>
             </CredentialResolver>
+            <!-- Trust engine -->
+            <TrustEngine type="Chaining">
+                <TrustEngine type="ExplicitKey"/>
+                    <TrustEngine type="StaticPKIX">
+                        <CredentialResolver type="File" use="TLS">
+                             <Key>
+                                 <Path>${AM_STORAGE_SERVICE_SSL_KEY_FILE:-/secrets/nginx/am-dash-key.pem}</Path>
+                             </Key>
+                             <Certificate>
+                                 <Path>${AM_STORAGE_SERVICE_SSL_CERT_FILE:-/secrets/nginx/am-dash-cert.pem}</Path>
+                                 <Path>${AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE:-/secrets/nginx/sp-ca-bundle.pem}</Path>
+                            </Certificate>
+                        </CredentialResolver>
+                    </TrustEngine>
+                <TrustEngine type="PKIX"/>
+            </TrustEngine>
         </ApplicationOverride>
         <!-- Troubleshooting: Extracts support information for IdP from its metadata. -->
         <AttributeExtractor type="Metadata" errorURL="errorURL" DisplayName="displayName"

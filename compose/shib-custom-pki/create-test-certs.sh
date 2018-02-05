@@ -226,7 +226,7 @@ main()
     local -r root_cert_file="${BUILD_DIR}/root-ca.crt"
     cp -p "${src_ca_cert_file}" "${ca_cert_file}"
     cp -p "${src_root_cert_file}" "${root_cert_file}"
-    #cat "${ca_cert_file}" "${root_cert_file}" > "${BUILD_DIR}/cabundle.crt"
+    cat "${ca_cert_file}" "${root_cert_file}" > "${BUILD_DIR}/cabundle.pem"
     # Generate certs for the IdP
     generate_idp_certs "idp.${DOMAIN_NAME}"
     # Generate certs for the SPs

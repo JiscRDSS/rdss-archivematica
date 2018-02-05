@@ -1,8 +1,15 @@
 <SecurityPolicies xmlns="urn:mace:shibboleth:2.0:native:sp:config">
 
-	<!-- Disable security for demo/test purposes. Don't use in production -->
-    <Policy id="default" validate="false">
-        <PolicyRule type="NullSecurity"/>
+    <Policy id="default" validate="true">
+        <PolicyRule type="MessageFlow" checkReplay="true" expires="60"/>
+        <PolicyRule type="Conditions">
+            <PolicyRule type="Audience"/>
+            <!-- Enable Delegation rule to permit delegated access. -->
+            <!-- <PolicyRule type="Delegation"/> -->
+        </PolicyRule>
+        <PolicyRule type="ClientCertAuth" errorFatal="true"/>
+        <PolicyRule type="XMLSigning" errorFatal="true"/>
+        <PolicyRule type="SimpleSigning" errorFatal="true"/>
     </Policy>
 
 </SecurityPolicies>

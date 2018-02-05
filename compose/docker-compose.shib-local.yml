@@ -24,9 +24,9 @@ services:
     environment:
       DOMAIN_NAME: "${DOMAIN_NAME}"
       # Deployment settings
-      AM_EXTERNAL_PORT: "${AM_EXTERNAL_PORT}"
+      AM_EXTERNAL_PORT:
       IDP_HOSTNAME: "idp.${DOMAIN_NAME}"
-      IDP_EXTERNAL_PORT: "${IDP_EXTERNAL_PORT}"
+      IDP_EXTERNAL_PORT:
       IDP_KEYSTORE_PASSWORD: "12345"
     volumes:
       - "idp_logs:/opt/shibboleth-idp/logs"

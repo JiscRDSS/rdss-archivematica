@@ -333,11 +333,11 @@ For the `nginx` service:
 	# This extends the `nginx` definition in `am-shib` to add custom PKI files
 	nginx:
 	    environment:
-		    AM_DASHBOARD_SSL_CA_CERT_FILE: "/etc/pki/shibboleth-sp/ca.crt"
+		    AM_DASHBOARD_SSL_CA_BUNDLE_FILE: "/etc/pki/shibboleth-sp/cabundle.pem"
 		    AM_DASHBOARD_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-dash.crt"
 		    AM_DASHBOARD_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-dash.key"
 		    AM_DASHBOARD_SSL_WEB_CERT_FILE: "/etc/pki/shibboleth-sp/am-dash-web.crt"
-		    AM_STORAGE_SERVICE_SSL_CA_CERT_FILE: "/etc/pki/shibboleth-sp/ca.crt"
+		    AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE: "/etc/pki/shibboleth-sp/cabundle.pem"
 		    AM_STORAGE_SERVICE_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss.crt"
 		    AM_STORAGE_SERVICE_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-ss.key"
 		    AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss-web.crt"

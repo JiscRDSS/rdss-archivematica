@@ -68,18 +68,20 @@ The following environment variables are used by these service containers:
 | Variable | Description |
 |---|---|
 | AM_DASHBOARD_EXTERNAL_PORT | The external port that the Archivematica Dashboard should be exposed on. Default is 443. |
-| AM_DASHBOARD_SSL_CA_CERT_FILE | The CA certificate file to secure the Archivematica Dashboard with for Shibboleth communications. | `/secrets/nginx/sp-ca-cert.pem` |
+| AM_DASHBOARD_SSL_CA_BUNDLE_FILE | The CA certificates file to secure the Archivematica Dashboard with for Shibboleth communications. This is expected to be a bundle, with the whole certificate chain included. | `/secrets/nginx/sp-ca-bundle.pem` |
 | AM_DASHBOARD_SSL_CERT_FILE | The certificate file to secure the Archivematica Dashboard with for Shibboleth communications. | `/secrets/nginx/am-dash-cert.pem` |
 | AM_DASHBOARD_SSL_KEY_FILE | The private key file to secure the Archivematica Dashboard service with. | `/secrets/nginx/am-dash-key.pem` |
 | AM_DASHBOARD_SSL_WEB_CERT_FILE | The certificate file to secure the Archivematica Dashboard web service with. | `/secrets/nginx/am-dash-web-cert.pem` |
 | AM_STORAGE_SERVICE_EXTERNAL_PORT | The external port that the Archivematica Storage Service should be exposed on. Default is 8443 |
-| AM_STORAGE_SERVICE_SSL_CA_CERT_FILE | The CA certificate file to secure the Archivematica Storage Service with for Shibboleth communications. | `/secrets/nginx/sp-ca-cert.pem` |
+| AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE | The CA certificates file to secure the Archivematica Storage Service with for Shibboleth communications. This is expected be a bundle, with the whole certificate chain included. | `/secrets/nginx/sp-ca-bundle.pem` |
 | AM_STORAGE_SERVICE_SSL_CERT_FILE | The certificate file to secure the Archivematica Storage Service with for Shibboleth communications. | `/secrets/nginx/am-ss-cert.pem` |
 | AM_STORAGE_SERVICE_SSL_KEY_FILE | The private key file to secure the Archivematica Storage Service service with. | `/secrets/nginx/am-ss-key.pem` |
 | AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE | The certificate file to secure the Archivematica Storage Service web service with. | `/secrets/nginx/am-ss-web-cert.pem` |
 | NGINX_EXTERNAL_IP | The external IP address that `nginx` should bind to. Default is `0.0.0.0`, meaning the service is available on all interfaces. |
 | SHIBBOLETH_IDP_ENTITY_ID | The `entityID` of the IdP that the SP should use for authentication. By default it will use the local Shibboleth IdP service. |
 | SHIBBOLETH_IDP_METADATA_URL | The URL of the IdP metadata that the SP should use for authentication. By default it will contact the local Shibboleth IdP service to obtain its metadata. |
+| `SHIBBOLETH_METADATA_SIGNING_CERT` | Certificate file to use to verify the signature of metadata responses from the IdP. | `ukfederation-mdq.pem` |
+| `SHIBBOLETH_METADATA_URL_SUBST` | The "substitution string" to use when determining the metadata URL for the IdP's entity id. | `http://mdq.ukfederation.org.uk/entities/$entityID` |
 
 Entitlements
 -------------
@@ -107,14 +109,14 @@ The environment variables must be applied to the `nginx` container, because that
 services:
   nginx:
     environment:
-      AM_DASHBOARD_SSL_KEY_FILE:            '/secrets/dash-private-key.pem'
-      AM_DASHBOARD_SSL_CERT_FILE:           '/secrets/dash-sp-certificate.pem'
-      AM_DASHBOARD_SSL_WEB_CERT_FILE:       '/secrets/dash-web-certificate.pem'
-      AM_DASHBOARD_SSL_CA_CERT_FILE:        '/secrets/ca-certificate.pem'
-      AM_STORAGE_SERVICE_SSL_KEY_FILE:      '/secrets/ss-private-key.pem'
-      AM_STORAGE_SERVICE_SSL_CERT_FILE:     '/secrets/ss-sp-certificate.pem'
-      AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE: '/secrets/ss-web-certificate.pem'
-      AM_STORAGE_SERVICE_SSL_CA_CERT_FILE:  '/secrets/ca-certificate.pem'
+      AM_DASHBOARD_SSL_KEY_FILE:              '/secrets/dash-private-key.pem'
+      AM_DASHBOARD_SSL_CERT_FILE:             '/secrets/dash-sp-certificate.pem'
+      AM_DASHBOARD_SSL_WEB_CERT_FILE:         '/secrets/dash-web-certificate.pem'
+      AM_DASHBOARD_SSL_CA_BUNDLE_FILE:        '/secrets/cabundle.pem'
+      AM_STORAGE_SERVICE_SSL_KEY_FILE:        '/secrets/ss-private-key.pem'
+      AM_STORAGE_SERVICE_SSL_CERT_FILE:       '/secrets/ss-sp-certificate.pem'
+      AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE:   '/secrets/ss-web-certificate.pem'
+      AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE:  '/secrets/cabundle.pem'
     volumes:
       - '/keys/dash/private-key.pem:/secrets/dash-private-key.pem:ro'
       - '/keys/dash/sp-certificate.pem:/secrets/dash-sp-certificate.pem:ro'
@@ -122,16 +124,12 @@ services:
       - '/keys/ss/private-key.pem:/secrets/ss-private-key.pem:ro'
       - '/keys/ss/sp-certificate.pem:/secrets/ss-sp-certificate.pem:ro'
       - '/keys/ss/web-certificate.pem:/secrets/ss-web-certificate.pem:ro'
-      - '/keys/ca-certificate.pem:/secrets/ca-certificate.pem:ro'
+      - '/keys/cabundle.pem:/secrets/cabundle.pem:ro'
 ```
 
 There are two different types of service being secured by SSL: the Shibboleth SP for each application, and the Nginx virtual host for each application. Each application is expected to have a different hostname, which means different CNs, which requires different certificates to secure it (unless using a wildcard certificate, but we cannot assume this). 
 
 In addition, the application SP certificates must include the "subject alt name" of the host, as a "DNS" entry in the certificate metadata. This means that they must be seperate to those used by `nginx`. If using OpenSSL to create the SP certificates then the following must be added to the OpenSSL config:
-
-Currently, any intermediate certificates should be bundled in the CA certificate files.
-
-All key and certificate files must be in PEM format.
 
 ```
 [ req_ext ]
@@ -143,6 +141,20 @@ DNS.1 = ${hostname}
 
 This is exactly as they are used in the [create-secrets.sh](nginx/create-secrets.sh) script, in which the OpenSSL config is generated (hence the use of `${hostname}` instead of a static value).
 
+Currently, any intermediate certificates should be bundled in the CA certificate files.
+
+All key and certificate files must be in PEM format.
+
+
+
+Shibboleth Metadata
+--------------------
+
+The Shibboleth SPs are configured to use a dynamic metadata provider. This means that the IdP's entity id will be used to determine the URL to request metadata from, and the returned metadata will have its signature checked against a given certificate.
+
+By default it is assumed that the IdP will be a well-known identity provide registered with the UKAMF, so the metadata URL will be resolved using the substitution `http://mdq.ukfederation.org.uk/entities/$entityID`. To override this, set the `SHIBBOLETH_METADATA_URL_SUBST` environment variable.
+
+The certificate used to verify the signature of the metadata may also be specified. By default the `ukfederation-mdq.pem` certificate will be used, which is pre-installed in the image, but setting `SHIBBOLETH_METADATA_SIGNING_CERT` will override this and use the file path specified. The file given must be mounted from the host into the container using a volume mount.
 
 
 Diagnostics
@@ -184,9 +196,9 @@ When using this tool, extra log output can be obtained by modifying the `console
 
 The `resolvertest` tool can be used to test what attributes the SP receives from the IdP and what survive the various filters etc. Its full documentation is [here](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPresolvertest).
 
-As an example, here's how you might check what happens when the SP tries to resolve the attributes for the user `aa` for the `archivematica-dashboard` application:
+As an example, here's how you might check what happens when the SP tries to resolve the attributes for the user `aa` for the `am-dash` application:
 
-	resolvertest -a archivematica-dashboard -i https://idp.example.ac.uk/idp/shibboleth -saml2 -n aa@example.ac.uk
+	resolvertest -a am-dash -i https://idp.example.ac.uk/idp/shibboleth -saml2 -n aa@example.ac.uk
 
 As with `mdquery`, the `console.logger` configuration file can be used to increase the logging level to offer more information for diagnostics.
 

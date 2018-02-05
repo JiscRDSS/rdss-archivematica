@@ -29,10 +29,14 @@ services:
       # Shibboleth FastCGI SP config
       SHIBBOLETH_IDP_ENTITY_ID: "https://idp.${DOMAIN_NAME}/idp/shibboleth"
       SHIBBOLETH_IDP_METADATA_URL: "https://idp.${DOMAIN_NAME}:${IDP_EXTERNAL_PORT}/idp/shibboleth"
+      # Metadata config - set URL subst to same as IdP metadata URL for our local IDP
+      SHIBBOLETH_METADATA_SIGNING_CERT: "/etc/shibboleth/md-signing.crt"
+      SHIBBOLETH_METADATA_URL_SUBST: "https://idp.${DOMAIN_NAME}:${IDP_EXTERNAL_PORT}/idp/shibboleth"
       # Deployment settings
       AM_EXTERNAL_PORT:
     volumes:
       - "${VOL_BASE}/am-shib/build/secrets/:/secrets/:ro"
+      - "${VOL_BASE}/../shib-local/build/secrets/idp/idp.${DOMAIN_NAME}.crt:/etc/shibboleth/md-signing.crt:ro"
     ports:
       - "${NGINX_EXTERNAL_IP}:${AM_EXTERNAL_PORT}:443"
     depends_on:
