@@ -71,11 +71,19 @@ The following environment variables are used by this service:
 
 | Variable | Description |
 |---|---|
-| AM_DASHBOARD_EXTERNAL_PORT | The external port that the Archivematica Dashboard should be exposed on - required . Default is 443. |
-| AM_STORAGE_SERVICE_EXTERNAL_PORT | The external port that the Archivematica Storage Service should be exposed on. Default is 8443 |
+| AM_DASHBOARD_HOST | The hostname for the Archivematica Dashboard. Default value is `dashboard.archivematica.example.ac.uk`. |
+| AM_EXTERNAL_PORT | The external port that the Archivematica Dashboard should be exposed on - required . Default is 443. |
+| AM_STORAGE_SERVICE_HOST | The hostname for the Archivematica Storage Service. Default value is `ss.archivematica.example.ac.uk`. |
 | DOMAIN_NAME | The domain name to use for this IdP. This becomes the Shibboleth "scope", i.e. the domain that is 'managed' by this IdP. Default value is `example.ac.uk` |
-| IDP_EXTERNAL_PORT | The external port that the IdP is exposed on. Default is 6443. |
-| NGINX_HOSTNAME | The hostname of the `nginx` service, which is expected to be proxying the Archivematica Dashboard and Storage Service. Default value is `archivematica.example.ac.uk`. |
+| IDP_EXTERNAL_PORT | The external port that the IdP is exposed on. Default is 4443. |
+
+
+## Important Note
+
+Previous versions supported additional environment variables that are no longer supported:
+
+* `AM_DASHBOARD_EXTERNAL_PORT` and `AM_STORAGE_SERVICE_EXTERNAL_PORT` have now been replaced by `AM_EXTERNAL_PORT`
+* `NGINX_HOSTNAME` has been replaced by `AM_DASHBOARD_HOST` and `AM_STORAGE_SERVICE_HOST`
 
 UI Customization
 -----------------

@@ -11,11 +11,12 @@ DOCKER_BUILD_UID ?= $(shell id -u)
 
 DOMAIN_NAME ?= example.ac.uk
 
-IDP_EXTERNAL_PORT ?= 6443
+IDP_EXTERNAL_PORT ?= 4443
 
 IDP_LDAP_HOSTNAME ?= ldap.$(DOMAIN_NAME)
 
-NGINX_HOSTNAME ?= archivematica.$(DOMAIN_NAME)
+AM_DASHBOARD_HOST ?= dashboard.archivematica.$(DOMAIN_NAME)
+AM_STORAGE_SERVICE_HOST ?= ss.archivematica.$(DOMAIN_NAME)
 
 all: destroy init-ca build create-secrets up bootstrap list
 
@@ -35,7 +36,8 @@ build-idp:
 		--volume "$(VOL_BASE)/shib-local/etc/idp/:/src/etc/:ro" \
 		--volume "$(VOL_BASE)/shib-local/build/idp/:/build" \
 		--workdir "/src" \
-		-e NGINX_HOSTNAME=$(NGINX_HOSTNAME) \
+		-e AM_DASHBOARD_HOST=$(AM_DASHBOARD_HOST) \
+		-e AM_STORAGE_SERVICE_HOST=$(AM_STORAGE_SERVICE_HOST) \
 		python:2-alpine \
 		python idp-metadata-providers.py /src/etc/service-providers.json > \
 			"$(BASE_DIR)/build/idp/metadata-providers.xml"

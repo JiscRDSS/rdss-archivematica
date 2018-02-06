@@ -7,9 +7,9 @@
     <RequestMapper type="XML">
         <RequestMap authType="shibboleth" requireSession="true">
           <!-- Declare the host for the Archivematica Dashboard -->
-          <Host applicationId="archivematica-dashboard"
-            name="${NGINX_HOSTNAME:-archivematica.example.ac.uk}"
-            scheme="https" port="${AM_DASHBOARD_EXTERNAL_PORT:-443}">
+          <Host applicationId="am-dash"
+            name="${AM_DASHBOARD_HOST:-dashboard.archivematica.example.ac.uk}"
+            scheme="https" port="${AM_EXTERNAL_PORT:-443}">
             <!-- Access to the Archivematica Dashboard requires preservation entitlement -->
             <AccessControl>
                 <OR>
@@ -22,9 +22,9 @@
             <Path name="media" authType="None" requireSession="false"/>
           </Host>
           <!-- Declare the host for the Archivematica Storage Service -->
-          <Host applicationId="archivematica-storage-service"
-            name="${NGINX_HOSTNAME:-archivematica.example.ac.uk}"
-            scheme="https" port="${AM_STORAGE_SERVICE_EXTERNAL_PORT:-8443}">
+          <Host applicationId="am-ss"
+            name="${AM_STORAGE_SERVICE_HOST:-ss.archivematica.example.ac.uk}"
+            scheme="https" port="${AM_EXTERNAL_PORT:-443}">
             <!-- Access to the Archivematica Storage Service requires preservation entitlement -->
             <AccessControl>
                 <OR>
@@ -38,7 +38,7 @@
           </Host>
         </RequestMap>
     </RequestMapper>
-    <ApplicationDefaults entityID="https://${NGINX_HOSTNAME:-archivematica.example.ac.uk}/Shibboleth.sso/metadata" 
+    <ApplicationDefaults entityID="default-always-overridden"
             REMOTE_USER="eppn persistent-id targeted-id"
             sessionHook="/Shibboleth.sso/AttrChecker"
             metadataAttributePrefix="Meta-" >
@@ -65,18 +65,27 @@
         <AttributeExtractor type="XML" validate="true" reloadChanges="true" path="attribute-map.xml"/>
         <AttributeResolver type="Query" subjectMatch="true"/>
         <AttributeFilter type="XML" validate="true" reloadChanges="true" path="attribute-policy.xml"/>
-        <!-- Trust credentials config -->
-        <CredentialResolver type="File" key="/secrets/nginx/sp-key.pem">
-          <Certificate>
-            <Path>/secrets/nginx/sp-cert.pem</Path>
-            <Path>/secrets/nginx/sp-ca-cert.pem</Path>
-          </Certificate>
-        </CredentialResolver>
         <!-- Archivematica applications -->
-        <ApplicationOverride id="archivematica-dashboard"
-          entityID="https://${NGINX_HOSTNAME:-archivematica.example.ac.uk}:${AM_DASHBOARD_EXTERNAL_PORT:-443}/Shibboleth.sso/metadata"/>
-        <ApplicationOverride id="archivematica-storage-service"
-          entityID="https://${NGINX_HOSTNAME:-archivematica.example.ac.uk}:${AM_STORAGE_SERVICE_EXTERNAL_PORT:-8443}/Shibboleth.sso/metadata"/>
+        <ApplicationOverride id="am-dash"
+          entityID="https://${AM_DASHBOARD_HOST:-dashboard.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
+            <!-- Trust credentials config -->
+            <CredentialResolver type="File" key="/secrets/nginx/am-dash-key.pem">
+              <Certificate>
+                <Path>/secrets/nginx/am-dash-cert.pem</Path>
+                <Path>/secrets/nginx/sp-ca-cert.pem</Path>
+              </Certificate>
+            </CredentialResolver>
+        </ApplicationOverride>
+        <ApplicationOverride id="am-ss"
+          entityID="https://${AM_STORAGE_SERVICE_HOST:-ss.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
+            <!-- Trust credentials config -->
+            <CredentialResolver type="File" key="/secrets/nginx/am-ss-key.pem">
+              <Certificate>
+                <Path>/secrets/nginx/am-ss-cert.pem</Path>
+                <Path>/secrets/nginx/sp-ca-cert.pem</Path>
+              </Certificate>
+            </CredentialResolver>
+        </ApplicationOverride>
         <!-- Troubleshooting: Extracts support information for IdP from its metadata. -->
         <AttributeExtractor type="Metadata" errorURL="errorURL" DisplayName="displayName"
             InformationURL="informationURL" PrivacyStatementURL="privacyStatementURL"

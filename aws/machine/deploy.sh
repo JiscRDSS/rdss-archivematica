@@ -94,7 +94,7 @@ deploy_containers() {
         export DOMAIN_ORGANISATION=${DOMAIN_ORGANISATION} ; \
         export NGINX_EXTERNAL_IP='0.0.0.0' ; \
         export IDP_EXTERNAL_IP='0.0.0.0' ; \
-        export IDP_EXTERNAL_PORT=6443 ; \
+        export IDP_EXTERNAL_PORT=4443 ; \
         export REGISTRY=localhost:5000/ ; \
             make all \
                 SHIBBOLETH_CONFIG=${SHIBBOLETH_CONFIG} \
@@ -151,8 +151,9 @@ deploy_dockerhost()
     am_ss_port="$(docker_get_service_port 'nginx' 8000)"
     nextcloud_port="$(docker_get_service_port 'nextcloud' 8888)"
     if [ "${SHIB_ENABLED}" == "true" ] ; then
+        # Dash and SS use the same port with Shibboleth enabled
         am_dash_port="$(docker_get_service_port 'nginx' 443)"
-        am_ss_port="$(docker_get_service_port 'nginx' 8443)"
+        am_ss_port="${am_dash_port}"
         nextcloud_port="$(docker_get_service_port 'nextcloud' 8888)"
         shib_idp_port="$(docker_get_service_port 'idp' 4443)"
     fi
@@ -167,13 +168,24 @@ deploy_dockerhost()
     # Add a private hosts entry for the docker host
     local -r priv_ip="$(aws_ec2_get_private_ip_for_instance_name "${DOCKERHOST_INSTANCE}")"
     aws_r53_add_host "${PRIVATE_HOSTED_ZONE}" "dockerhost" "${priv_ip}"
-    # Add alias and services for Archivematica
-    aws_r53_add_host_alias "${PRIVATE_HOSTED_ZONE}" \
-        "archivematica" "dockerhost.${PRIVATE_HOSTED_ZONE}"
-    aws_r53_add_service "${PRIVATE_HOSTED_ZONE}" \
-        "am_dashboard" "${am_dash_port}" "tcp" "archivematica.${PRIVATE_HOSTED_ZONE}"
-    aws_r53_add_service "${PRIVATE_HOSTED_ZONE}" \
-        "am_storage_service" "${am_ss_port}" "tcp" "archivematica.${PRIVATE_HOSTED_ZONE}"
+    # Add aliases and services for Archivematica
+    if [ "${SHIB_ENABLED}" == "true" ] ; then
+        aws_r53_add_host_alias "${PRIVATE_HOSTED_ZONE}" \
+            "dashboard.archivematica" "dockerhost.${PRIVATE_HOSTED_ZONE}"
+        aws_r53_add_host_alias "${PRIVATE_HOSTED_ZONE}" \
+            "ss.archivematica" "dockerhost.${PRIVATE_HOSTED_ZONE}"
+        aws_r53_add_service "${PRIVATE_HOSTED_ZONE}" \
+            "am_dashboard" "${am_dash_port}" "tcp" "dashboard.archivematica.${PRIVATE_HOSTED_ZONE}"
+        aws_r53_add_service "${PRIVATE_HOSTED_ZONE}" \
+            "am_storage_service" "${am_ss_port}" "tcp" "ss.archivematica.${PRIVATE_HOSTED_ZONE}"
+    else
+        aws_r53_add_host_alias "${PRIVATE_HOSTED_ZONE}" \
+            "archivematica" "dockerhost.${PRIVATE_HOSTED_ZONE}"
+        aws_r53_add_service "${PRIVATE_HOSTED_ZONE}" \
+            "am_dashboard" "${am_dash_port}" "tcp" "archivematica.${PRIVATE_HOSTED_ZONE}"
+        aws_r53_add_service "${PRIVATE_HOSTED_ZONE}" \
+            "am_storage_service" "${am_ss_port}" "tcp" "archivematica.${PRIVATE_HOSTED_ZONE}"
+    fi
     # Add alias and service for NextCloud, if required
     aws_r53_add_host_alias "${PRIVATE_HOSTED_ZONE}" \
         "nextcloud" "dockerhost.${PRIVATE_HOSTED_ZONE}"
@@ -188,10 +200,13 @@ deploy_dockerhost()
     fi
     # Add public service entries for each of the externally accessible services
     local -r pub_ip="$(aws_ec2_get_public_ip_for_instance_name "${DOCKERHOST_INSTANCE}")"
-    aws_r53_add_host "${PUBLIC_HOSTED_ZONE}" "archivematica" "${pub_ip}"
     aws_r53_add_host "${PUBLIC_HOSTED_ZONE}" "nextcloud" "${pub_ip}"
     if [ "${SHIB_ENABLED}" == "true" ] ; then
+        aws_r53_add_host "${PUBLIC_HOSTED_ZONE}" "dashboard.archivematica" "${pub_ip}"
+        aws_r53_add_host "${PUBLIC_HOSTED_ZONE}" "ss.archivematica" "${pub_ip}"
         aws_r53_add_host "${PUBLIC_HOSTED_ZONE}" "idp" "${pub_ip}"
+    else
+        aws_r53_add_host "${PUBLIC_HOSTED_ZONE}" "archivematica" "${pub_ip}"
     fi
 }
 
@@ -307,10 +322,7 @@ prepare_dockerhost()
         "sudo rm -Rf ${clone_dir} && mkdir -p ${clone_dir} && \
             git clone --branch '${RDSSARK_VERSION}' \
                 ${RDSS_ARCHIVEMATICA_REPO} ${clone_dir} && \
-            ansible-playbook  \
-                --extra-vars='registry=localhost:5000/ rdss_version=${RDSSARK_VERSION}' \
-                ${clone_dir}/publish-images-playbook.yml \
-                ${clone_dir}/publish-qa-images-playbook.yml"
+            cd ${clone_dir} && make publish REGISTRY=localhost:5000/"
 }
 
 # Entrypoint ###################################################################
@@ -343,8 +355,8 @@ main()
     am_ss_url="http://archivematica.${PUBLIC_HOSTED_ZONE}:<dynamic-port>/"
     if [ "${SHIB_ENABLED}" == "true" ] ; then
         # With Shibboleth enabled the ports are fixed and HTTPS is used
-        am_dash_url="https://archivematica.${PUBLIC_HOSTED_ZONE}/"
-        am_ss_url="https://archivematica.${PUBLIC_HOSTED_ZONE}:8443/"
+        am_dash_url="https://dashboard.archivematica.${PUBLIC_HOSTED_ZONE}/"
+        am_ss_url="https://ss.archivematica.${PUBLIC_HOSTED_ZONE}/"
     fi
     log_info "  Archivematica Dashboard:       ${am_dash_url}"
     log_info "  Archivematica Storage Service: ${am_ss_url}"

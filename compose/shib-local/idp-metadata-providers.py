@@ -51,9 +51,9 @@ with open(sp_conf_file, 'r') as f:
    sp_conf = json.load(f)
    for sp in sp_conf:
       metadata_url = sp_conf[sp]['metadata'].replace(
-         '${NGINX_HOSTNAME}', os.getenv('NGINX_HOSTNAME', 'archivematica.example.ac.uk')).replace(
-         '${AM_DASHBOARD_EXTERNAL_PORT}', os.getenv('AM_DASHBOARD_EXTERNAL_PORT', '443')).replace(
-         '${AM_STORAGE_SERVICE_EXTERNAL_PORT}', os.getenv('AM_STORAGE_SERVICE_EXTERNAL_PORT', '8443'))
+         '${AM_DASHBOARD_HOST}', os.getenv('AM_DASHBOARD_HOST', 'dashboard.archivematica.example.ac.uk')).replace(
+         '${AM_STORAGE_SERVICE_HOST}', os.getenv('AM_STORAGE_SERVICE_HOST', 'ss.archivematica.example.ac.uk')).replace(
+         '${AM_EXTERNAL_PORT}', os.getenv('AM_EXTERNAL_PORT', '443'))
       print ("""
     <MetadataProvider xsi:type="FileBackedHTTPMetadataProvider"
         id="{name}Metadata"

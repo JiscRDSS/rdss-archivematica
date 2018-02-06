@@ -1,7 +1,7 @@
 
 # Required params
 idp.scope=${IDP_DOMAIN}
-idp.entityID=https://${IDP_HOSTNAME}:${IDP_EXTERNAL_PORT}/idp/shibboleth
+idp.entityID=https://${IDP_HOSTNAME}/idp/shibboleth
 idp.ldap.basedn=${IDP_DOMAIN_BASEDN}
 idp.ldap.host=${IDP_LDAP_HOSTNAME}
 

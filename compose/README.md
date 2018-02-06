@@ -170,11 +170,11 @@ After a successful build of the Shibboleth-enabled Archivematica services and Ne
 
 	              Name                             Command                             State                              Ports
 	-----------------------------------------------------------------------------------------------------------------------------------------
-	archivematica.example.ac.uk        /usr/local/bin/ep -v /etc/ ...     Up                                 0.0.0.0:443->443/tcp,
+	rdss_nginx_1                       /usr/local/bin/ep -v /etc/ ...     Up                                 0.0.0.0:443->443/tcp,
 	                                                                                                         0.0.0.0:34312->80/tcp,
 	                                                                                                         0.0.0.0:34311->8000/tcp,
-	                                                                                                         0.0.0.0:8443->8443/tcp, 9090/tcp
-	idp.example.ac.uk                  /bin/sh -c bootstrap.sh && ...     Up                                 0.0.0.0:6443->4443/tcp, 8443/tcp
+	                                                                                                         9090/tcp
+	idp.example.ac.uk                  /bin/sh -c bootstrap.sh && ...     Up                                 0.0.0.0:4443->4443/tcp, 8443/tcp
 	rdss_archivematica-dashboard_1     /bin/sh -c /usr/local/bin/ ...     Up                                 8000/tcp
 	rdss_archivematica-mcp-client_1    /bin/sh -c /src/MCPClient/ ...     Up
 	rdss_archivematica-mcp-server_1    /bin/sh -c /src/MCPServer/ ...     Up
@@ -198,7 +198,7 @@ After a successful build of the Shibboleth-enabled Archivematica services and Ne
 	msgcreator_1
 	rdss_redis_1                       docker-entrypoint.sh --sav ...     Up                                 6379/tcp
 
-Notice that the `idp.example.ac.uk`,  and `archivematica.example.ac.uk` have specific ports exposed - this is because Shibboleth requires well-known URLs for the Service Provider and Identity Provider.
+Notice that the `idp.example.ac.uk` and `rdss_nginx_1` containers have specific ports exposed - this is because Shibboleth requires well-known URLs for the Service Provider and Identity Provider.
 
 If you wish to change the ports used to something other than the default then you can change them using the environment variables defined in the [.env](.env) file in this folder, which is used by `docker-compose` during the build, or by overriding them via environment variables:
 

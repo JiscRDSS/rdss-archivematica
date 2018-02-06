@@ -7,7 +7,7 @@ IDP_LDAP_HOSTNAME=${IDP_LDAP_HOSTNAME:-"ldap.${DOMAIN_NAME}"}
 
 IDP_DOMAIN=${DOMAIN_NAME}
 IDP_DOMAIN_BASEDN="$(echo -n DC=${IDP_DOMAIN} | sed 's#[.]#,DC=#g')"
-IDP_EXTERNAL_PORT=${IDP_EXTERNAL_PORT:-443}
+IDP_EXTERNAL_PORT=${IDP_EXTERNAL_PORT:-4443}
 
 export JAVA_HOME=/opt/jre-home
 export PATH=$PATH:$JAVA_HOME/bin
@@ -66,7 +66,7 @@ cat idp-metadata.xml.head idp-metadata.xml.mid idp-metadata.xml.tail \
 	> idp-metadata.xml
 
 # Replace IdP host with actual 'external' host/port
-sed -i "s|https://${IDP_HOSTNAME}/idp/|https://${IDP_HOSTNAME}:${IDP_EXTERNAL_PORT}/idp/|g" idp-metadata.xml
+sed -i "s|Location=\"https://${IDP_HOSTNAME}/idp/|Location=\"https://${IDP_HOSTNAME}:${IDP_EXTERNAL_PORT}/idp/|g" idp-metadata.xml
 
 cp idp-metadata.xml /ext-mount/customized-shibboleth-idp/metadata/
 

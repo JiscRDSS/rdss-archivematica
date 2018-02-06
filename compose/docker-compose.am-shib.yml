@@ -4,7 +4,7 @@ version: "2"
 services:
 
   # Override main nginx config, enabling Shibboleth for Archivematica services
-  # Dashboard runs on 443 and Storage Service on 8443
+  # which both run on port 443
   nginx:
     image: "arkivum/shibboleth-nginx:${DOMAIN_NAME}"
     build:
@@ -14,21 +14,25 @@ services:
         - NGINX_CONF_TEMPLATE_FILE=templates/am-shib.conf.tpl
         - SHIBBOLETH_ATTRCHECKER_TEMPLATE_FILE=templates/attrChecker.html.tpl
         - SHIBBOLETH_CONF_TEMPLATE_FILE=templates/shibboleth2.xml.tpl
-    container_name: "archivematica.${DOMAIN_NAME}"
-    hostname: "archivematica"
-    domainname: "${DOMAIN_NAME}"
     networks:
-      - "default"
-      - "shibnet"
+      default:
+          aliases:
+            - "dashboard.archivematica.${DOMAIN_NAME}"
+            - "ss.archivematica.${DOMAIN_NAME}"
+      shibnet:
+          aliases:
+            - "dashboard.archivematica.${DOMAIN_NAME}"
+            - "ss.archivematica.${DOMAIN_NAME}"
+
     environment:
       # The hostname of the nginx server serving Archivematica
-      NGINX_HOSTNAME: "archivematica.${DOMAIN_NAME}"
+      AM_DASHBOARD_HOST: "dashboard.archivematica.${DOMAIN_NAME}"
+      AM_STORAGE_SERVICE_HOST: "ss.archivematica.${DOMAIN_NAME}"
       # Shibboleth FastCGI SP config
-      SHIBBOLETH_IDP_ENTITY_ID: "https://idp.${DOMAIN_NAME}:${IDP_EXTERNAL_PORT}/idp/shibboleth"
-      SHIBBOLETH_IDP_METADATA_URL: "https://idp.${DOMAIN_NAME}:4443/idp/shibboleth"
+      SHIBBOLETH_IDP_ENTITY_ID: "https://idp.${DOMAIN_NAME}/idp/shibboleth"
+      SHIBBOLETH_IDP_METADATA_URL: "https://idp.${DOMAIN_NAME}:${IDP_EXTERNAL_PORT}/idp/shibboleth"
       # Deployment settings
-      AM_DASHBOARD_EXTERNAL_PORT: "${AM_DASHBOARD_EXTERNAL_PORT}"
-      AM_STORAGE_SERVICE_EXTERNAL_PORT: "${AM_STORAGE_SERVICE_EXTERNAL_PORT}"
+      AM_EXTERNAL_PORT:
     volumes:
       #
       # Nginx
@@ -70,10 +74,8 @@ services:
     ]
     expose:
       - "443"
-      - "8443"
     ports:
-      - "${NGINX_EXTERNAL_IP}:${AM_DASHBOARD_EXTERNAL_PORT}:443"
-      - "${NGINX_EXTERNAL_IP}:${AM_STORAGE_SERVICE_EXTERNAL_PORT}:8443"
+      - "${NGINX_EXTERNAL_IP}:${AM_EXTERNAL_PORT}:443"
     depends_on:
       - "archivematica-dashboard"
       - "archivematica-storage-service"

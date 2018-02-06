@@ -36,7 +36,7 @@ destroy_containers() {
             export DOMAIN_ORGANISATION=${DOMAIN_ORGANISATION} ; \
             export NGINX_EXTERNAL_IP='0.0.0.0' ; \
             export IDP_EXTERNAL_IP='0.0.0.0' ; \
-            export IDP_EXTERNAL_PORT=6443 ; \
+            export IDP_EXTERNAL_PORT=4443 ; \
                 make destroy \
                     SHIBBOLETH_CONFIG=${SHIBBOLETH_CONFIG} \
                     NEXTCLOUD_ENABLED=true ; \
