@@ -9,7 +9,7 @@
           <!-- Declare the host for the Archivematica Dashboard -->
           <Host applicationId="am-dash"
             name="${AM_DASHBOARD_HOST:-dashboard.archivematica.example.ac.uk}"
-            scheme="https" port="${AM_EXTERNAL_PORT:-443}">
+            scheme="http" port="80">
             <!-- Access to the Archivematica Dashboard requires preservation entitlement -->
             <AccessControl>
                 <OR>
@@ -24,7 +24,7 @@
           <!-- Declare the host for the Archivematica Storage Service -->
           <Host applicationId="am-ss"
             name="${AM_STORAGE_SERVICE_HOST:-ss.archivematica.example.ac.uk}"
-            scheme="https" port="${AM_EXTERNAL_PORT:-443}">
+            scheme="http" port="80">
             <!-- Access to the Archivematica Storage Service requires preservation entitlement -->
             <AccessControl>
                 <OR>
@@ -45,8 +45,8 @@
         <!-- Session config -->
         <Sessions lifetime="28800" timeout="3600" relayState="ss:mem"
                   checkAddress="false"
-                  handlerSSL="true"
-                  cookieProps="https">
+                  handlerSSL="false"
+                  cookieProps="http">
             <SSO entityID="${SHIBBOLETH_IDP_ENTITY_ID:-https://idp.example.ac.uk/idp/shibboleth}">SAML2</SSO>
             <Logout>SAML2 Local</Logout>
             <Handler type="MetadataGenerator" Location="/metadata" signing="false"/>
@@ -56,6 +56,16 @@
            <Handler type="AttributeChecker" Location="/AttrChecker" attributes="cn entitlement eppn givenName mail sn"
                 template="attrChecker.html" flushSession="true" showAttributeValues="true"/>
         </Sessions>
+        <!-- Default trust credentials for TLS - use Dashboard key and certs -->
+		<CredentialResolver type="File" use="TLS">
+		  <Key>
+			<Path>${AM_DASHBOARD_SSL_KEY_FILE:-/secrets/nginx/am-dash-key.pem}</Path>
+		  </Key>
+		  <Certificate>
+			<Path>${AM_DASHBOARD_SSL_CERT_FILE:-/secrets/nginx/am-dash-cert.pem}</Path>
+			<Path>${AM_DASHBOARD_SSL_CA_BUNDLE_FILE:-/secrets/nginx/sp-ca-bundle.pem}</Path>
+		  </Certificate>
+		</CredentialResolver>
         <!-- Metadata provider -->
         <MetadataProvider type="Dynamic"
             minCacheDuration="10" refreshDelayFactory="0.1">
@@ -85,7 +95,7 @@
         <AttributeFilter type="XML" validate="true" reloadChanges="true" path="attribute-policy.xml"/>
         <!-- Archivematica Dashboard application -->
         <ApplicationOverride id="am-dash"
-          entityID="https://${AM_DASHBOARD_HOST:-dashboard.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
+          entityID="http://${AM_DASHBOARD_HOST:-dashboard.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
             <!-- Trust credentials config -->
             <CredentialResolver type="File">
               <Key>
@@ -115,7 +125,7 @@
         </ApplicationOverride>
         <!-- Archivematica Storage Service application -->
         <ApplicationOverride id="am-ss"
-          entityID="https://${AM_STORAGE_SERVICE_HOST:-ss.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
+          entityID="http://${AM_STORAGE_SERVICE_HOST:-ss.archivematica.example.ac.uk}/Shibboleth.sso/metadata">
             <!-- Trust credentials config -->
             <CredentialResolver type="File">
               <Key>

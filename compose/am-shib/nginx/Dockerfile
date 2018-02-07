@@ -22,6 +22,10 @@ RUN useradd -s /bin/nologin nginx && usermod -G _shibd nginx && \
     ln -s /dev/stdout /var/log/shibboleth/shibd.log && \
     ln -s /dev/stderr /var/log/shibboleth/shibd_warn.log
 
+# enable debug mode in nginx
+#RUN sed -i 's/--group=_shibd/--group=_shibd --with-debug/' /tmp/build-nginx.sh && \
+#	chmod +x /tmp/build-nginx.sh && /tmp/build-nginx.sh
+
 # Process configs using envplate and bootstrap before passing to supervisor
 CMD ["/usr/local/bin/ep", \
       "-v", "/etc/nginx/conf.d/am-shib.conf", "/etc/shibboleth/shibboleth2.xml", \
@@ -30,8 +34,8 @@ CMD ["/usr/local/bin/ep", \
       "bootstrap.sh && /usr/bin/supervisord --nodaemon --configuration /etc/supervisor/supervisord.conf" \
     ]
 
-# Listen on 443
-EXPOSE 443
+# Listen on 80
+EXPOSE 80
 
 # Copy rootfs files
 COPY rootfs /

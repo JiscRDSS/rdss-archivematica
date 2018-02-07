@@ -17,6 +17,7 @@ IDP_LDAP_HOSTNAME ?= ldap.$(DOMAIN_NAME)
 
 AM_DASHBOARD_HOST ?= dashboard.archivematica.$(DOMAIN_NAME)
 AM_STORAGE_SERVICE_HOST ?= ss.archivematica.$(DOMAIN_NAME)
+AM_EXTERNAL_PORT ?= 80
 
 all: destroy init-ca build create-secrets up bootstrap list
 
@@ -38,6 +39,7 @@ build-idp:
 		--workdir "/src" \
 		-e AM_DASHBOARD_HOST=$(AM_DASHBOARD_HOST) \
 		-e AM_STORAGE_SERVICE_HOST=$(AM_STORAGE_SERVICE_HOST) \
+		-e AM_EXTERNAL_PORT=$(AM_EXTERNAL_PORT) \
 		python:2-alpine \
 		python idp-metadata-providers.py /src/etc/service-providers.json > \
 			"$(BASE_DIR)/build/idp/metadata-providers.xml"

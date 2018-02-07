@@ -4,7 +4,7 @@ version: "2"
 services:
 
   # Override main nginx config, enabling Shibboleth for Archivematica services
-  # which both run on port 443
+  # which both run on port 80
   nginx:
     image: "arkivum/shibboleth-nginx:${DOMAIN_NAME}"
     build:
@@ -34,11 +34,14 @@ services:
       SHIBBOLETH_METADATA_URL_SUBST: "https://idp.${DOMAIN_NAME}:${IDP_EXTERNAL_PORT}/idp/shibboleth"
       # Deployment settings
       AM_EXTERNAL_PORT:
+
     volumes:
+      - "${VOL_BASE}/am-shib/nginx/rootfs/etc/nginx/conf.d/archivematica.conf:/etc/nginx/conf.d/archivematica.conf:ro"
       - "${VOL_BASE}/am-shib/build/secrets/:/secrets/:ro"
       - "${VOL_BASE}/../shib-local/build/secrets/idp/idp.${DOMAIN_NAME}.crt:/etc/shibboleth/md-signing.crt:ro"
     ports:
-      - "${NGINX_EXTERNAL_IP}:${AM_EXTERNAL_PORT}:443"
+      - "${NGINX_EXTERNAL_IP}:${AM_EXTERNAL_PORT}:80"
+
     depends_on:
       - "archivematica-dashboard"
       - "archivematica-storage-service"
