@@ -42,7 +42,8 @@ check_dockerhost_dependencies()
             s3fs \
             software-properties-common && \
         sudo usermod -a -G docker ubuntu && \
-        sudo -H pip install -U pip docker-compose"
+        sudo -H pip install -U pip && \
+        sudo -H pip install docker-compose==${DOCKER_COMPOSE_VERSION:-1.17.0}"
 }
 
 # Checks, and if necessary creates, a registry on the remote Docker host.
