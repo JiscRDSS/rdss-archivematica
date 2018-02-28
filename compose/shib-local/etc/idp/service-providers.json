@@ -1,8 +1,8 @@
 {
   "am-dashboard" : {
-    "metadata": "http://${AM_DASHBOARD_HOST}:${AM_EXTERNAL_PORT}/Shibboleth.sso/metadata"
+    "metadata": "https://${AM_DASHBOARD_HOST}:${AM_EXTERNAL_PORT}/Shibboleth.sso/metadata"
   },
   "am-storage-service" : {
-    "metadata": "http://${AM_STORAGE_SERVICE_HOST}:${AM_EXTERNAL_PORT}/Shibboleth.sso/metadata"
+    "metadata": "https://${AM_STORAGE_SERVICE_HOST}:${AM_EXTERNAL_PORT}/Shibboleth.sso/metadata"
   }
 }

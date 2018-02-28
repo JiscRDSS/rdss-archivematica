@@ -3,15 +3,11 @@ version: "2"
 
 services:
 
-  # Override main nginx config, enabling Shibboleth for Archivematica services
-  # which both run on port 80
-  nginx:
-    image: "arkivum/shibboleth-nginx:${DOMAIN_NAME}"
+  # Applies SSL as a proxy in front of the Shibboleth SP proxy
+  nginx-ssl:
+    image: "arkivum/nginx-ssl"
     build:
-      context: "./am-shib/nginx/"
-      args:
-        - NGINX_CONF_TEMPLATE_FILE=templates/am-shib.conf.tpl
-        - SHIBBOLETH_CONF_TEMPLATE_FILE=templates/shibboleth2.xml.tpl
+      context: "./am-shib/nginx-ssl/"
     networks:
       default:
           aliases:
@@ -21,30 +17,54 @@ services:
           aliases:
             - "dashboard.archivematica.${DOMAIN_NAME}"
             - "ss.archivematica.${DOMAIN_NAME}"
-
+    ports:
+      - "${NGINX_EXTERNAL_IP}:${AM_EXTERNAL_PORT}:443"
     environment:
-      # The hostname of the nginx server serving Archivematica
       AM_DASHBOARD_HOST: "dashboard.archivematica.${DOMAIN_NAME}"
       AM_STORAGE_SERVICE_HOST: "ss.archivematica.${DOMAIN_NAME}"
+      AM_EXTERNAL_PORT:
+      SHIB_SP_HOST: "shib-sp-proxy"
+    volumes:
+      - "${VOL_BASE}/am-shib/build/secrets/:/secrets/:ro"
+    depends_on:
+      - "shib-sp-proxy"
+
+  # Enforces Shibboleth authentication in front of our AM nginx proxy
+  shib-sp-proxy:
+    image: "rdss-archivematica-shib-sp-proxy"
+    #build:
+    #  context: "${VOL_BASE}/../src/rdss-archivematica-shib-sp-proxy/"
+    networks:
+      default:
+      shibnet:
+    environment:
+      # Target proxy (our nginx container)
+      TARGET_PROXY_HOST: "nginx"
+      # Archivematica
+      AM_DASHBOARD_HOST: "dashboard.archivematica.${DOMAIN_NAME}"
+      AM_DASHBOARD_SSL_CA_BUNDLE_FILE: "/secrets/nginx/sp-ca-bundle.pem"
+      AM_DASHBOARD_SSL_CERT_FILE: "/secrets/nginx/am-dash-cert.pem"
+      AM_DASHBOARD_SSL_KEY_FILE: "/secrets/nginx/am-dash-key.pem"
+      AM_DASHBOARD_TARGET_PORT: "80"
+      AM_STORAGE_SERVICE_HOST: "ss.archivematica.${DOMAIN_NAME}"
+      AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE: "/secrets/nginx/sp-ca-bundle.pem"
+      AM_STORAGE_SERVICE_SSL_CERT_FILE: "/secrets/nginx/am-ss-cert.pem"
+      AM_STORAGE_SERVICE_SSL_KEY_FILE: "/secrets/nginx/am-ss-key.pem"
+      AM_STORAGE_SERVICE_TARGET_PORT: "8000"
+      AM_EXTERNAL_PORT:
       # Shibboleth FastCGI SP config
       SHIBBOLETH_IDP_ENTITY_ID: "https://idp.${DOMAIN_NAME}/idp/shibboleth"
       SHIBBOLETH_IDP_METADATA_URL: "https://idp.${DOMAIN_NAME}:${IDP_EXTERNAL_PORT}/idp/shibboleth"
       # Metadata config - set URL subst to same as IdP metadata URL for our local IDP
       SHIBBOLETH_METADATA_SIGNING_CERT: "/etc/shibboleth/md-signing.crt"
       SHIBBOLETH_METADATA_URL_SUBST: "https://idp.${DOMAIN_NAME}:${IDP_EXTERNAL_PORT}/idp/shibboleth"
-      # Deployment settings
-      AM_EXTERNAL_PORT:
-
+      # Error support contact
+      SHIBBOLETH_SUPPORT_EMAIL: "shibboleth-support@${DOMAIN_NAME}"
     volumes:
-      - "${VOL_BASE}/am-shib/nginx/rootfs/etc/nginx/conf.d/archivematica.conf:/etc/nginx/conf.d/archivematica.conf:ro"
       - "${VOL_BASE}/am-shib/build/secrets/:/secrets/:ro"
-      - "${VOL_BASE}/../shib-local/build/secrets/idp/idp.${DOMAIN_NAME}.crt:/etc/shibboleth/md-signing.crt:ro"
-    ports:
-      - "${NGINX_EXTERNAL_IP}:${AM_EXTERNAL_PORT}:80"
-
+      - "${VOL_BASE}/shib-local/build/secrets/idp/idp.${DOMAIN_NAME}.crt:/etc/shibboleth/md-signing.crt:ro"
     depends_on:
-      - "archivematica-dashboard"
-      - "archivematica-storage-service"
+      - "nginx"
 
   archivematica-dashboard:
     environment:

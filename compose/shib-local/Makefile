@@ -17,7 +17,7 @@ IDP_LDAP_HOSTNAME ?= ldap.$(DOMAIN_NAME)
 
 AM_DASHBOARD_HOST ?= dashboard.archivematica.$(DOMAIN_NAME)
 AM_STORAGE_SERVICE_HOST ?= ss.archivematica.$(DOMAIN_NAME)
-AM_EXTERNAL_PORT ?= 80
+AM_EXTERNAL_PORT ?= 443
 
 all: destroy init-ca build create-secrets up bootstrap list
 

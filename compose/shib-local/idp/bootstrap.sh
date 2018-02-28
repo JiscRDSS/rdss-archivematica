@@ -78,7 +78,7 @@ main()
 	# Wait for all metadata providers to be available
 	for m in $(grep metadataURL /opt/shibboleth-idp/conf/metadata-providers.xml | \
 		sed -r 's/.+="([^"]+).*/\1/') ; do
-		until curl -s -k "${m}" >/dev/null ; do
+		until curl -s -S -I "${m}" | grep '200 OK' > /dev/null ; do
 			echo "Waiting for ${m} to become available..."
 			sleep 8
 		done

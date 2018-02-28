@@ -22,7 +22,7 @@ server {
 
 	client_max_body_size 256M;
 
-	set $upstream_endpoint http://nginx:80;
+	set $upstream_endpoint http://${SHIB_SP_HOST}:80;
 
 	location / {
 		# Configure proxy
@@ -53,7 +53,7 @@ server {
 
 	client_max_body_size 256M;
 
-	set $upstream_endpoint http://nginx:80;
+	set $upstream_endpoint http://${SHIB_SP_HOST}:80;
 
 	location / {
 		# Configure proxy
