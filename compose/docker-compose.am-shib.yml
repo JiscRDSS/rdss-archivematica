@@ -42,14 +42,14 @@ services:
       TARGET_PROXY_HOST: "nginx"
       # Archivematica
       AM_DASHBOARD_HOST: "dashboard.archivematica.${DOMAIN_NAME}"
-      AM_DASHBOARD_SSL_CA_BUNDLE_FILE: "/secrets/nginx/sp-ca-bundle.pem"
-      AM_DASHBOARD_SSL_CERT_FILE: "/secrets/nginx/am-dash-cert.pem"
-      AM_DASHBOARD_SSL_KEY_FILE: "/secrets/nginx/am-dash-key.pem"
+      AM_DASHBOARD_SSL_CA_BUNDLE_FILE: "/secrets/sp-proxy/sp-ca-bundle.pem"
+      AM_DASHBOARD_SSL_CERT_FILE: "/secrets/sp-proxy/sp-am-dash-cert.pem"
+      AM_DASHBOARD_SSL_KEY_FILE: "/secrets/sp-proxy/sp-am-dash-key.pem"
       AM_DASHBOARD_TARGET_PORT: "80"
       AM_STORAGE_SERVICE_HOST: "ss.archivematica.${DOMAIN_NAME}"
-      AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE: "/secrets/nginx/sp-ca-bundle.pem"
-      AM_STORAGE_SERVICE_SSL_CERT_FILE: "/secrets/nginx/am-ss-cert.pem"
-      AM_STORAGE_SERVICE_SSL_KEY_FILE: "/secrets/nginx/am-ss-key.pem"
+      AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE: "/secrets/sp-proxy/sp-ca-bundle.pem"
+      AM_STORAGE_SERVICE_SSL_CERT_FILE: "/secrets/sp-proxy/sp-am-ss-cert.pem"
+      AM_STORAGE_SERVICE_SSL_KEY_FILE: "/secrets/sp-proxy/sp-am-ss-key.pem"
       AM_STORAGE_SERVICE_TARGET_PORT: "8000"
       AM_EXTERNAL_PORT:
       # Shibboleth FastCGI SP config

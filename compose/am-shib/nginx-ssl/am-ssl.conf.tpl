@@ -17,8 +17,8 @@ server {
 	ssl_ciphers         HIGH:!aNULL:!MD5;
 	ssl_session_cache   shared:SSL:10m;
 	ssl_session_timeout 10m;
-	ssl_certificate     ${AM_DASHBOARD_SSL_WEB_CERT_FILE:-/secrets/nginx/am-dash-web-cert.pem};
-	ssl_certificate_key ${AM_DASHBOARD_SSL_KEY_FILE:-/secrets/nginx/am-dash-key.pem};
+	ssl_certificate     ${AM_DASHBOARD_SSL_WEB_CERT_FILE:-/secrets/ssl-proxy/am-dash-cert.pem};
+	ssl_certificate_key ${AM_DASHBOARD_SSL_KEY_FILE:-/secrets/ssl-proxy/am-dash-key.pem};
 
 	client_max_body_size 256M;
 
@@ -48,8 +48,8 @@ server {
 	ssl_ciphers         HIGH:!aNULL:!MD5;
 	ssl_session_cache   shared:SSL:10m;
 	ssl_session_timeout 10m;
-	ssl_certificate     ${AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE:-/secrets/nginx/am-ss-web-cert.pem};
-	ssl_certificate_key ${AM_STORAGE_SERVICE_SSL_KEY_FILE:-/secrets/nginx/am-ss-key.pem};
+	ssl_certificate     ${AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE:-/secrets/ssl-proxy/am-ss-cert.pem};
+	ssl_certificate_key ${AM_STORAGE_SERVICE_SSL_KEY_FILE:-/secrets/ssl-proxy/am-ss-key.pem};
 
 	client_max_body_size 256M;
 

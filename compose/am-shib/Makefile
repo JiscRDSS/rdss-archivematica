@@ -31,17 +31,33 @@ clean:
 config:
 	COMPOSE_FILE=$(COMPOSE_FILE) docker-compose config
 
-create-secrets:
-	# Create keys and certs for the nginx service
-	@mkdir -p "$(BASE_DIR)/build/secrets/nginx"
+create-secrets: create-sp-proxy-secrets create-ssl-proxy-secrets
+
+create-sp-proxy-secrets:
+	# Create keys and certs for the sp-proxy service
+	@mkdir -p "$(BASE_DIR)/build/secrets/sp-proxy"
 	@docker run --rm \
 		--user $(shell id -u):$(shell id -g) \
 		--volume "$(VOL_BASE)/shib-local/ca/:/src/ca" \
-		--volume "$(VOL_BASE)/am-shib/nginx/:/src/nginx:ro" \
-		--volume "$(VOL_BASE)/am-shib/build/secrets/nginx:/build" \
+		--volume "$(VOL_BASE)/am-shib/sp-proxy/:/src/sp-proxy/:ro" \
+		--volume "$(VOL_BASE)/am-shib/build/secrets/sp-proxy/:/build" \
 		--env DOMAIN_NAME="$(DOMAIN_NAME)" \
 		--env GENERATE_SSL_CERTS="$(GENERATE_SSL_CERTS)" \
-		--workdir "/src/nginx" \
+		--workdir "/src/sp-proxy/" \
+		rawmind/alpine-base:3.5-1 \
+		./create-secrets.sh
+
+create-ssl-proxy-secrets:
+	# Create keys and certs for the ssl-proxy service
+	@mkdir -p "$(BASE_DIR)/build/secrets/ssl-proxy"
+	@docker run --rm \
+		--user $(shell id -u):$(shell id -g) \
+		--volume "$(VOL_BASE)/shib-local/ca/:/src/ca" \
+		--volume "$(VOL_BASE)/am-shib/nginx-ssl/:/src/ssl-proxy/:ro" \
+		--volume "$(VOL_BASE)/am-shib/build/secrets/ssl-proxy/:/build" \
+		--env DOMAIN_NAME="$(DOMAIN_NAME)" \
+		--env GENERATE_SSL_CERTS="$(GENERATE_SSL_CERTS)" \
+		--workdir "/src/ssl-proxy/" \
 		rawmind/alpine-base:3.5-1 \
 		./create-secrets.sh
 
@@ -55,4 +71,4 @@ list:
 up:
 	COMPOSE_FILE=$(COMPOSE_FILE) docker-compose up -d
 
-.PHONY: all bootstrap build clean create-secrets destroy list up
+.PHONY: all bootstrap build clean create-secrets create-sp-proxy-secrets create-ssl-proxy-secrets destroy list up

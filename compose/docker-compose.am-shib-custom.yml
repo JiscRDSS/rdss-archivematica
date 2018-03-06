@@ -3,9 +3,10 @@ version: "2"
 
 services:
 
-  # This extends the `nginx` definition in `am-shib` to add custom PKI files
-  nginx:
+  # This extends the `shib-sp-proxy` definition in `am-shib` to add custom PKI files
+  shib-sp-proxy:
     environment:
+      # Archivematica
       AM_DASHBOARD_SSL_CA_BUNDLE_FILE: "/etc/pki/shibboleth-sp/cabundle.pem"
       AM_DASHBOARD_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-dash.crt"
       AM_DASHBOARD_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-dash.key"
@@ -14,6 +15,7 @@ services:
       AM_STORAGE_SERVICE_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss.crt"
       AM_STORAGE_SERVICE_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-ss.key"
       AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss-web.crt"
+      # Shibboleth
       SHIBBOLETH_METADATA_SIGNING_CERT: "/etc/pki/shibboleth-sp/idp.crt"
     volumes:
       - "${VOL_BASE}/shib-custom-pki/build/${DOMAIN_NAME}/:/etc/pki/shibboleth-sp/:ro"
