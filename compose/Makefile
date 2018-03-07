@@ -56,7 +56,7 @@ export VERSION
 
 all: destroy build create-secrets up bootstrap list
 
-bootstrap create-secrets:
+bootstrap create-secrets reset-processing-configs:
 	$(foreach DIR, $(COMPOSE_DIRS), $(MAKE) -C $(DIR) $@ ;)
 
 build clean destroy:

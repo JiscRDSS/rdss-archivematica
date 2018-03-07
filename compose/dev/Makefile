@@ -119,7 +119,20 @@ destroy:
 list:
 	docker-compose ps
 
+reset-processing-configs:
+	# Remove the builtin processing configs so the originals can be restored when mcp server restarts
+	docker-compose run --rm --no-deps \
+		--user root \
+		--entrypoint rm \
+		--workdir /var/archivematica/sharedDirectory/sharedMicroServiceTasksConfigs/processingMCPConfigs/ \
+			archivematica-mcp-server \
+				-f automatedProcessingMCP.xml defaultProcessingMCP.xml;
+
+ifeq ($(RESET_PROCESSING_CONFIG), true)
+restart-mcp-services: reset-processing-configs
+else
 restart-mcp-services:
+endif
 	docker-compose restart archivematica-mcp-server archivematica-mcp-client
 
 up: build
