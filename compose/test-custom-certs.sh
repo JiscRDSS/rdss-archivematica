@@ -23,5 +23,5 @@ docker-compose \
     -f docker-compose.am-shib-custom.yml \
     -f docker-compose.shib-local-custom.yml \
     up -d --build --no-deps --force-recreate \
-    nginx idp
+    nginx-ssl shib-sp-proxy idp
 
