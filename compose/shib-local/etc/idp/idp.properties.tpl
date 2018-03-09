@@ -13,9 +13,6 @@ idp.encryption.cert = /etc/pki/shibboleth-idp/idp-encryption.crt
 idp.sealer.keyPassword = ${IDP_KEYSTORE_PASSWORD}
 idp.sealer.storePassword = ${IDP_KEYSTORE_PASSWORD}
 
-# Relax requirement for authn request to be encrypted (for testing only)
-idp.encryption.optional = true
-
 # Enable detailed error messages sent back to SP
 idp.errors.detailed = true
 

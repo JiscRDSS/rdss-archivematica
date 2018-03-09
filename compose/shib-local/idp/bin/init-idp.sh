@@ -71,6 +71,8 @@ cat idp-metadata.xml.head idp-metadata.xml.mid idp-metadata.xml.tail \
 sed -i "s|Location=\"https://${IDP_HOSTNAME}/idp/|Location=\"https://${IDP_HOSTNAME}:${IDP_EXTERNAL_PORT}/idp/|g" idp-metadata.xml
 
 cp idp-metadata.xml /ext-mount/customized-shibboleth-idp/metadata/
+mv /ext-mount/customized-shibboleth-idp/metadata/idp-metadata.xml \
+	/ext-mount/customized-shibboleth-idp/metadata/idp-metadata.unsigned.xml
 
 # Change owner on all exported files to be IDP_OWNER_UID:IDP_OWNER_GID
 chown -R ${IDP_OWNER_UID:-0}:${IDP_OWNER_GID:-0} /ext-mount

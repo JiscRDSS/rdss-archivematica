@@ -45,6 +45,19 @@ jetty.sslContext.keyStorePassword=${IDP_SSL_KEYSTORE_PASSWORD}
 EOF
 }
 
+sign_idp_metadata()
+{
+	if [ ! -e "/opt/shibboleth-idp/metadata/idp-metadata.xml" ] ; then
+		pushd "/opt/xmlsectool-2.0.0" && \
+			JAVA_HOME=/opt/jre-home/ ./xmlsectool.sh --sign \
+				--inFile /opt/shibboleth-idp/metadata/idp-metadata.unsigned.xml \
+				--outFile /opt/shibboleth-idp/metadata/idp-metadata.xml \
+				--certificate "${IDP_SIGNING_CERT}" \
+				--key "${IDP_SIGNING_KEY}"
+		popd
+	fi
+}
+
 main()
 {
 	mkdir -p "${DEST_DIR}"
@@ -74,6 +87,9 @@ main()
 
 	# Make Jetty the owner of all destination files
 	chown -R jetty:jetty "${DEST_DIR}"/*
+
+	# Sign IdP metadata
+	sign_idp_metadata
 
 	# Wait for all metadata providers to be available
 	for m in $(grep metadataURL /opt/shibboleth-idp/conf/metadata-providers.xml | \

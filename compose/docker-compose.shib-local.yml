@@ -37,7 +37,7 @@ services:
       - "${VOL_BASE}/shib-local/etc/idp/ldap.properties:/opt/shibboleth-idp/conf/ldap.properties:ro"
       - "${VOL_BASE}/shib-local/etc/idp/messages/:/opt/shibboleth-idp/messages/:ro"
       - "${VOL_BASE}/shib-local/build/idp/customized-shibboleth-idp/conf/idp.properties:/opt/shibboleth-idp/conf/idp.properties:ro"
-      - "${VOL_BASE}/shib-local/build/idp/customized-shibboleth-idp/metadata/idp-metadata.xml:/opt/shibboleth-idp/metadata/idp-metadata.xml:ro"
+      - "${VOL_BASE}/shib-local/build/idp/customized-shibboleth-idp/metadata/idp-metadata.unsigned.xml:/opt/shibboleth-idp/metadata/idp-metadata.unsigned.xml:ro"
       - "${VOL_BASE}/shib-local/build/idp/metadata-providers.xml:/opt/shibboleth-idp/conf/metadata-providers.xml:ro"
       # Jetty customizations
       - "${VOL_BASE}/shib-local/etc/idp/jetty/backchannel.ini:/opt/shib-jetty-base/start.d/backchannel.ini:ro"
