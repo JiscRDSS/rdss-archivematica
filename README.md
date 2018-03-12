@@ -19,6 +19,18 @@ publish                        Publish Docker images to a registry.
 
     $ make publish REGISTRY=aws_account_id.dkr.ecr.region.amazonaws.com/
 
+To use a local registry, to work with the QA build locally, you can [set up a local Docker registry service](https://docs.docker.com/registry/#basic-commands):
+
+    $ docker run -d -p 5000:5000 --name registry registry:2
+
+You can then use this registry to publish to before doing a compose build:
+
+    $ make publish REGISTRY=localhost:5000/
+    $ cd compose
+    $ make all REGISTRY=localhost:5000/
+
+You may also want to look at using a [registry frontend](https://github.com/kwk/docker-registry-frontend) to browse your local registry repositories.
+
 ## Development environment
 
 Open [the compose folder](compose) to see more details.
