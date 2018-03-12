@@ -70,9 +70,9 @@ Environment Variables
 The following environment variables are used by this service:
 
 | Variable | Description | Default Value |
-|---|---|
+|---|---|---|
 | `AM_DASHBOARD_HOST` | Hostname for the Archivematica Dashboard. | `dashboard.archivematica.example.ac.uk`. |
-| `AM_EXTERNAL_PORT` | External port that the Archivematica Dashboard should be exposed on - required . | `443` |
+| `AM_EXTERNAL_PORT` | External port that the Archivematica Dashboard and Storage Service should be exposed on - required. | `443` |
 | `AM_STORAGE_SERVICE_HOST` | Hostname for the Archivematica Storage Service. | `ss.archivematica.example.ac.uk` |
 | `DOMAIN_NAME` | Domain name to use for this IdP. This becomes the Shibboleth "scope", i.e. the domain that is 'managed' by this IdP. | `example.ac.uk` |
 | `IDP_EXTERNAL_PORT` | External port that the IdP is exposed on. | `4443` |
@@ -111,6 +111,12 @@ services:
 Note that if your certificate chain requires intermediate certificates then these should be bundled into the file given by the `IDP_SSL_CA_CERT_FILE` variable.
 
 All key and certificate files must be in PEM format.
+
+
+Metadata Signing
+-----------------
+
+The IdP metadata has been digitally signed so that SP clients can verify its XML signature. This is done at start up during the bootstrap phase; the SSL certificate and private key for securing the IdP are used to sign the metadata too. This is done using the [xmlsectool](https://wiki.shibboleth.net/confluence/display/XSTJ2/xmlsectool+V2+Home) which is part of the Shibboleth tools suite.
 
 
 UI Customization

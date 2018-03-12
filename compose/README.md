@@ -7,14 +7,14 @@ The following diagram gives an overview of the deployed service containers, grou
 
 ![containers diagram](doc/images/containers.jpg)
 
-In the above, the main Archivematica services are highlighted in orange. The services related to Shibboleth are in green, whilst the RDSS-specific containers are highlighted in purple. The NextCloud service is highlighted in pink. The nginx service that fronts it all is highlighted in blue. Where relevant the components deployed into each container are shown; for base services this is omitted.
+In the above, the main Archivematica services are highlighted in orange. The services related to Shibboleth are in green, whilst the RDSS-specific containers are highlighted in purple. The NextCloud service is highlighted in pink. The nginx services that front it all are highlighted in blue (although the `nginx-ssl` service is actually part of the Shibboleth deployment, currently). Where relevant the components deployed into each container are shown; for base services this is omitted.
 
-Some of these containers are required for local development only. In a production deployment, the `dynalite`, `minikine` and `minio` containers would be replaced with connections to actual DynamoDB, Kinesis and S3 services in an AWS environment. Similarly, if the Shibboleth SP in the `nginx` container is configured to use an external IdP then the `idp` and `ldap` containers would become unnecessary.
+Some of these containers are required for local development only. In a production deployment, the `dynalite`, `minikine` and `minio` containers would be replaced with connections to actual DynamoDB, Kinesis and S3 services in an AWS environment. Similarly, if the Shibboleth SP in the `shib-sp-proxy` container is configured to use an external IdP then the `idp` and `ldap` containers would become unnecessary.
 
 External Volumes
 -----------------
 
-To allow Archivematica and NextCloud to interact and share data with other systems in the environment, some volumes are marked as `external`. These must be created prior to starting the docker containers.
+To allow Archivematica and NextCloud to interact and share data between them and with other systems in the environment, some volumes are marked as `external`. These **must** be created prior to starting the docker containers.
 
 | Volume | Description |
 |---|---|
@@ -176,39 +176,35 @@ To enable Shibboleth integration and NextCloud, use
 
 	make all ENV=dev SHIBBOLETH_CONFIG=archivematica NEXTCLOUD_ENABLED=true
 
-After a successful build of the Shibboleth-enabled Archivematica services and NextCloud service you should find you have the following services listed by `make list`:
+After a successful build of the Shibboleth-enabled Archivematica services and NextCloud service you should find you have the following services listed by `make list SHIBBOLETH_CONFIG=archivematica NEXTCLOUD_ENABLED=true`:
 
 	              Name                             Command                             State                              Ports
 	-----------------------------------------------------------------------------------------------------------------------------------------
-	rdss_nginx_1                       /usr/local/bin/ep -v /etc/ ...     Up                                 0.0.0.0:443->443/tcp,
-	                                                                                                         0.0.0.0:34312->80/tcp,
-	                                                                                                         0.0.0.0:34311->8000/tcp,
-	                                                                                                         9090/tcp
-	idp.example.ac.uk                  /bin/sh -c bootstrap.sh && ...     Up                                 0.0.0.0:4443->4443/tcp, 8443/tcp
-	rdss_archivematica-dashboard_1     /bin/sh -c /usr/local/bin/ ...     Up                                 8000/tcp
-	rdss_archivematica-mcp-client_1    /bin/sh -c /src/MCPClient/ ...     Up
-	rdss_archivematica-mcp-server_1    /bin/sh -c /src/MCPServer/ ...     Up
-	rdss_archivematica-storage-        /bin/sh -c /usr/local/bin/ ...     Up                                 8000/tcp
-	service_1
-	rdss_clamavd_1                     /run.sh                            Up                                 3310/tcp
-	rdss_dynalite_1                    node ./dynalite.js                 Up                                 0.0.0.0:34306->4567/tcp
-	rdss_elasticsearch_1               /docker-entrypoint.sh elas ...     Up                                 9200/tcp, 9300/tcp
-	rdss_fits_1                        /usr/bin/fits-ngserver.sh  ...     Up                                 2113/tcp
-	rdss_gearmand_1                    docker-entrypoint.sh --que ...     Up                                 4730/tcp
-	rdss_ldap_1                        /container/tool/run                Up                                 389/tcp, 636/tcp
-	rdss_minikine_1                    node ./minikine.js                 Up                                 0.0.0.0:34307->4567/tcp
-	rdss_minio_1                       /usr/bin/docker-entrypoint ...     Up                                 0.0.0.0:34305->9000/tcp
-	rdss_mysql_1                       docker-entrypoint.sh mysqld        Up                                 3306/tcp
-	rdss_nextcloud_1                   run.sh                             Up                                 0.0.0.0:8888->8888/tcp
-	rdss_rdss-archivematica-channel-   go run main.go consumer            Up                                 0.0.0.0:34314->6060/tcp
-	adapter-consumer_1
-	rdss_rdss-archivematica-channel-   go run main.go publisher           Up                                 0.0.0.0:33786->6060/tcp
-	adapter-publisher_1
-	rdss_rdss-archivematica-           go run main.go -addr=0.0.0 ...     Up                                 0.0.0.0:34308->8000/tcp
-	msgcreator_1
-	rdss_redis_1                       docker-entrypoint.sh --sav ...     Up                                 6379/tcp
+	rdss_archivematica-automation-tools_1                 run.sh                           Up
+	rdss_archivematica-dashboard_1                        /bin/sh -c /usr/local/bin/ ...   Up       8000/tcp
+	rdss_archivematica-mcp-client_1                       /bin/sh -c /src/MCPClient/ ...   Up
+	rdss_archivematica-mcp-server_1                       /bin/sh -c /src/MCPServer/ ...   Up
+	rdss_archivematica-storage-service_1                  /bin/sh -c /usr/local/bin/ ...   Up       8000/tcp
+	rdss_clamavd_1                                        /run.sh                          Up       3310/tcp
+	rdss_dynalite_1                                       node ./dynalite.js               Up       0.0.0.0:34059->4567/tcp
+	rdss_elasticsearch_1                                  /docker-entrypoint.sh elas ...   Up       9200/tcp, 9300/tcp
+	rdss_fits_1                                           /usr/bin/fits-ngserver.sh  ...   Up       2113/tcp
+	rdss_gearmand_1                                       docker-entrypoint.sh --que ...   Up       4730/tcp
+	rdss_idp_1                                            /bin/sh -c bootstrap.sh && ...   Up       0.0.0.0:4443->4443/tcp, 8443/tcp
+	rdss_ldap_1                                           /container/tool/run              Up       389/tcp, 636/tcp
+	rdss_minikine_1                                       node ./minikine.js               Up       0.0.0.0:34058->4567/tcp
+	rdss_minio_1                                          /usr/bin/docker-entrypoint ...   Up       0.0.0.0:50500->9000/tcp
+	rdss_mysql_1                                          docker-entrypoint.sh mysqld      Up       3306/tcp
+	rdss_nextcloud_1                                      run.sh                           Up       0.0.0.0:8888->8888/tcp
+	rdss_nginx-ssl_1                                      /usr/local/bin/ep -v /etc/ ...   Up       0.0.0.0:443->443/tcp, 80/tcp
+	rdss_nginx_1                                          nginx -g daemon off;             Up       0.0.0.0:34057->80/tcp, 0.0.0.0:34056->8000/tcp
+	rdss_rdss-archivematica-channel-adapter-consumer_1    /go/bin/rdss-archivematica ...   Up       0.0.0.0:34061->6060/tcp
+	rdss_rdss-archivematica-channel-adapter-publisher_1   /go/bin/rdss-archivematica ...   Exit 1
+	rdss_rdss-archivematica-msgcreator_1                  /go/bin/rdss-archivematica ...   Up       8000/tcp
+	rdss_redis_1                                          docker-entrypoint.sh --sav ...   Up       6379/tcp
+	rdss_shib-sp-proxy_1                                  /usr/local/bin/run-app.sh        Up       80/tcp
 
-Notice that the `idp.example.ac.uk` and `rdss_nginx_1` containers have specific ports exposed - this is because Shibboleth requires well-known URLs for the Service Provider and Identity Provider.
+Notice that the `rdss_idp_1` and `rdss_nginx-ssl_1` containers have specific ports exposed - this is because Shibboleth requires well-known URLs for the Service Provider and Identity Provider.
 
 ### QA Build
 
@@ -242,7 +238,7 @@ Here are some other `make` commands other than `make all` that may be useful whe
 | `make list` | List all running containers (using `docker-compose ps`) |
 | `make watch` | Watch logs from all containers |
 | `make watch-idp` | Watch logs from the [idp](shib-local/idp) container, if present |
-| `make watch-idp` | Watch logs from the `nginx` container |
+| `make watch-nginx` | Watch logs from the `nginx` container |
 
 Remember to append the `SHIBBOLETH_CONFIG` argument to the above commands if `make all` was run with this set, otherwise the `docker-compose` context won't be resolved properly (this is required for the `watch-idp` command).
 
@@ -321,28 +317,36 @@ The [shib-custom-pki](shib-custom-pki) folder contains scripts for generating th
 	    up -d --build --no-deps --force-recreate \
 	    nginx idp
 
-The above is also available in [test-custom-certs.sh](test-custom-certs.sh). Note the use of `docker-compose.am-shib-custom.yml` and `docker-compose.shib-local-custom.yml`, which override the `nginx` and `idp` services to set the necessary environment variables to customise the certs and keys used.
+The above is also available in [test-custom-certs.sh](test-custom-certs.sh). Note the use of `docker-compose.am-shib-custom.yml` and `docker-compose.shib-local-custom.yml`, which override the `nginx-ssl`, `shib-sp-proxy` and `idp` services to set the necessary environment variables to customise the certs and keys used.
 
-For the `nginx` service:
+For the `nginx-ssl` and `shib-sp-proxy` services:
 
 	---
 	version: "2"
 	
 	services:
 	
-	# This extends the `nginx` definition in `am-shib` to add custom PKI files
-	nginx:
-	    environment:
-		    AM_DASHBOARD_SSL_CA_BUNDLE_FILE: "/etc/pki/shibboleth-sp/cabundle.pem"
-		    AM_DASHBOARD_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-dash.crt"
-		    AM_DASHBOARD_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-dash.key"
-		    AM_DASHBOARD_SSL_WEB_CERT_FILE: "/etc/pki/shibboleth-sp/am-dash-web.crt"
-		    AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE: "/etc/pki/shibboleth-sp/cabundle.pem"
-		    AM_STORAGE_SERVICE_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss.crt"
-		    AM_STORAGE_SERVICE_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-ss.key"
-		    AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss-web.crt"
-	    volumes:
-		    - "${VOL_BASE}/shib-custom-pki/build/${DOMAIN_NAME}/:/etc/pki/shibboleth-sp/:ro"
+	    # This extends the `nginx-ssl` definition in `am-shib` to add custom PKI files
+	    nginx-ssl:
+	        environment:
+	            AM_DASHBOARD_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-dash.crt"
+	            AM_DASHBOARD_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-dash.key"
+	            AM_STORAGE_SERVICE_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss.crt"
+	            AM_STORAGE_SERVICE_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-ss.key"
+	        volumes:
+	            - "${VOL_BASE}/shib-custom-pki/build/${DOMAIN_NAME}/:/etc/pki/shibboleth-sp/:ro"
+	
+	    # This extends the `shib-sp-proxy` definition in `am-shib` to add custom PKI files
+	    shib-sp-proxy:
+	        environment:
+	            AM_DASHBOARD_SSL_CA_BUNDLE_FILE: "/etc/pki/shibboleth-sp/cabundle.pem"
+	            AM_DASHBOARD_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-dash.crt"
+	            AM_DASHBOARD_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-dash.key"
+	            AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE: "/etc/pki/shibboleth-sp/cabundle.pem"
+	            AM_STORAGE_SERVICE_SSL_CERT_FILE: "/etc/pki/shibboleth-sp/am-ss.crt"
+	            AM_STORAGE_SERVICE_SSL_KEY_FILE: "/etc/pki/shibboleth-sp/am-ss.key"
+	        volumes:
+	            - "${VOL_BASE}/shib-custom-pki/build/${DOMAIN_NAME}/:/etc/pki/shibboleth-sp/:ro"
 
 For the `idp` service:
 
@@ -352,11 +356,11 @@ For the `idp` service:
 	services:
 	
 	# This extends the `idp` definition in `shib-local` to add custom PKI files
-	idp:
-	    environment:
-		    IDP_SSL_CA_CERT_FILE: "/etc/pki/shib-custom-pki/ca.crt"
-		    IDP_SSL_CERT_FILE: "/etc/pki/shib-custom-pki/idp.crt"
-		    IDP_SSL_KEY_FILE: "/etc/pki/shib-custom-pki/idp.key"
-		    IDP_SSL_PASSWORD: "topsecret"
-	    volumes:
-		    - "${VOL_BASE}/shib-custom-pki/build/${DOMAIN_NAME}/:/etc/pki/shib-custom-pki/:ro"
+	    idp:
+	        environment:
+	            IDP_SSL_CA_CERT_FILE: "/etc/pki/shib-custom-pki/ca.crt"
+	            IDP_SSL_CERT_FILE: "/etc/pki/shib-custom-pki/idp.crt"
+	            IDP_SSL_KEY_FILE: "/etc/pki/shib-custom-pki/idp.key"
+	            IDP_SSL_PASSWORD: "topsecret"
+	        volumes:
+	            - "${VOL_BASE}/shib-custom-pki/build/${DOMAIN_NAME}/:/etc/pki/shib-custom-pki/:ro"

@@ -1,87 +1,47 @@
 Shibboleth-enabled Archivematica Services
 ===========================================
 
-The containers in this `docker-compose` service set provide an Archivematica deployment that uses Shibboleth authentication to secure access. They comprise the default Archivematica services (including Dashboard and Storage Service), as well as a modified `nginx` service that includes the Shibboleth Service Provider (SP) to enable Shibboleth authentication.
+The containers in this `docker-compose` service set provide an Archivematica deployment that uses Shibboleth authentication to secure access. They comprise the default Archivematica services (including Dashboard and Storage Service), as well as a Shibboleth Service Provider (SP) container that acts as a proxy to the Archivematica services, and a further Nginx proxy, which adds a SSL layer to secure everything.
 
-The Shibboleth nginx service runs the [nginx](https://www.nginx.com) web server with the [nginx-shibboleth module](https://github.com/nginx-shib/nginx-http-shibboleth) enabled. In addition, it runs the [Shibboleth FastCGI SP](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPFastCGIConfig) application, which `nginx` communicates with via UNIX sockets, as well as [supervisord](http://supervisord.org/) to run the Shibboleth components as daemons (in the absence of `systemd` in a Docker container).
+The Shibboleth SP service runs the [Apache 2](https://httpd.apache.org) web server with the [mod_shib](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPApacheConfig) module enabled. This is all taken care of by the [rdss-archivematica-shib-sp-proxy](https://github.com/JiscRDSS/rdss-archivematica-shib-sp-proxy) image, which has Debian slim as its base OS image.
 
-The docker image for this service is based on [virtualstaticvoid/shibboleth-nginx](https://hub.docker.com/r/virtualstaticvoid/shibboleth-nginx/) image, which in turn has Debian Wheezy as its base OS.
+The Apache 2 service hosts two virtual servers, one for the Archivematica Dashboard and one for the Archivematica Storage Service, both on port 443. Each server is configured with the required Shibboleth locations, as well as the `/` location, which is secured by Shibboleth. Some resources, such as `/api` and static media are not secured, because they don't need to be.
 
-The nginx service hosts two virtual servers, one for the Archivematica Dashboard on port 443, and one for the Archivematica Storage Service on port 8443. Each server is configured with the required Shibboleth locations, as well as the `/` location, which is secured by Shibboleth. Some resources, such as `/api` and static media are not secured, because they don't need to be.
-
-By default this service is configured to be available at `https://archivematica.example.ac.uk/`.
+By default these services are configured to be available at `https://dashboard.archivematica.example.ac.uk/` and `https://ss.archivematica.example.ac.uk`.
 
 Building
 ---------
 
 This service can be built using `docker build`. However, since it depends on the main Archivematica services, it is recommended that the parent [compose](compose) makefile is used instead.
 
-### Arguments
-
-The [Dockerfile](nginx/Dockerfile) used to build the image takes a number of arguments.
-
-| Argument | Description |
-|---|---|
-| NGINX_CONF_TEMPLATE_FILE | Path of the nginx config template file, which will be used to create `/etc/nginx/conf.d/am-shib.conf`. This is specifically concerned with Shibboleth-enabled services, not anything else that may be hosted by `nginx`. |
-| SHIBBOLETH_CONF_TEMPLATE_FILE | Path of the Shibboleth config template file, which will be used to create `/etc/shibboleth/shibboleth2.xml`. |
-
-All of the above arguments are required; there are no defaults.
-
 Configuration
 --------------
 
-The files in [etc](nginx/rootfs/etc) that configure this service are grouped by the process to which they relate - one of `nginx`, the `shibd` SP, or `supervisor`.
+The only configuration file for this container set is [am-ssl.conf.tpl](nginx-ssl/am-ssl.conf.tpl), which provides the template for the `nginx-ssl` service to use for its configuration. You generally shouldn't need to edit this.
 
-* [nginx](nginx/rootfs/etc/nginx)
-	* [am-shib.inc](nginx/rootfs/etc/nginx/conf.d/am-shib.inc) includes some common SSL/Shibboleth settings for nginx
-	* [archivematica.conf](nginx/rootfs/etc/nginx/conf.d/archivematica.conf) overrides the default, non-Shibboleth nginx configuration for Archivematica, enabling alternatives to be set.
-	* [shib_clear_headers](nginx/rootfs/etc/nginx/shib_clear_headers) clears HTTP headers related to Shibboleth, to avoid spoofing etc
-	* [shib_fastcgi_params](nginx/rootfs/etc/nginx/shib_fastcgi_params) defines a number of FastCGI parameters specific to Shibboleth
-* [shibboleth](nginx/rootfs/etc/shibboleth)
-	* [attrChecker.html](nginx/rootfs/etc/shibboleth/attrChecker.html) | HTML page to present when checking attributes has failed.
-	* [attrChecker.pl](nginx/rootfs/etc/shibboleth/attrChecker.pl) may be used to update `attrChecker.html` based on the SP's metadata.
-	* [attribute-map.xml](nginx/rootfs/etc/shibboleth/attribute-map.xml) defines how attributes from the IdP are interpreted. See [official documentation](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPAttributeExtractor) for more details.
-	* [attribute-policy.xml](nginx/rootfs/etc/shibboleth/attribute-policy.xml) defines what validation is done on the attributes from an IdP. See the [official documentation](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPAttributeFilter) for more details.
-	* [console.logger](nginx/rootfs/etc/shibboleth/console.logger) configures logging for the Shibboleth SP console tools (see [Diagnostics](#diagnostics), below).
-	* [security-policy.xml](nginx/rootfs/etc/shibboleth/security-policy.xml) overrides the default security policy in terms of trusting signatures etc. See [Security Policies](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPSecurityPolicies) documentation for more on this.
-	* [shibd.logger](nginx/rootfs/etc/shibboleth/shibd.logger) configures logging for the Shibd daemon process, which responds to the FastCGI calls. This configuration causes all logging to go to `stdout` and `stderr`, so that `docker logs` can pick them up.
-* [supervisor](nginx/rootfs/etc/supervisor)
-	* [shibboleth.conf](nginx/rootfs/etc/supervisor/conf.d/shibboleth.conf), which adds an additional SP handler to the Supervisor, to accomodate both the Dashboard and Storage services.
-
-Template Files
----------------
-
-This service makes use of several templated configuration files. These are referenced by arguments to the Dockerfile, as follows:
-
-| Variable | Description | Default File |
-|---|---|---|
-| NGINX_CONFIG_TEMPLATE_FILE | Provides the template for the `/etc/nginx/conf.d/am-shib.conf` file. This is expected to include configuration for interfacing with the SP FastCGI module, as well as defining which locations are protected by Shibboleth in their configuration. | [am-shib.conf.tpl](nginx/templates/am-shib.conf.tpl) |
-| SHIBBOLETH_CONFIG_TEMPLATE_FILE | Provides the template for the `/etc/shibboleth/shibboleth2.xml` file. This configures how the SP functions; see the [SP configuration documentation](https://wiki.shibboleth.net/confluence/display/SHIB2/NativeSPConfiguration) for full details of what can be in this configuration file. | [shibboleth2.xml.tpl](nginx/templates/shibboleth2.xml.tpl]) |
-
-These templates are interpreted using [envplate](https://github.com/kreuzwerker/envplate) at instantiation time, since `envplate` is used as the `ENTRYPOINT` for the parent `virtualstaticvoid/shibboleth-nginx` image. This is why they are included at build time via the Dockerfile, rather than at run-time via a volume mount. If a volume were used then the original would be overwritten, since `envplate` uses in-place substitutions.
+This template is interpreted using [envplate](https://github.com/kreuzwerker/envplate) at instantiation time.
 
 Environment Variables
 ----------------------
 
 The following environment variables are used by these service containers:
 
-| Variable | Description |
-|---|---|
-| AM_DASHBOARD_EXTERNAL_PORT | The external port that the Archivematica Dashboard should be exposed on. Default is 443. |
-| AM_DASHBOARD_SSL_CA_BUNDLE_FILE | The CA certificates file to secure the Archivematica Dashboard with for Shibboleth communications. This is expected to be a bundle, with the whole certificate chain included. | `/secrets/nginx/sp-ca-bundle.pem` |
-| AM_DASHBOARD_SSL_CERT_FILE | The certificate file to secure the Archivematica Dashboard with for Shibboleth communications. | `/secrets/nginx/am-dash-cert.pem` |
-| AM_DASHBOARD_SSL_KEY_FILE | The private key file to secure the Archivematica Dashboard service with. | `/secrets/nginx/am-dash-key.pem` |
-| AM_DASHBOARD_SSL_WEB_CERT_FILE | The certificate file to secure the Archivematica Dashboard web service with. | `/secrets/nginx/am-dash-web-cert.pem` |
-| AM_STORAGE_SERVICE_EXTERNAL_PORT | The external port that the Archivematica Storage Service should be exposed on. Default is 8443 |
-| AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE | The CA certificates file to secure the Archivematica Storage Service with for Shibboleth communications. This is expected be a bundle, with the whole certificate chain included. | `/secrets/nginx/sp-ca-bundle.pem` |
-| AM_STORAGE_SERVICE_SSL_CERT_FILE | The certificate file to secure the Archivematica Storage Service with for Shibboleth communications. | `/secrets/nginx/am-ss-cert.pem` |
-| AM_STORAGE_SERVICE_SSL_KEY_FILE | The private key file to secure the Archivematica Storage Service service with. | `/secrets/nginx/am-ss-key.pem` |
-| AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE | The certificate file to secure the Archivematica Storage Service web service with. | `/secrets/nginx/am-ss-web-cert.pem` |
-| NGINX_EXTERNAL_IP | The external IP address that `nginx` should bind to. Default is `0.0.0.0`, meaning the service is available on all interfaces. |
-| SHIBBOLETH_IDP_ENTITY_ID | The `entityID` of the IdP that the SP should use for authentication. By default it will use the local Shibboleth IdP service. |
-| SHIBBOLETH_IDP_METADATA_URL | The URL of the IdP metadata that the SP should use for authentication. By default it will contact the local Shibboleth IdP service to obtain its metadata. |
+| Variable | Description | Default Value |
+|---|---|---|
+| `AM_EXTERNAL_PORT` | The external port that the Archivematica services should be exposed on | `443` |
+| `AM_DASHBOARD_SSL_CA_BUNDLE_FILE` | The CA certificates file to secure the Archivematica Dashboard with for Shibboleth communications. This is expected to be a bundle, with the whole certificate chain included. | `/secrets/nginx/sp-ca-bundle.pem` |
+| `AM_DASHBOARD_SSL_CERT_FILE` | The certificate file to secure the Archivematica Dashboard with for Shibboleth communications. | `/secrets/nginx/am-dash-cert.pem` |
+| `AM_DASHBOARD_SSL_KEY_FILE` | The private key file to secure the Archivematica Dashboard service with. | `/secrets/nginx/am-dash-key.pem` |
+| `AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE` | The CA certificates file to secure the Archivematica Storage Service with for Shibboleth communications. This is expected be a bundle, with the whole certificate chain included. | `/secrets/nginx/sp-ca-bundle.pem` |
+| `AM_STORAGE_SERVICE_SSL_CERT_FILE` | The certificate file to secure the Archivematica Storage Service with for Shibboleth communications. | `/secrets/nginx/am-ss-cert.pem` |
+| `AM_STORAGE_SERVICE_SSL_KEY_FILE` | The private key file to secure the Archivematica Storage Service service with. | `/secrets/nginx/am-ss-key.pem` |
+| `DOMAIN_NAME` | The domain name that the services are being hosted under. | `example.ac.uk` |
+| `NGINX_EXTERNAL_IP` | The external IP address that `nginx` should bind to. Default is `0.0.0.0`, meaning the service is available on all interfaces. |
+| `SHIBBOLETH_IDP_ENTITY_ID` | The `entityID` of the IdP that the SP should use for authentication. | The entity ID of our "local" Shibboleth IdP service. |
+| `SHIBBOLETH_IDP_METADATA_URL` | The URL of the IdP metadata that the SP should use for authentication. | The local Shibboleth IdP service's metadata URL. |
 | `SHIBBOLETH_METADATA_SIGNING_CERT` | Certificate file to use to verify the signature of metadata responses from the IdP. | `ukfederation-mdq.pem` |
 | `SHIBBOLETH_METADATA_URL_SUBST` | The "substitution string" to use when determining the metadata URL for the IdP's entity id. | `http://mdq.ukfederation.org.uk/entities/$entityID` |
+| `SHIBBOLETH_SUPPORT_EMAIL` | The email address to display as a contact address on Shibboleth-related error pages. | `shibboleth-support@{DOMAIN_NAME}` |
 
 Entitlements
 -------------
@@ -103,33 +63,29 @@ SSL Certificates
 
 The certificates and private keys that should be used to secure the Shibboleth services can be specified using the `AM_DASHBOARD_SSL_*` and `AM_STORAGE_SERVICE_SSL_*` environment variables described above. If none of these values are set, default keys and self-signed certificates will be generated and used by the Compose bootstrap process.
 
-The environment variables must be applied to the `nginx` container, because that is where the SSL layer is applied. For example, using docker-compose:
+The environment variables must be applied to the `nginx-ssl` container, because that is where the SSL layer is applied. For example, using docker-compose:
 
 ```
 services:
-  nginx:
+  nginx-ssl:
     environment:
       AM_DASHBOARD_SSL_KEY_FILE:              '/secrets/dash-private-key.pem'
-      AM_DASHBOARD_SSL_CERT_FILE:             '/secrets/dash-sp-certificate.pem'
-      AM_DASHBOARD_SSL_WEB_CERT_FILE:         '/secrets/dash-web-certificate.pem'
-      AM_DASHBOARD_SSL_CA_BUNDLE_FILE:        '/secrets/cabundle.pem'
+      AM_DASHBOARD_SSL_CERT_FILE:             '/secrets/dash-certificate.pem'
       AM_STORAGE_SERVICE_SSL_KEY_FILE:        '/secrets/ss-private-key.pem'
-      AM_STORAGE_SERVICE_SSL_CERT_FILE:       '/secrets/ss-sp-certificate.pem'
-      AM_STORAGE_SERVICE_SSL_WEB_CERT_FILE:   '/secrets/ss-web-certificate.pem'
-      AM_STORAGE_SERVICE_SSL_CA_BUNDLE_FILE:  '/secrets/cabundle.pem'
+      AM_STORAGE_SERVICE_SSL_CERT_FILE:       '/secrets/ss-certificate.pem'
     volumes:
       - '/keys/dash/private-key.pem:/secrets/dash-private-key.pem:ro'
-      - '/keys/dash/sp-certificate.pem:/secrets/dash-sp-certificate.pem:ro'
-      - '/keys/dash/web-certificate.pem:/secrets/dash-web-certificate.pem:ro'
+      - '/keys/dash/sp-certificate.pem:/secrets/dash-certificate.pem:ro'
       - '/keys/ss/private-key.pem:/secrets/ss-private-key.pem:ro'
-      - '/keys/ss/sp-certificate.pem:/secrets/ss-sp-certificate.pem:ro'
-      - '/keys/ss/web-certificate.pem:/secrets/ss-web-certificate.pem:ro'
-      - '/keys/cabundle.pem:/secrets/cabundle.pem:ro'
+      - '/keys/ss/sp-certificate.pem:/secrets/ss-certificate.pem:ro'
 ```
 
-There are two different types of service being secured by SSL: the Shibboleth SP for each application, and the Nginx virtual host for each application. Each application is expected to have a different hostname, which means different CNs, which requires different certificates to secure it (unless using a wildcard certificate, but we cannot assume this). 
+Shibboleth SP Certificates
+----------------------------
 
-In addition, the application SP certificates must include the "subject alt name" of the host, as a "DNS" entry in the certificate metadata. This means that they must be seperate to those used by `nginx`. If using OpenSSL to create the SP certificates then the following must be added to the OpenSSL config:
+Each application is expected to have a different hostname, which means different CNs, which requires different certificates to secure it (unless using a wildcard certificate, but we cannot assume this). 
+
+In addition, the SP certificates must include the "subject alt name" of the host, as a "DNS" entry in the certificate metadata. This means that they must be seperate to those used by `nginx-ssl`. If using OpenSSL to create the SP certificates then the following must be added to the OpenSSL config:
 
 ```
 [ req_ext ]
@@ -139,7 +95,7 @@ subjectAltName = @alt_names
 DNS.1 = ${hostname}
 ```
 
-This is exactly as they are used in the [create-secrets.sh](nginx/create-secrets.sh) script, in which the OpenSSL config is generated (hence the use of `${hostname}` instead of a static value).
+This is exactly as they are used in the [create-secrets.sh](sp-proxy/create-secrets.sh) script, in which the OpenSSL config is generated (hence the use of `${hostname}` instead of a static value).
 
 Currently, any intermediate certificates should be bundled in the CA certificate files.
 

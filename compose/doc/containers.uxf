@@ -3,37 +3,21 @@
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>189</x>
-      <y>54</y>
-      <w>153</w>
-      <h>189</h>
+      <x>18</x>
+      <y>108</y>
+      <w>171</w>
+      <h>54</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 nginx
-bg=#c5e5f0
-group=14</panel_attributes>
+bg=#c5e5f0</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>198</x>
-      <y>108</y>
-      <w>126</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>symbol=component
-nginx
-layer=1
-bg=#c5e5f0
-group=14</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLGeneric</id>
-    <coordinates>
-      <x>198</x>
-      <y>153</y>
+      <x>216</x>
+      <y>99</y>
       <w>126</w>
       <h>36</h>
     </coordinates>
@@ -41,17 +25,16 @@ group=14</panel_attributes>
 Shib SP
 
 bg=#d0f0c5
-layer=1
-group=14</panel_attributes>
+layer=1</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>9</x>
-      <y>54</y>
+      <x>207</x>
+      <y>216</y>
       <w>153</w>
-      <h>126</h>
+      <h>153</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 idp
@@ -61,8 +44,8 @@ bg=#d0f0c5</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>18</x>
-      <y>99</y>
+      <x>216</x>
+      <y>270</y>
       <w>126</w>
       <h>72</h>
     </coordinates>
@@ -76,7 +59,7 @@ layer=1</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>405</x>
+      <x>414</x>
       <y>108</y>
       <w>126</w>
       <h>72</h>
@@ -91,10 +74,10 @@ layer=1</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>369</x>
-      <y>54</y>
+      <x>378</x>
+      <y>45</y>
       <w>216</w>
-      <h>144</h>
+      <h>162</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 archivematica-dashboard
@@ -104,7 +87,7 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>414</x>
+      <x>423</x>
       <y>144</y>
       <w>108</w>
       <h>27</h>
@@ -117,10 +100,10 @@ layer=2</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>369</x>
-      <y>207</y>
+      <x>378</x>
+      <y>216</y>
       <w>216</w>
-      <h>144</h>
+      <h>153</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 archivematica-storage-service
@@ -130,8 +113,8 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>405</x>
-      <y>261</y>
+      <x>414</x>
+      <y>279</y>
       <w>126</w>
       <h>72</h>
     </coordinates>
@@ -145,8 +128,8 @@ layer=1</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>414</x>
-      <y>297</y>
+      <x>423</x>
+      <y>315</y>
       <w>108</w>
       <h>27</h>
     </coordinates>
@@ -158,23 +141,8 @@ layer=2</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>198</x>
-      <y>198</y>
-      <w>126</w>
-      <h>36</h>
-    </coordinates>
-    <panel_attributes>symbol=component
-Supervisor
-layer=1
-bg=#c5e5f0
-group=14</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLGeneric</id>
-    <coordinates>
       <x>612</x>
-      <y>117</y>
+      <y>162</y>
       <w>189</w>
       <h>36</h>
     </coordinates>
@@ -188,9 +156,9 @@ layer=1</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>603</x>
-      <y>54</y>
+      <y>108</y>
       <w>216</w>
-      <h>108</h>
+      <h>99</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 archivematica-mcp-client
@@ -201,7 +169,7 @@ bg=#ffe7bd</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>612</x>
-      <y>225</y>
+      <y>261</y>
       <w>189</w>
       <h>36</h>
     </coordinates>
@@ -215,9 +183,9 @@ layer=1</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>603</x>
-      <y>171</y>
+      <y>216</y>
       <w>216</w>
-      <h>108</h>
+      <h>90</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 archivematica-mcp-server
@@ -227,9 +195,9 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>9</x>
-      <y>360</y>
-      <w>108</w>
+      <x>603</x>
+      <y>378</y>
+      <w>99</w>
       <h>54</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
@@ -240,8 +208,8 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>279</x>
-      <y>360</y>
+      <x>711</x>
+      <y>378</y>
       <w>108</w>
       <h>54</h>
     </coordinates>
@@ -253,8 +221,8 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>549</x>
-      <y>360</y>
+      <x>711</x>
+      <y>315</y>
       <w>108</w>
       <h>54</h>
     </coordinates>
@@ -266,8 +234,8 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>144</x>
-      <y>360</y>
+      <x>486</x>
+      <y>378</y>
       <w>108</w>
       <h>54</h>
     </coordinates>
@@ -279,9 +247,9 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>684</x>
-      <y>360</y>
-      <w>108</w>
+      <x>378</x>
+      <y>378</y>
+      <w>99</w>
       <h>54</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
@@ -292,9 +260,9 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>414</x>
-      <y>360</y>
-      <w>108</w>
+      <x>603</x>
+      <y>315</y>
+      <w>99</w>
       <h>54</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
@@ -305,9 +273,9 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>1089</x>
-      <y>360</y>
-      <w>99</w>
+      <x>1071</x>
+      <y>378</y>
+      <w>108</w>
       <h>54</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
@@ -318,8 +286,8 @@ bg=#d0c1e8</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>819</x>
-      <y>360</y>
+      <x>837</x>
+      <y>378</y>
       <w>108</w>
       <h>54</h>
     </coordinates>
@@ -332,7 +300,7 @@ bg=#d0c1e8</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>954</x>
-      <y>360</y>
+      <y>378</y>
       <w>108</w>
       <h>54</h>
     </coordinates>
@@ -344,51 +312,48 @@ bg=#d0c1e8</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>954</x>
+      <x>918</x>
       <y>270</y>
-      <w>108</w>
-      <h>72</h>
+      <w>171</w>
+      <h>81</h>
     </coordinates>
     <panel_attributes>symbol=component
 Go
 
-bg=#ad86eb
-group=21</panel_attributes>
+bg=#ad86eb</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>846</x>
-      <y>207</y>
+      <x>837</x>
+      <y>216</y>
       <w>342</w>
-      <h>144</h>
+      <h>153</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 rdss-archivematica-channel-adapter-publisher
-bg=#d0c1e8
-group=21</panel_attributes>
+bg=#d0c1e8</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>846</x>
-      <y>54</y>
+      <x>837</x>
+      <y>45</y>
       <w>342</w>
-      <h>144</h>
+      <h>162</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 rdss-archivematica-channel-adapter-consumer
-bg=#d0c1e8
-group=23</panel_attributes>
+bg=#d0c1e8</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>9</x>
-      <y>189</y>
+      <x>207</x>
+      <y>378</y>
       <w>153</w>
       <h>54</h>
     </coordinates>
@@ -400,65 +365,50 @@ bg=#d0f0c5</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>963</x>
+      <x>954</x>
       <y>306</y>
       <w>90</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>publisher
 layer=1
-group=21
 bg=#d0c1e8</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>954</x>
-      <y>117</y>
-      <w>108</w>
-      <h>72</h>
+      <x>918</x>
+      <y>108</y>
+      <w>171</w>
+      <h>81</h>
     </coordinates>
     <panel_attributes>symbol=component
 Go
 
 bg=#ad86eb
-layer=1
-group=23</panel_attributes>
+layer=1</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>963</x>
-      <y>153</y>
+      <x>954</x>
+      <y>144</y>
       <w>90</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>consumer
 layer=2
-bg=#d0c1e8
-group=23</panel_attributes>
+bg=#d0c1e8</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>189</x>
-      <y>18</y>
-      <w>153</w>
-      <h>27</h>
-    </coordinates>
-    <panel_attributes>Nginx
-bg=#c5e5f0</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLNote</id>
-    <coordinates>
-      <x>369</x>
-      <y>18</y>
-      <w>450</w>
+      <x>378</x>
+      <y>9</y>
+      <w>441</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>Archivematica
@@ -468,8 +418,8 @@ bg=#ffe7bd</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>846</x>
-      <y>18</y>
+      <x>837</x>
+      <y>9</y>
       <w>342</w>
       <h>27</h>
     </coordinates>
@@ -480,8 +430,8 @@ bg=#d0c1e8</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>9</x>
-      <y>18</y>
+      <x>207</x>
+      <y>9</y>
       <w>153</w>
       <h>27</h>
     </coordinates>
@@ -492,8 +442,8 @@ bg=#d0f0c5</panel_attributes>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
-      <x>27</x>
-      <y>135</y>
+      <x>225</x>
+      <y>306</y>
       <w>108</w>
       <h>27</h>
     </coordinates>
@@ -505,9 +455,9 @@ layer=2</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>9</x>
-      <y>261</y>
-      <w>333</w>
+      <x>18</x>
+      <y>180</y>
+      <w>171</w>
       <h>27</h>
     </coordinates>
     <panel_attributes>NextCloud
@@ -517,10 +467,10 @@ bg=#d490b3</panel_attributes>
   <element>
     <id>UMLDeployment</id>
     <coordinates>
-      <x>9</x>
-      <y>297</y>
-      <w>333</w>
-      <h>54</h>
+      <x>18</x>
+      <y>216</y>
+      <w>171</w>
+      <h>216</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 nextcloud
@@ -531,13 +481,124 @@ bg=#d490b3</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>603</x>
-      <y>288</y>
+      <y>45</y>
       <w>216</w>
-      <h>63</h>
+      <h>54</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 automation-tools
 bg=#ffe7bd</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLDeployment</id>
+    <coordinates>
+      <x>207</x>
+      <y>45</y>
+      <w>153</w>
+      <h>162</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Container&gt;&gt;
+shib-sp-proxy
+bg=#d0f0c5</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>216</x>
+      <y>153</y>
+      <w>126</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+Apache 2
+
+bg=#d0f0c5
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>45</x>
+      <y>342</y>
+      <w>108</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>nextcloud
+bg=#fabedd
+layer=2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>27</x>
+      <y>306</y>
+      <w>144</w>
+      <h>72</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+php-fpm
+
+bg=#9e6281
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLDeployment</id>
+    <coordinates>
+      <x>18</x>
+      <y>45</y>
+      <w>171</w>
+      <h>54</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;Container&gt;&gt;
+nginx-ssl
+bg=#c5e5f0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>27</x>
+      <y>261</y>
+      <w>144</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+nginx
+
+bg=#9e6281
+layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>18</x>
+      <y>9</y>
+      <w>171</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Nginx
+bg=#c5e5f0</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLGeneric</id>
+    <coordinates>
+      <x>27</x>
+      <y>387</y>
+      <w>144</w>
+      <h>36</h>
+    </coordinates>
+    <panel_attributes>symbol=component
+s6
+
+bg=#9e6281
+layer=1</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
