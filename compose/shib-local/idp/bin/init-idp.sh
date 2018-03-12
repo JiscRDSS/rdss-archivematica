@@ -56,21 +56,10 @@ rm -r /ext-mount/customized-shibboleth-idp/views/user-prefs.js
 # Remove backchannel keys and certs because they're self-signed - we'll replace them later
 rm /ext-mount/customized-shibboleth-idp/credentials/idp-*
 
-# Enable SLO via HTTP in IdP metadata config
-# (commented out section starts at line 110 so splice the file to 'edit' the XML)
-head -n 109 /ext-mount/customized-shibboleth-idp/metadata/idp-metadata.xml \
-	> idp-metadata.xml.head
-tail -n +111 /ext-mount/customized-shibboleth-idp/metadata/idp-metadata.xml \
-	| head -n 3 > idp-metadata.xml.mid
-tail -n +116 /ext-mount/customized-shibboleth-idp/metadata/idp-metadata.xml \
-	> idp-metadata.xml.tail
-cat idp-metadata.xml.head idp-metadata.xml.mid idp-metadata.xml.tail \
-	> idp-metadata.xml
-
 # Replace IdP host with actual 'external' host/port
-sed -i "s|Location=\"https://${IDP_HOSTNAME}/idp/|Location=\"https://${IDP_HOSTNAME}:${IDP_EXTERNAL_PORT}/idp/|g" idp-metadata.xml
+sed -i "s|Location=\"https://${IDP_HOSTNAME}/idp/|Location=\"https://${IDP_HOSTNAME}:${IDP_EXTERNAL_PORT}/idp/|g" \
+	/ext-mount/customized-shibboleth-idp/metadata/idp-metadata.xml
 
-cp idp-metadata.xml /ext-mount/customized-shibboleth-idp/metadata/
 mv /ext-mount/customized-shibboleth-idp/metadata/idp-metadata.xml \
 	/ext-mount/customized-shibboleth-idp/metadata/idp-metadata.unsigned.xml
 
