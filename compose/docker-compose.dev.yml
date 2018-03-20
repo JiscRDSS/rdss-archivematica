@@ -81,3 +81,8 @@ services:
     entrypoint: "go run main.go -addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint=http://minikine:4567 -kinesis-stream=main -kinesis-region=eu-west-2 -s3-access-key=AKIAIOSFODNN7EXAMPLE -s3-secret-key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY -s3-region=eu-west-2 -s3-endpoint=https://minio:9000"
     volumes:
       - "${VOL_BASE}/../src/qa/rdss-archivematica-msgcreator:/go/src/github.com/JiscRDSS/rdss-archivematica-msgcreator"
+      
+  nextcloud:
+    image: "nextcloud"
+    build:
+      context: "../src/rdss-arkivum-nextcloud/"

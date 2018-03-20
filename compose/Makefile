@@ -33,11 +33,6 @@ ifdef SHIBBOLETH_CONFIG
 	endif
 endif
 
-# Do we want to include the nextcloud services?
-ifeq ("$(NEXTCLOUD_ENABLED)", "true")
-	override COMPOSE_DIRS += nextcloud
-endif
-
 # Set the docker-compose COMPOSE_FILE env var to include the config from each
 # dir in COMPOSE_DIRS
 override COMPOSE_FILE ?= $(shell echo \

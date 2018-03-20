@@ -12,9 +12,16 @@ export VERSION
 all: destroy bootstrap
 	docker-compose ps
 
-build:
+build: build-docker build-nextcloud-apps
+
+build-docker:
 	# Specify compose file explicitly, we don't want to build any other container sets
 	COMPOSE_FILE=$(DEFAULT_COMPOSE_FILE) docker-compose build
+
+build-nextcloud-apps:
+	# Make sure NextCloud apps are built
+	@cd $(BASE_DIR)/../../src/rdss-arkivum-nextcloud/ && \
+		make build-apps && cd $(BASE_DIR)
 
 bootstrap: build bootstrap-storage-service bootstrap-dashboard bootstrap-dashboard-frontend restart-mcp-services
 
@@ -140,4 +147,4 @@ watch-am:
 watch-ss:
 	docker-compose logs -f archivematica-storage-service
 
-.PHONY: default destroy bootstrap build bootstrap-dashboard bootstrap-dashboard-frontend bootstrap-storage-service config create-secrets list restart-mcp-services
+.PHONY: default destroy bootstrap build build-docker build-nextcloud-apps bootstrap-dashboard bootstrap-dashboard-frontend bootstrap-storage-service config create-secrets list restart-mcp-services

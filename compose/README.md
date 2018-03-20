@@ -80,13 +80,12 @@ This must be used with caution, which is why you will be prompted to confirm you
 Service Sets
 -------------
 
-There are currently five service sets defined:
+There are currently four service sets defined:
 
-1. [qa](qa), which defines the main Archivematica services and supporting web server, db, etc, suitable for use in a qa environment.
+1. [qa](qa), which defines the main Archivematica services and supporting web server, db, etc, as well as NextCloud, suitable for use in a qa environment.
 1. [dev](dev), which extends `qa` to build the images from local files, rather than expecting to pull existing images.
 1. [am-shib](am-shib), which wraps the Archivematica services in the [qa](qa) service set in Shibboleth authentication.
 1. [shib-local](shib-local), which provides a local example Shibboleth IdP with backing LDAP directory.
-1. [nextcloud](nextcloud), which provides a NextCloud instance, tailored for the RDSS platform.
 
 These service sets are defined by the following `docker-compose` configuration files:
 
@@ -94,7 +93,6 @@ These service sets are defined by the following `docker-compose` configuration f
 1. [docker-compose.dev.yml](docker-compose.dev.yml)
 1. [docker-compose.am-shib.yml](docker-compose.am-shib.yml)
 1. [docker-compose.shib-local.yml](docker-compose.shib-local.yml)
-1. [docker-compose.nextcloud.yml](docker-compose.nextcloud.yml)
 
 You can use the [COMPOSE_FILE](https://docs.docker.com/compose/reference/envvars/) environment variable to set which `docker-compose` file or files you wish to use. To just configure the Archivematica dev environment, use
 
@@ -105,19 +103,19 @@ To configure Archivematica with local Shibboleth authentication, use
 	COMPOSE_FILE=docker-compose.dev.yml:docker-compose.am-shib.yml:docker-compose.shib-local.yml docker-compose \
 		<compose-args>
 
-To configure Archivematica with external Shibboleth authentication, and include NextCloud too, use
+To configure Archivematica and NextCloud with external Shibboleth authentication, use
 
 	SHIBBOLETH_IDP_ENTITY_ID=https://your.domain/idp/shibboleth \
 	SHIBBOLETH_IDP_METADATA_URL=https://your.domain/path/to/idp/metadata \
-	COMPOSE_FILE=docker-compose.dev.yml:docker-compose.am-shib.yml:docker-compose.shib-local.yml:docker-compose.nextcloud.yml \
+	COMPOSE_FILE=docker-compose.dev.yml:docker-compose.am-shib.yml:docker-compose.shib-local.yml \
 		docker-compose \
 			<compose-args>
 
 This is quite a mouthful, so there are also Makefiles defined that shortcut some of this for you, for example:
 
-	make all SHIBBOLETH_CONFIG=archivematica NEXTCLOUD_ENABLED=true
+	make all SHIBBOLETH_CONFIG=archivematica
 
-This will set `COMPOSE_FILE=docker-compose.dev.yml:docker-compose.am-shib.yml:docker-compose.shib-local.yml:docker-compose.nextcloud.yml` when calling `docker-compose` as part of the build process. To use an external IdP with the `make` command:
+This will set `COMPOSE_FILE=docker-compose.dev.yml:docker-compose.am-shib.yml:docker-compose.shib-local.yml` when calling `docker-compose` as part of the build process. To use an external IdP with the `make` command:
 
 	SHIBBOLETH_IDP_ENTITY_ID=https://your.domain/idp/shibboleth \
 	SHIBBOLETH_IDP_METADATA_URL=https://your.domain/path/to/idp/metadata \
@@ -141,7 +139,6 @@ Details of the services deployed for each service set are in the README for that
 * [Archivematica Services](dev/README.md)
 * [Shibboleth-enabled Archivematica Services](am-shib/README.md)
 * [Local Shibboleth IdP Service](shib-local/README.md)
-* [NextCloud Service](nextcloud/README.md)
 
 Building
 ---------
@@ -171,10 +168,6 @@ There is no Shibboleth integration in this usage. To enable Shibboleth, use this
 This will include additional services defined in [docker-compose.am-shib.yml](docker-compose.am-shib.yml) in addition to those in [docker-compose.dev.yml](docker-compose.dev.yml).
 
 By default this will include the local example Shibboleth IdP in [docker-compose.shib-local.yml](docker-compose.shib-local.yml) too. In future it may be possible to define a different Shibboleth IdP using the `SHIBBOLETH_IDP` environment variable (e.g. to use the UKAMF or UKAMF test IdPs). Alternatively, the `SHIBBOLETH_IDP_ENTITY_ID` and `SHIBBOLETH_IDP_METADATA_URL` environment variables may be used to override this. To use an alternative IdP and prevent the local IdP from being created, use `SHIBBOLETH_IDP=false`.
-
-To enable Shibboleth integration and NextCloud, use
-
-	make all ENV=dev SHIBBOLETH_CONFIG=archivematica NEXTCLOUD_ENABLED=true
 
 After a successful build of the Shibboleth-enabled Archivematica services and NextCloud service you should find you have the following services listed by `make list SHIBBOLETH_CONFIG=archivematica NEXTCLOUD_ENABLED=true`:
 
@@ -250,7 +243,6 @@ The following makefile variables are supported by this build, in addition to tho
 | Variable | Description |
 |---|---|
 | `GENERATE_SSL_CERTS` | Whether or not to auto-generate SSL keys and certificates for the [am-shib](am-shib) and [shib-local](shib-local) container sets. Default is `true`, if set to `false` then you must provide the key and certificate files using the defined environment variables described in those modules' readme documentation (see [Custom SSL Certificates](#CustomSSLCertificates), below). |
-| `NEXTCLOUD_ENABLED` | Whether or not to include the NextCloud service in the deployed containers. Default is `false`. Set to `true` to enable. |
 | `SHIBBOLETH_CONFIG` | The Shibboleth profile to use. Currently only `archivematica` is supported. Default is undefined, causing no Shibboleth support to be enabled. |
 | `SHIBBOLETH_IDP` | The shibboleth IdP profile to use. Currently only `local` is supported, which is the default if `SHIBBOLETH_CONFIG` is set. Setting to another value will prevent the local Shibboleth IdP ([shib-local](shib-local)) from being included. |
 
