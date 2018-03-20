@@ -8,7 +8,12 @@ RUN apk --no-cache add curl && \
     rm -f /etc/nginx/conf.d/default.conf
 
 # Process config using envplate
-CMD ["/usr/local/bin/ep", "-v", "/etc/nginx/conf.d/am-ssl.conf", "--", "/bin/sh", "-c", "nginx -g 'daemon off;'"]
+CMD ["/usr/local/bin/ep", "-v", \
+    "/etc/nginx/conf.d/am-ssl.conf", \
+    "/etc/nginx/conf.d/nextcloud-ssl.conf", \
+    "--", \
+     "/bin/sh", "-c", "nginx -g 'daemon off;'"]
 
-# Copy our config template
+# Copy our config templates
 COPY am-ssl.conf.tpl /etc/nginx/conf.d/am-ssl.conf
+COPY nextcloud-ssl.conf.tpl /etc/nginx/conf.d/nextcloud-ssl.conf

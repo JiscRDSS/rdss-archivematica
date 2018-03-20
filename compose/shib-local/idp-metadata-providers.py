@@ -53,7 +53,8 @@ with open(sp_conf_file, 'r') as f:
       metadata_url = sp_conf[sp]['metadata'].replace(
          '${AM_DASHBOARD_HOST}', os.getenv('AM_DASHBOARD_HOST', 'dashboard.archivematica.example.ac.uk')).replace(
          '${AM_STORAGE_SERVICE_HOST}', os.getenv('AM_STORAGE_SERVICE_HOST', 'ss.archivematica.example.ac.uk')).replace(
-         '${AM_EXTERNAL_PORT}', os.getenv('AM_EXTERNAL_PORT', '443'))
+         '${AM_EXTERNAL_PORT}', os.getenv('AM_EXTERNAL_PORT', '443')).replace(
+         '${NEXTCLOUD_HOST}', os.getenv('NEXTCLOUD_HOST', 'nextcloud.example.ac.uk'))
       print ("""
     <MetadataProvider xsi:type="FileBackedHTTPMetadataProvider"
         id="{name}Metadata"

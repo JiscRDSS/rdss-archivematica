@@ -61,9 +61,9 @@
 
       - name: "RDSS Arkivum NextCloud"
         repo: "https://github.com/JiscRDSS/rdss-arkivum-nextcloud"
-        version: "v0.2.5"
+        version: "dev/shibboleth"
         dest: "./src/rdss-arkivum-nextcloud"
-        make_target: "build-files-move-app"
+        make_target: "build-apps"
         images:
           - name: "{{ registry }}nextcloud"
             path: "./src/rdss-arkivum-nextcloud/"

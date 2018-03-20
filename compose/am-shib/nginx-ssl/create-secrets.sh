@@ -14,6 +14,7 @@ CA_PEM_CERT="${DOMAIN_NAME}-ca.crt"
 
 AM_DASHBOARD_HOST="${AM_DASHBOARD_HOST:-dashboard.archivematica.${DOMAIN_NAME}}"
 AM_STORAGE_SERVICE_HOST="${AM_STORAGE_SERVICE_HOST:-ss.archivematica.${DOMAIN_NAME}}"
+NEXTCLOUD_HOST="${NEXTCLOUD_HOST:-nextcloud.${DOMAIN_NAME}}"
 
 AM_DASHBOARD_KEY="am-dash-key.pem"
 AM_DASHBOARD_CERT="am-dash-cert.pem"
@@ -22,6 +23,10 @@ AM_DASHBOARD_CSR="${AM_DASHBOARD_HOST}.csr"
 AM_STORAGE_SERVICE_KEY="am-ss-key.pem"
 AM_STORAGE_SERVICE_CERT="am-ss-cert.pem"
 AM_STORAGE_SERVICE_CSR="${AM_STORAGE_SERVICE_HOST}.csr"
+
+NEXTCLOUD_KEY="nextcloud-key.pem"
+NEXTCLOUD_CERT="nextcloud-cert.pem"
+NEXTCLOUD_CSR="${NEXTCLOUD_HOST}.csr"
 
 
 #
@@ -117,6 +122,20 @@ generate_ssl_certs()
 	create_signed_cert "${AM_STORAGE_SERVICE_HOST}" \
 		"${BUILD_DIR}/${AM_STORAGE_SERVICE_CSR}" \
 		"${BUILD_DIR}/${AM_STORAGE_SERVICE_CERT}"
+
+	#
+	# NextCloud
+	#
+	# Create private key
+	create_key "${BUILD_DIR}/${NEXTCLOUD_KEY}"
+	# Create CSR for nginx SSL
+	create_web_csr "${NEXTCLOUD_HOST}" \
+		"${BUILD_DIR}/${NEXTCLOUD_KEY}" \
+		"${BUILD_DIR}/${NEXTCLOUD_CSR}"
+	# Sign nginx CSR
+	create_signed_cert "${NEXTCLOUD_HOST}" \
+		"${BUILD_DIR}/${NEXTCLOUD_CSR}" \
+		"${BUILD_DIR}/${NEXTCLOUD_CERT}"
 }
 
 #

@@ -12,10 +12,12 @@ services:
       default:
           aliases:
             - "dashboard.archivematica.${DOMAIN_NAME}"
+            - "nextcloud.${DOMAIN_NAME}"
             - "ss.archivematica.${DOMAIN_NAME}"
       shibnet:
           aliases:
             - "dashboard.archivematica.${DOMAIN_NAME}"
+            - "nextcloud.${DOMAIN_NAME}"
             - "ss.archivematica.${DOMAIN_NAME}"
     ports:
       - "${NGINX_EXTERNAL_IP}:${AM_EXTERNAL_PORT}:443"
@@ -23,10 +25,14 @@ services:
       AM_DASHBOARD_HOST: "dashboard.archivematica.${DOMAIN_NAME}"
       AM_STORAGE_SERVICE_HOST: "ss.archivematica.${DOMAIN_NAME}"
       AM_EXTERNAL_PORT:
+      NEXTCLOUD_HOST: "nextcloud.${DOMAIN_NAME}"
+      NEXTCLOUD_EXTERNAL_SSL_PORT:
+      NEXTCLOUD_PROXIED_HOST: "nextcloud"
       SHIB_SP_HOST: "shib-sp-proxy"
     volumes:
       - "${VOL_BASE}/am-shib/build/secrets/:/secrets/:ro"
     depends_on:
+      - "nextcloud"
       - "shib-sp-proxy"
 
   # Enforces Shibboleth authentication in front of our AM nginx proxy
@@ -73,6 +79,22 @@ services:
   archivematica-storage-service:
     environment:
       SS_SHIBBOLETH_AUTHENTICATION: "True"
+
+  # Enforces Shibboleth for NextCloud
+  nextcloud:
+    environment:
+      # Proxy settings
+      HTTP_PROTOCOL: "https"
+      NEXTCLOUD_HOST: "nextcloud.${DOMAIN_NAME}"
+      PROXY_HOST: "nginx-ssl"
+      # Shibboleth
+      SHIBBOLETH_AUTHENTICATION: "true"
+      SHIB_IDP_CERT_FILE: "/etc/shibboleth/md-signing.crt"
+      SHIB_SP_CERT_FILE: "/secrets/ssl-proxy/nextcloud-cert.pem"
+      SHIB_SP_KEY_FILE: "/secrets/ssl-proxy/nextcloud-key.pem"
+    volumes:
+      - "${VOL_BASE}/am-shib/build/secrets/:/secrets/:ro"
+      - "${VOL_BASE}/shib-local/build/secrets/idp/idp.${DOMAIN_NAME}.crt:/etc/shibboleth/md-signing.crt:ro"
 
 networks:
   shibnet:
