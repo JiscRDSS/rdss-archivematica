@@ -67,7 +67,7 @@ docker_get_service_port()
     local -r service="$1"
     local -r private_port="$2"
     local compose_files
-    compose_files="docker-compose.qa.yml:docker-compose.nextcloud.yml"
+    compose_files="docker-compose.qa.yml"
     if [ "${SHIB_ENABLED}" == "true" ] ; then
         compose_files="${compose_files}:docker-compose.am-shib.yml"
         compose_files="${compose_files}:docker-compose.shib-local.yml"

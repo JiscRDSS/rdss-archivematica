@@ -96,9 +96,7 @@ deploy_containers() {
         export IDP_EXTERNAL_IP='0.0.0.0' ; \
         export IDP_EXTERNAL_PORT=4443 ; \
         export REGISTRY=localhost:5000/ ; \
-            make all \
-                SHIBBOLETH_CONFIG=${SHIBBOLETH_CONFIG} \
-                NEXTCLOUD_ENABLED=true"
+            make all SHIBBOLETH_CONFIG=${SHIBBOLETH_CONFIG}"
     # Use docker machine to copy sample data from compose dev src to minio
     docker-machine ssh "${DOCKERHOST_INSTANCE}" \
         "sudo rsync -avz \
@@ -151,10 +149,10 @@ deploy_dockerhost()
     am_ss_port="$(docker_get_service_port 'nginx' 8000)"
     nextcloud_port="$(docker_get_service_port 'nextcloud' 8888)"
     if [ "${SHIB_ENABLED}" == "true" ] ; then
-        # Dash and SS use the same port with Shibboleth enabled
-        am_dash_port="$(docker_get_service_port 'nginx' 443)"
+        # Dash, SS and NextCloud use the same port with Shibboleth enabled
+        am_dash_port="$(docker_get_service_port 'nginx-ssl' 443)"
         am_ss_port="${am_dash_port}"
-        nextcloud_port="$(docker_get_service_port 'nextcloud' 8888)"
+        nextcloud_port="${am_dash_port}"
         shib_idp_port="$(docker_get_service_port 'idp' 4443)"
     fi
     # Add ingress rule for each of the exposed services
@@ -351,19 +349,22 @@ main()
     log_info "The following services will be deployed:"
     local am_dash_url
     local am_ss_url
+    local nextcloud_url
     am_dash_url="http://archivematica.${PUBLIC_HOSTED_ZONE}:<dynamic-port>/"
     am_ss_url="http://archivematica.${PUBLIC_HOSTED_ZONE}:<dynamic-port>/"
+    nextcloud_url="http://nextcloud.${PUBLIC_HOSTED_ZONE}:8888/"
     if [ "${SHIB_ENABLED}" == "true" ] ; then
         # With Shibboleth enabled the ports are fixed and HTTPS is used
         am_dash_url="https://dashboard.archivematica.${PUBLIC_HOSTED_ZONE}/"
         am_ss_url="https://ss.archivematica.${PUBLIC_HOSTED_ZONE}/"
+        nextcloud_url="https://nextcloud.${PUBLIC_HOSTED_ZONE}/"
     fi
     log_info "  Archivematica Dashboard:       ${am_dash_url}"
     log_info "  Archivematica Storage Service: ${am_ss_url}"
     if [ ! -z "${ARKIVUM_ENABLED}" ] ; then
         log_info "  Arkivum appliance:             https://arkivum.${PUBLIC_HOSTED_ZONE}:8443/"
     fi
-    log_info "  NextCloud:                     http://nextcloud.${PUBLIC_HOSTED_ZONE}:8888/"
+    log_info "  NextCloud:                     ${nextcloud_url}"
     log_info "  RDSS Archivematica MsgCreator: ${am_dash_url}msgcreator"
     log_note "If this looks incorrect, abort now using CTRL+C ..."
     sleep 10
@@ -401,7 +402,7 @@ main()
     if [ ! -z "${ARKIVUM_ENABLED}" ] ; then
         log_info "  Arkivum appliance:             https://arkivum.${PUBLIC_HOSTED_ZONE}:8443/"
     fi
-    log_info "  NextCloud:                     http://nextcloud.${PUBLIC_HOSTED_ZONE}:8888/"
+    log_info "  NextCloud:                     ${nextcloud_url}"
     log_info "  RDSS Archivematica MsgCreator: ${am_dash_url}msgcreator"
     local -r public_ns="$(aws_r53_get_zone_ns "${PUBLIC_HOSTED_ZONE}")"
     log_info "The following NS records must be added to DNS for ${PUBLIC_DOMAIN_NAME}:"
