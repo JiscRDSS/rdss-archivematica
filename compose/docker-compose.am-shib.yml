@@ -37,7 +37,7 @@ services:
 
   # Enforces Shibboleth authentication in front of our AM nginx proxy
   shib-sp-proxy:
-    image: "rdss-archivematica-shib-sp-proxy"
+    image: "${REGISTRY}rdss-archivematica-shib-sp-proxy:${SHIB_SPPROXY_VERSION}"
     #build:
     #  context: "${VOL_BASE}/../src/rdss-archivematica-shib-sp-proxy/"
     networks:
