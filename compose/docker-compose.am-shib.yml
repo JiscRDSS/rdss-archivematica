@@ -82,6 +82,9 @@ services:
 
   # Enforces Shibboleth for NextCloud
   nextcloud:
+    networks:
+      default:
+      shibnet:
     environment:
       # Proxy settings
       HTTP_PROTOCOL: "https"
@@ -89,7 +92,9 @@ services:
       PROXY_HOST: "nginx-ssl"
       # Shibboleth
       SHIBBOLETH_AUTHENTICATION: "true"
+      SHIB_IDP_ENTITY_ID: "https://idp.${DOMAIN_NAME}/idp/shibboleth"
       SHIB_IDP_CERT_FILE: "/etc/shibboleth/md-signing.crt"
+      SHIB_IDP_SSO_URL: "https://idp.${DOMAIN_NAME}:4443/idp/profile/SAML2/Redirect/SSO"
       SHIB_SP_CERT_FILE: "/secrets/ssl-proxy/nextcloud-cert.pem"
       SHIB_SP_KEY_FILE: "/secrets/ssl-proxy/nextcloud-key.pem"
     volumes:
