@@ -19,7 +19,7 @@
 
       - name: "Archivematica (JiscRDSS fork)"
         repo: "https://github.com/JiscRDSS/archivematica"
-        version: "v0.5.0"
+        version: "v0.6.0"
         dest: "./src/archivematica"
         images:
           - name: "{{ registry }}archivematica-dashboard"
@@ -34,7 +34,7 @@
 
       - name: "Archivematica Storage Service (JiscRDSS fork)"
         repo: "https://github.com/JiscRDSS/archivematica-storage-service"
-        version: "v0.3.0"
+        version: "v0.4.0"
         dest: "./src/archivematica-storage-service"
         images:
           - name: "{{ registry }}archivematica-storage-service"
@@ -43,7 +43,7 @@
 
       - name: "RDSS Archivematica Automation Tools"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-automation-tools.git"
-        version: "v0.1.2"
+        version: "v0.2.0"
         dest: "./src/rdss-archivematica-automation-tools"
         images:
           - name: "{{ registry }}archivematica-automation-tools"
@@ -52,7 +52,7 @@
 
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-        version: "v0.4.0"
+        version: "v0.6.0"
         dest: "./src/rdss-archivematica-channel-adapter"
         images:
           - name: "{{ registry }}rdss-archivematica-channel-adapter"
@@ -61,7 +61,7 @@
 
       - name: "RDSS Arkivum NextCloud"
         repo: "https://github.com/JiscRDSS/rdss-arkivum-nextcloud"
-        version: "dev/shibboleth"
+        version: "v0.3.0"
         dest: "./src/rdss-arkivum-nextcloud"
         make_target: "build-apps"
         images:
