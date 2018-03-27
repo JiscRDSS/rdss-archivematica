@@ -278,6 +278,9 @@ services:
     image: '${REGISTRY}rdss-archivematica-channel-adapter:${RDSS_CHANADAPTER_VERSION}'
     command: "consumer"
     environment:
+      RDSS_ARCHIVEMATICA_ADAPTER_CONSUMER.BACKEND: "dynamodb"
+      RDSS_ARCHIVEMATICA_ADAPTER_CONSUMER.DYNAMODB_TLS: "false"
+      RDSS_ARCHIVEMATICA_ADAPTER_CONSUMER.DYNAMODB_ENDPOINT: "http://dynalite:4567"
       RDSS_ARCHIVEMATICA_ADAPTER_LOGGING.LEVEL: "debug"
       RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.URL: "http://archivematica-dashboard:8000"
       RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.USER: "test"
