@@ -75,7 +75,7 @@
 
       - name: "RDSS Archivematica Shibboleth SP Proxy"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-shib-sp-proxy.git"
-        version: "v0.1.0"
+        version: "v0.1.1"
         dest: "./src/rdss-archivematica-shib-sp-proxy/"
         images:
           - name: "{{ registry }}rdss-archivematica-shib-sp-proxy"
