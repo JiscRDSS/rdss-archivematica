@@ -88,6 +88,8 @@ services:
     environment:
       # Proxy settings
       HTTP_PROTOCOL: "https"
+      NEXTCLOUD_HOST: "nextcloud.${DOMAIN_NAME}"
+      NEXTCLOUD_PORT: "${NEXTCLOUD_EXTERNAL_SSL_PORT}"
       PROXY_HOST: "nginx-ssl"
       # Shibboleth
       SHIBBOLETH_AUTHENTICATION: "true"
