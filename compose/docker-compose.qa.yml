@@ -14,37 +14,37 @@ volumes:
   # filesystems from elsewhere.
   archivematica_autotools_data:
     external:
-      name: "rdss_am-autotools-data"
+      name: "${COMPOSE_PROJECT_NAME}_am-autotools-data"
   archivematica_pipeline_data:
     external:
-      name: "rdss_am-pipeline-data"
+      name: "${COMPOSE_PROJECT_NAME}_am-pipeline-data"
   archivematica_storage_service_location_data:
     external:
-      name: "rdss_am-ss-location-data"
+      name: "${COMPOSE_PROJECT_NAME}_am-ss-location-data"
   archivematica_storage_service_staging_data:
     external:
-      name: "rdss_am-ss-staging-data"
+      name: "${COMPOSE_PROJECT_NAME}_am-ss-staging-data"
   arkivum-storage:
     external:
-      name: "rdss_arkivum-storage"
+      name: "${COMPOSE_PROJECT_NAME}_arkivum-storage"
   elasticsearch_data:
     external:
-      name: "rdss_elasticsearch-data"
+      name: "${COMPOSE_PROJECT_NAME}_elasticsearch-data"
   jisc-test-research-data:
     external:
-      name: "rdss_jisc-test-research-data"
+      name: "${COMPOSE_PROJECT_NAME}_jisc-test-research-data"
   minio_export_data:
     external:
-      name: "rdss_minio_export_data"
+      name: "${COMPOSE_PROJECT_NAME}_minio_export_data"
   mysql_data:
     external:
-      name: "rdss_mysql_data"
+      name: "${COMPOSE_PROJECT_NAME}_mysql_data"
   nextcloud_data:
     external:
-      name: "rdss_nextcloud-data"
+      name: "${COMPOSE_PROJECT_NAME}_nextcloud-data"
   nextcloud_themes:
     external:
-      name: "rdss_nextcloud-themes"
+      name: "${COMPOSE_PROJECT_NAME}_nextcloud-themes"
 
 services:
 
@@ -58,8 +58,6 @@ services:
     volumes:
       - "${VOL_BASE}/dev/etc/minio:/root/.minio"
       - "minio_export_data:/export"
-    ports:
-      - "50500:9000"
     expose:
       - "9000"
 
@@ -376,7 +374,7 @@ services:
       - "arkivum-storage:/mnt/astor/"
       - "jisc-test-research-data:/mnt/jisc-test-research-data"
     ports:
-      - "${NEXTCLOUD_EXTERNAL_IP}:8888:8888"
+      - "${NEXTCLOUD_EXTERNAL_IP}:${NEXTCLOUD_EXTERNAL_PORT}:8888"
     depends_on:
       - "mysql"
       - "redis"
