@@ -1,0 +1,48 @@
+---
+
+version: "2"
+
+#
+# Utility services for RDSS docker containers. None of these are required for
+# the main services to function, all of them are convenient and useful to have.
+#
+
+services:
+
+  # Performs garbage collection for Docker, removing unused containers and
+  # images periodically to free up disk and reduce resource usage.
+  gc:
+    image: "docwhat/docker-gc:latest"
+    networks:
+      utils:
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+
+  # Operates a local registry of Docker images, which we publish to and pull
+  # from.
+  registry:
+    image: "registry:2"
+    networks:
+      utils:
+    ports:
+      - "${REGISTRY_PORT}:5000"
+
+  # Provides a convenient web-based user interface to the Docker image registry
+  # so that it's easier to determine what images are published.
+  registry-frontend:
+    image: "konradkleine/docker-registry-frontend:v2"
+    networks:
+      utils:
+    environment:
+      ENV_DOCKER_REGISTRY_HOST: "registry"
+      ENV_DOCKER_REGISTRY_PORT: "5000"
+    ports:
+      - "${REGISTRY_FRONTEND_PORT}:80"
+    depends_on:
+      - "registry"
+
+networks:
+  # Use a separate network to prevent these services from being pulled down
+  # during a `make destroy`.
+  utils:
+    driver: "bridge"
