@@ -2,6 +2,32 @@
 
 Integration repo for the RDSS fork of Archivematica.
 
+## Development Quick Start
+
+For development, you can deploy docker containers into your local Docker environment. Most users will be running as the single user on their system, but multi-user deployments are supported too.
+
+There's now a handy `quickstart` script to get you up and running as quickly as possible. This script will automatically create a unique namespace for each user, as well as selecting ports that are not already in use.
+
+To start up all the required services, volumes and containers etc, use:
+
+	$ ./quickstart start
+
+Once built, you can then check the status with:
+
+	$ ./quickstart status
+
+If you want to terminate your deployment, use:
+
+	$ ./quickstart shutdown
+
+If you no longer want your deployment at all, use:
+
+	$ ./quickstart destroy
+
+This will wipe all persistent data for your deployment and remove any associated built images from your system. Any other deployments on the same Docker environment will remain untouched.
+
+For more advanced usage, see below.
+
 ## Usage
 
 This project uses a Makefile to drive the build. Run `make help` to see a list

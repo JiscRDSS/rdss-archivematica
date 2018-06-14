@@ -1,0 +1,250 @@
+#!/bin/bash
+
+#
+# Quickstart script for RDSSARK Docker Compose
+#
+# Simplifies operation of Docker Compose services to get newcomers going as
+# quickly as possible.
+#
+# Usage: quickstart <start|status|shutdown|destroy>
+# Commands:
+#  * start     - starts all the necessary Docker Compose services
+#  * status    - shows the status of Docker Compose services
+#  * shutdown  - stops and destroys running Docker Compose services
+#  * destroy   - removes all images and destroys persisted storage locations
+#
+
+# The file to load our context from. This includes settings like what the
+# "project name" is, and what ports we want to use.
+CONTEXT_FILE="${CONTEXT_FILE:-./.quickstart.ctx}"
+
+check_sudo()
+{
+    # Check the user is in the sudo group
+    if id -Gn | grep sudo >/dev/null ; then
+        # Only ask if the user isn't already authenticated
+        if ! sudo -n true >/dev/null 2>&1 ; then
+            echo "This script creates folders owned by a different user, which requires sudo."
+            sudo true >/dev/null
+        fi
+    else
+        echo "FATAL! You must have sudo rights to run this."
+        exit 1
+    fi
+}
+
+deploy_services()
+{
+    # Create our registry
+    pushd compose >/dev/null \
+        && docker-compose -f docker-compose.utils.yml up -d
+    popd >/dev/null
+    # Build our images and publish to our registry
+    make publish REGISTRY="localhost:${REGISTRY_PORT}/"
+    # Create storage volumes and bring up our service containers
+    pushd compose >/dev/null \
+        && sudo make create-volumes \
+            COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME}" \
+        && make all REGISTRY="localhost:${REGISTRY_PORT}/" \
+        && print_docker_services \
+        && echo "Deployment complete." \
+        && echo
+    popd >/dev/null
+}
+
+destroy_context()
+{
+    rm -Rf "${CONTEXT_FILE}"
+}
+
+destroy()
+{
+    # Load our context
+    get_context
+
+    # Destroy all volumes and shutdown util containers
+    pushd compose \
+        && sudo make destroy-volumes \
+            COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME}" \
+        && docker-compose -f docker-compose.utils.yml down --volumes
+    popd
+
+    # Destroy the context
+    destroy_context
+}
+
+get_context()
+{
+    if [ ! -f "${CONTEXT_FILE}" ] ; then
+        # Context doesn't exist, define and save to file
+        cat  << EOF > "${CONTEXT_FILE}"
+export COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-$(id -un)rdss}"
+export NEXTCLOUD_EXTERNAL_PORT="$(get_free_port "${NEXTCLOUD_EXTERNAL_PORT:-8888}")"
+export REGISTRY_PORT="$(get_free_port "${REGISTRY_PORT:-5000}")"
+export REGISTRY_FRONTEND_PORT="$(get_free_port "${REGISTRY_FRONTEND_PORT:-8000}")"
+EOF
+    fi
+    # Load the context from file
+    source "${CONTEXT_FILE}"
+}
+
+get_free_port()
+{
+    # Get the next free port based on the given port. If the given port is
+    # available then it will be used, otherwise we increment until we find one
+    # that is.
+    local port="$1"
+    while [ "$(netstat -tanp 2>/dev/null | grep "${port}")" != "" ] ; do
+        port="$((port + 1))"
+    done
+    echo -n "${port}"
+}
+
+get_service_port()
+{
+    local -r service="$1"
+    local -r private_port="$2"
+    local -r docker_args="$3"
+    # shellcheck disable=SC2086
+    docker-compose ${docker_args} port "${service}" "${private_port}" 2>/dev/null
+}
+
+print_docker_services()
+{
+    local -r am_dash_port="$(get_service_port nginx 80)"
+    local -r am_ss_port="$(get_service_port nginx 8000)"
+    local -r nc_port="$(get_service_port nextcloud 8888)"
+    local -r reg_port="$(get_service_port registry 5000 '-f docker-compose.utils.yml')"
+    local -r reg_ui_port="$(get_service_port registry-frontend 80 '-f docker-compose.utils.yml')"
+    echo
+    echo "AVAILABLE SERVICES:"
+    echo
+    local service_count=0
+    if [ "${reg_port}" != "" ] ; then
+        service_count=$((service_count + 1))
+        echo "Docker Registry:                localhost:${reg_port#*:}/"
+    fi
+    if [ "${reg_ui_port}" != "" ] ; then
+        service_count=$((service_count + 1))
+        echo "Docker Registry UI:             http://${reg_ui_port}/"
+    fi
+    if [ "${am_dash_port}" != "" ] ; then
+        service_count=$((service_count + 1))
+        echo "Archivematica Dashboard:        http://${am_dash_port}/"
+    fi
+    if [ "${am_ss_port}" != "" ] ; then
+        service_count=$((service_count + 1))
+        echo "Archivematica Storage Service:  http://${am_ss_port}/"
+    fi
+    if [ "${nc_port}" != "" ] ; then
+        service_count=$((service_count + 1))
+        echo "NextCloud:                      http://${nc_port}/"
+    fi
+    if [ ${service_count} -eq 0 ] ; then
+        echo "No services deployed."
+    fi
+    echo
+}
+
+shutdown()
+{
+    # Load our context
+    get_context
+
+    # Shutdown the main containers
+    pushd compose >/dev/null \
+        && make destroy COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME}"
+    popd >/dev/null
+}
+
+start() {
+
+    # The `create-volumes` stage requires sudo rights to change the ownership of
+    # created directories. Ask for sudo here to create session so user doesn't
+    # have to wait to be prompted midway through the process.
+    check_sudo
+
+    # Load our context
+    get_context
+
+    # Echo context info and wait for user confirmation before continuing
+    echo "This will deploy a new RDSSARK environment with Archivematica and NextCloud."
+    echo
+    echo "The following settings will be used:"
+    echo
+    echo "Deployment Name:    ${COMPOSE_PROJECT_NAME}"
+    echo "Docker Registry:    localhost:${REGISTRY_PORT}/"
+    echo "Docker Registry UI: http://localhost:${REGISTRY_FRONTEND_PORT}/"
+    echo
+    echo "Ports for Archivematica and NextCloud will be reported after deployment."
+    echo
+    echo -n "Do you wish to continue? [yes/no]: "
+    read yn
+    case "${yn}" in
+        [Yy][Ee][Ss] )
+            # Go ahead and deploy the docker services
+            deploy_services
+            ;;
+        [Nn][Oo] )
+            # Cancel deployment
+            echo "Cancelled on user request."
+            exit 0
+            ;;
+        *)
+            echo "Invalid answer, must be 'yes' or 'no'."
+            ;;
+    esac
+}
+
+status()
+{
+    # Load our context
+    get_context
+
+    # List current containers
+    pushd compose >/dev/null \
+        && echo \
+        && echo '------------------------------------------------------------' \
+        && echo "Deployment details for '${COMPOSE_PROJECT_NAME}'" \
+        && echo '------------------------------------------------------------' \
+        && echo \
+        && echo "DOCKER CONTAINERS:" \
+        && echo \
+        && docker-compose ps \
+        && print_docker_services
+    popd >/dev/null
+}
+
+usage()
+{
+    echo "$(basename "${0}") <destroy|shutdown|status|start>"
+    echo "Commands:"
+    echo "  destroy    Removes all images and destroys persisted storage locations"
+    echo "  shutdown   Stops and destroys running Docker Compose services"
+    echo "  start      Starts all the necessary Docker Compose services"
+    echo "  status     Shows the status of Docker Compose services"
+}
+
+main()
+{
+    local -r command="$1"
+    case "${command}" in
+        destroy)
+            shutdown && destroy
+            ;;
+        shutdown)
+            shutdown
+            ;;
+        status)
+            status
+            ;;
+        start)
+            start
+            ;;
+        *)
+            usage
+            ;;
+    esac
+}
+
+main "$@"
