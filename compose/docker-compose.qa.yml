@@ -366,8 +366,6 @@ services:
         automated-transfer:/mnt/am-ss-default-location-data/automated \
         interactive-transfer:/mnt/am-ss-default-location-data/interactive \
         s3-jisc-test-research:/mnt/jisc-test-research-data"
-      NEXTCLOUD_HOST: "nextcloud.${DOMAIN_NAME}"
-      NEXTCLOUD_PORT: "8888"
     volumes:
       # Nextcloud app volumes
       - "nextcloud_data:/var/lib/nextcloud"
