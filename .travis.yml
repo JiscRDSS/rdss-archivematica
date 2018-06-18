@@ -14,7 +14,7 @@ script:
   - python -myamllint -f parsable *-playbook.yml
   - ansible-lint -p *-playbook.yml
   # Validate the quickstart shell scripts
-  - shellcheck quickstart
+  - shellcheck -f gcc quickstart
   # Validate the shell scripts for aws/machine
   - pushd aws/machine ; find . \( -name \*.sh -or -name \*.bash \) -exec shellcheck -x -f gcc {} + ; popd
   # TODO Add additional validation/build steps here

@@ -14,6 +14,12 @@
 #  * destroy   - removes all images and destroys persisted storage locations
 #
 
+# Directory where this script is stored
+SCRIPT_DIR="$( cd "$( dirname "$(readlink -f "${BASH_SOURCE[0]}")" )" && pwd )"
+
+# Directory where our Docker compose config is located
+COMPOSE_DIR="${SCRIPT_DIR}/compose"
+
 # The file to load our context from. This includes settings like what the
 # "project name" is, and what ports we want to use.
 CONTEXT_FILE="${CONTEXT_FILE:-./.quickstart.ctx}"
@@ -35,21 +41,29 @@ check_sudo()
 
 deploy_services()
 {
-    # Create our registry
-    pushd compose >/dev/null \
-        && docker-compose -f docker-compose.utils.yml up -d
-    popd >/dev/null
+    if pushd "${COMPOSE_DIR}" >/dev/null ; then
+        # Create our registry
+        docker-compose -f docker-compose.utils.yml up -d
+        if ! popd >/dev/null ; then
+            # Should never happen but keeps Shellcheck happy
+            echo "FATAL! deploy_services() failed to popd!" && exit 1
+        fi
+    fi
     # Build our images and publish to our registry
     make publish REGISTRY="localhost:${REGISTRY_PORT}/"
     # Create storage volumes and bring up our service containers
-    pushd compose >/dev/null \
-        && sudo make create-volumes \
-            COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME}" \
+    if pushd "${COMPOSE_DIR}" >/dev/null ; then
+        sudo make create-volumes \
+             COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME}" \
         && make all REGISTRY="localhost:${REGISTRY_PORT}/" \
         && print_docker_services \
         && echo "Deployment complete." \
         && echo
-    popd >/dev/null
+        if ! popd >/dev/null ; then
+            # Should never happen but keeps Shellcheck happy
+            echo "FATAL! deploy_services() failed to popd (2)!" && exit 1
+        fi
+    fi
 }
 
 destroy_context()
@@ -63,11 +77,15 @@ destroy()
     get_context
 
     # Destroy all volumes and shutdown util containers
-    pushd compose \
-        && sudo make destroy-volumes \
+    if pushd "${COMPOSE_DIR}" >/dev/null ; then
+        sudo make destroy-volumes \
             COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME}" \
         && docker-compose -f docker-compose.utils.yml down --volumes
-    popd
+        if ! popd >/dev/null ; then
+            # Should never happen but keeps Shellcheck happy
+            echo "FATAL! destroy() failed to return to popd!" && exit 1
+        fi
+    fi
 
     # Destroy the context
     destroy_context
@@ -85,6 +103,7 @@ export REGISTRY_FRONTEND_PORT="$(get_free_port "${REGISTRY_FRONTEND_PORT:-8000}"
 EOF
     fi
     # Load the context from file
+    # shellcheck source=/dev/null
     source "${CONTEXT_FILE}"
 }
 
@@ -152,9 +171,13 @@ shutdown()
     get_context
 
     # Shutdown the main containers
-    pushd compose >/dev/null \
-        && make destroy COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME}"
-    popd >/dev/null
+    if pushd "${COMPOSE_DIR}" >/dev/null ; then
+        make destroy COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME}"
+        if ! popd >/dev/null ; then
+            # Should never happen but keeps Shellcheck happy
+            echo "FATAL! shutdown() failed to popd!" && exit 1
+        fi
+    fi
 }
 
 start() {
@@ -179,7 +202,7 @@ start() {
     echo "Ports for Archivematica and NextCloud will be reported after deployment."
     echo
     echo -n "Do you wish to continue? [yes/no]: "
-    read yn
+    read -r yn
     case "${yn}" in
         [Yy][Ee][Ss] )
             # Go ahead and deploy the docker services
@@ -202,8 +225,8 @@ status()
     get_context
 
     # List current containers
-    pushd compose >/dev/null \
-        && echo \
+    if pushd "${COMPOSE_DIR}" >/dev/null ; then
+        echo \
         && echo '------------------------------------------------------------' \
         && echo "Deployment details for '${COMPOSE_PROJECT_NAME}'" \
         && echo '------------------------------------------------------------' \
@@ -212,7 +235,11 @@ status()
         && echo \
         && docker-compose ps \
         && print_docker_services
-    popd >/dev/null
+        if ! popd >/dev/null ; then
+            # Should never happen but keeps Shellcheck happy
+            echo "FATAL! status() failed to popd!" && exit 1
+        fi
+    fi
 }
 
 usage()
