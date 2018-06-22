@@ -80,9 +80,9 @@ DOCKERHOST_INSTANCE=${DOCKERHOST_INSTANCE:-"${PROJECT_ID}-${ENVIRONMENT}-dockerh
 DOCKERHOST_INSTANCE_TYPE=${DOCKERHOST_INSTANCE_TYPE:-"t2.medium"}
 
 # The size of the root partition for this deployment's Docker host, in
-# gigabytes. Default is 16, which is the minimum viable for running our Docker
+# gigabytes. Default is 40, which is the minimum viable for running our Docker
 # containers.
-DOCKERHOST_ROOT_SIZE=${DOCKERHOST_ROOT_SIZE:-16}
+DOCKERHOST_ROOT_SIZE=${DOCKERHOST_ROOT_SIZE:-40}
 
 # NextCloud ####################################################################
 

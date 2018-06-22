@@ -70,7 +70,7 @@ Before use, you will need to fill out the [configuration template](etc/deploymen
 ### Docker Host Parameters
 
 1. `DOCKERHOST_INSTANCE_TYPE`: The EC2 instance type to use for the Docker host. Defaults to `t2.medium`, which is the minimum required for all containers to build and run.
-1. `DOCKERHOST_ROOT_SIZE`: The size of the root partition for the Docker host, in gigabytes. Defaults to 16, which is the minimum viable for running all containers.
+1. `DOCKERHOST_ROOT_SIZE`: The size of the root partition for the Docker host, in gigabytes. Defaults to 40, which is the minimum viable for running all containers.
 
 ### NextCloud Parameters
 
