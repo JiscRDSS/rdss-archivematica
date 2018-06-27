@@ -5,7 +5,7 @@ We use `docker-compose` to orchestrate multiple services so that together they c
 
 The following diagram gives an overview of the deployed service containers, grouped together to show how they are related logically.
 
-![containers diagram](doc/images/containers.jpg)
+![containers diagram](doc/images/containers.png)
 
 In the above, the main Archivematica services are highlighted in orange. The services related to Shibboleth are in green, whilst the RDSS-specific containers are highlighted in purple. The NextCloud service is highlighted in pink. The nginx services that front it all are highlighted in blue (although the `nginx-ssl` service is actually part of the Shibboleth deployment, currently). Where relevant the components deployed into each container are shown; for base services this is omitted.
 
@@ -80,10 +80,11 @@ This must be used with caution, which is why you will be prompted to confirm you
 Service Sets
 -------------
 
-There are currently four service sets defined:
+There are currently five service sets defined:
 
 1. [qa](qa), which defines the main Archivematica services and supporting web server, db, etc, as well as NextCloud, suitable for use in a qa environment.
 1. [dev](dev), which extends `qa` to build the images from local files, rather than expecting to pull existing images.
+1. [mock-aws](mock-aws), which provides mock implementations of various AWS services for use locally.
 1. [am-shib](am-shib), which wraps the Archivematica services in the [qa](qa) service set in Shibboleth authentication.
 1. [shib-local](shib-local), which provides a local example Shibboleth IdP with backing LDAP directory.
 
@@ -91,6 +92,8 @@ These service sets are defined by the following `docker-compose` configuration f
 
 1. [docker-compose.qa.yml](docker-compose.qa.yml)
 1. [docker-compose.dev.yml](docker-compose.dev.yml)
+1. [docker-compose.mock-aws.qa.yml](docker-compose.mock-aws.qa.yml)
+1. [docker-compose.mock-aws.dev.yml](docker-compose.mock-aws.dev.yml)
 1. [docker-compose.am-shib.yml](docker-compose.am-shib.yml)
 1. [docker-compose.shib-local.yml](docker-compose.shib-local.yml)
 
@@ -134,7 +137,7 @@ This will set the right `COMPOSE_FILE` context whilst allowing you to redeploy t
 Service Details
 ----------------
 
-Details of the services deployed for each service set are in the README for that service set.
+Further details of the services deployed for each service set are in the README for that service set.
 
 * [Archivematica Services](dev/README.md)
 * [Shibboleth-enabled Archivematica Services](am-shib/README.md)
@@ -243,6 +246,7 @@ The following makefile variables are supported by this build, in addition to tho
 | Variable | Description |
 |---|---|
 | `GENERATE_SSL_CERTS` | Whether or not to auto-generate SSL keys and certificates for the [am-shib](am-shib) and [shib-local](shib-local) container sets. Default is `true`, if set to `false` then you must provide the key and certificate files using the defined environment variables described in those modules' readme documentation (see [Custom SSL Certificates](#CustomSSLCertificates), below). |
+| `MOCK_AWS` | Whether or not to deploy and use mock implementations of the required AWS services. Default is `true`, meaning mock services are used. |
 | `SHIBBOLETH_CONFIG` | The Shibboleth profile to use. Currently only `archivematica` is supported. Default is undefined, causing no Shibboleth support to be enabled. |
 | `SHIBBOLETH_IDP` | The shibboleth IdP profile to use. Currently only `local` is supported, which is the default if `SHIBBOLETH_CONFIG` is set. Setting to another value will prevent the local Shibboleth IdP ([shib-local](shib-local)) from being included. |
 
@@ -250,7 +254,7 @@ The following makefile variables are supported by this build, in addition to tho
 Environment Variables
 ----------------------
 
-The following environment variables are supported by this build.
+The following are the main environment variables that are supported by this build.
 
 | Variable | Description |
 |---|---|
@@ -258,7 +262,39 @@ The following environment variables are supported by this build.
 | `REGISTRY` | The name and port of the Docker registry to pull our applications' images from. Default is `''`, which means that no Docker registry will be used; all images will be expected to be local. This is mostly for use in QA deployments, where we deploy a Docker registry server on `localhost:5000/`. |
 | `VOL_BASE` | The path to use as the base for specifying volume paths in `docker-compose` configurations. Default is `'.'`, which gets correctly interpreted when build machine is the same as docker host. When deploying to a remote docker host (e.g. via `docker-machine`), this must be set to the path of the equivalent base path on the docker host, e.g. `/home/ubuntu/rdss-archivematica/compose` if using a standard Ubuntu AMI on EC2). |
 
-See also the individual [idp](shib-local/idp), [ldap](shib-local/ldap) and [nginx](am-shib/nginx) services for additional environment variables used by those specific services.
+There are many more - for the full list see the [compose environment file](.env) and the comments there.
+
+AWS Services
+-------------
+
+The RDSS Channel Adapter publisher and consumer require access to AWS services, namely DynamoDB, Kinesis and S3. If these are not available, for example on a local development or QA environment, then mock services will be used instead. However, if you do wish to use real AWS services, the following will be of use.
+
+### DynamoDB Parameters
+
+| Variable | Description |
+|---|---|
+| `RDSS_ADAPTER_DYNAMODB_ENDPOINT` | The endpoint to use for the DynamoDB service. Defaults to using the mock "dynalite" service. |
+| `RDSS_ADAPTER_DYNAMODB_TLS` | Whether or not to use TLS encryption when connecting to the DynamoDB service. Defaults to `false`. |
+
+### Kinesis Parameters
+
+| Variable | Description |
+|---|---|
+| `RDSS_ADAPTER_KINESIS_AWS_ACCESS_KEY` | The AWS access key to use when accessing Kinesis. |
+| `RDSS_ADAPTER_KINESIS_AWS_REGION` | The AWS region to use when accessing Kinesis. |
+| `RDSS_ADAPTER_KINESIS_AWS_SECRET_KEY` | The AWS secret key to use when accessing Kinesis. |
+| `RDSS_ADAPTER_KINESIS_ENDPOINT` | The endpoint to use for the Kinesis service. Default to using the mock "minikine" service. |
+| `RDSS_ADAPTER_KINESIS_TLS` | Whether or not to use TLS encryption when connecting to the Kinesis service. Defaults to `false`. |
+
+### S3 Parameters
+
+| Variable | Description |
+|---|---|
+| `RDSS_ADAPTER_S3_AWS_ACCESS_KEY` | The AWS access key to use when accessing S3. |
+| `RDSS_ADAPTER_S3_AWS_REGION` | The AWS region to use when accessing S3. |
+| `RDSS_ADAPTER_S3_AWS_SECRET_KEY` | The AWS secret key to use when accessing S3. |
+| `RDSS_ADAPTER_S3_ENDPOINT` | The endpoint to use for the S3 service. Defaults to using the mock "minio" service. |
+
 
 Secrets
 --------

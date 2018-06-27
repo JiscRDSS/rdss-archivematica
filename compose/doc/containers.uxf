@@ -280,7 +280,7 @@ bg=#ffe7bd</panel_attributes>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 minio
-bg=#d0c1e8</panel_attributes>
+bg=#ffe0fd</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -293,7 +293,7 @@ bg=#d0c1e8</panel_attributes>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 dynalite
-bg=#d0c1e8</panel_attributes>
+bg=#ffe0fd</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
@@ -306,16 +306,16 @@ bg=#d0c1e8</panel_attributes>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 minikine
-bg=#d0c1e8</panel_attributes>
+bg=#ffe0fd</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLGeneric</id>
     <coordinates>
       <x>918</x>
-      <y>270</y>
+      <y>243</y>
       <w>171</w>
-      <h>81</h>
+      <h>72</h>
     </coordinates>
     <panel_attributes>symbol=component
 Go
@@ -327,9 +327,9 @@ bg=#ad86eb</panel_attributes>
     <id>UMLDeployment</id>
     <coordinates>
       <x>837</x>
-      <y>216</y>
+      <y>189</y>
       <w>342</w>
-      <h>153</h>
+      <h>135</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 rdss-archivematica-channel-adapter-publisher
@@ -342,7 +342,7 @@ bg=#d0c1e8</panel_attributes>
       <x>837</x>
       <y>45</y>
       <w>342</w>
-      <h>162</h>
+      <h>135</h>
     </coordinates>
     <panel_attributes>&lt;&lt;Container&gt;&gt;
 rdss-archivematica-channel-adapter-consumer
@@ -366,7 +366,7 @@ bg=#d0f0c5</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>954</x>
-      <y>306</y>
+      <y>279</y>
       <w>90</w>
       <h>27</h>
     </coordinates>
@@ -379,9 +379,9 @@ bg=#d0c1e8</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>918</x>
-      <y>108</y>
+      <y>99</y>
       <w>171</w>
-      <h>81</h>
+      <h>72</h>
     </coordinates>
     <panel_attributes>symbol=component
 Go
@@ -394,7 +394,7 @@ layer=1</panel_attributes>
     <id>UMLGeneric</id>
     <coordinates>
       <x>954</x>
-      <y>144</y>
+      <y>135</y>
       <w>90</w>
       <h>27</h>
     </coordinates>
@@ -595,10 +595,22 @@ bg=#c5e5f0</panel_attributes>
       <h>36</h>
     </coordinates>
     <panel_attributes>symbol=component
-s6
+supervisor
 
 bg=#9e6281
 layer=1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>837</x>
+      <y>342</y>
+      <w>342</w>
+      <h>27</h>
+    </coordinates>
+    <panel_attributes>Mock AWS Services
+bg=#ffe0fd</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>
