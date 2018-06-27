@@ -1,6 +1,12 @@
 ---
 version: "2"
 
+volumes:
+
+  minio_export_data:
+    external:
+      name: "${COMPOSE_PROJECT_NAME}_minio_export_data"
+
 services:
 
   dynalite:
@@ -21,3 +27,15 @@ services:
       - "4567"
     ports:
       - "4567"
+
+  minio:
+    image: "minio/minio:latest"
+    command: "server /export"
+    environment:
+      MINIO_ACCESS_KEY: "AKIAIOSFODNN7EXAMPLE"
+      MINIO_SECRET_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+    volumes:
+      - "${VOL_BASE}/mock-aws/etc/minio:/root/.minio"
+      - "minio_export_data:/export"
+    expose:
+      - "9000"

@@ -1,0 +1,2 @@
+# Don't commit minio config
+config.json*

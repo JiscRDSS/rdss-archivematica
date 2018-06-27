@@ -33,9 +33,6 @@ volumes:
   jisc-test-research-data:
     external:
       name: "${COMPOSE_PROJECT_NAME}_jisc-test-research-data"
-  minio_export_data:
-    external:
-      name: "${COMPOSE_PROJECT_NAME}_minio_export_data"
   mysql_data:
     external:
       name: "${COMPOSE_PROJECT_NAME}_mysql_data"
@@ -47,19 +44,6 @@ volumes:
       name: "${COMPOSE_PROJECT_NAME}_nextcloud-themes"
 
 services:
-
-  # TODO Move this to dev. For QA we should use S3 instead.
-  minio:
-    image: "minio/minio:latest"
-    command: "server /export"
-    environment:
-      MINIO_ACCESS_KEY: "AKIAIOSFODNN7EXAMPLE"
-      MINIO_SECRET_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-    volumes:
-      - "${VOL_BASE}/dev/etc/minio:/root/.minio"
-      - "minio_export_data:/export"
-    expose:
-      - "9000"
 
   # TODO Move this to dev. For QA we should use AWS RDS instead.
   mysql:
@@ -263,12 +247,12 @@ services:
       RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.URL: "http://archivematica-dashboard:8000"
       RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.USER: "test"
       RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.KEY: "test"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.ENDPOINT: "https://minio:9000"
+      RDSS_ARCHIVEMATICA_ADAPTER_S3.ENDPOINT: "${RDSS_ADAPTER_S3_ENDPOINT}"
       RDSS_ARCHIVEMATICA_ADAPTER_S3.FORCE_PATH_STYLE: "true"
       RDSS_ARCHIVEMATICA_ADAPTER_S3.INSECURE_SKIP_VERIFY: "true"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.ACCESS_KEY: "AKIAIOSFODNN7EXAMPLE"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.SECRET_KEY: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
-      RDSS_ARCHIVEMATICA_ADAPTER_S3.REGION: "eu-west-2"
+      RDSS_ARCHIVEMATICA_ADAPTER_S3.ACCESS_KEY: "${RDSS_ADAPTER_S3_AWS_ACCESS_KEY}"
+      RDSS_ARCHIVEMATICA_ADAPTER_S3.SECRET_KEY: "${RDSS_ADAPTER_S3_AWS_SECRET_KEY}"
+      RDSS_ARCHIVEMATICA_ADAPTER_S3.REGION: "${RDSS_ADAPTER_S3_AWS_REGION}"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.MAIN: "main"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.INVALID: "invalid"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.ERROR: "error"
@@ -314,7 +298,7 @@ services:
   # TODO Change this to use AWS service for QA but still use mock for dev
   rdss-archivematica-msgcreator:
     image: '${REGISTRY}rdss-archivematica-msgcreator:${RDSS_MSGCREATOR_VERSION}'
-    command: "-addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint='${RDSS_ADAPTER_KINESIS_ENDPOINT}' -kinesis-stream=main -kinesis-region='${RDSS_ADAPTER_KINESIS_AWS_REGION}' -s3-access-key=AKIAIOSFODNN7EXAMPLE -s3-secret-key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY -s3-region=eu-west-2 -s3-endpoint=https://minio:9000"
+    command: "-addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint='${RDSS_ADAPTER_KINESIS_ENDPOINT}' -kinesis-stream=main -kinesis-region='${RDSS_ADAPTER_KINESIS_AWS_REGION}' -s3-access-key='${RDSS_ADAPTER_S3_AWS_ACCESS_KEY}' -s3-secret-key='${RDSS_ADAPTER_S3_AWS_SECRET_KEY}' -s3-region=eu-west-2 -s3-endpoint='${RDSS_ADAPTER_S3_ENDPOINT}'"
     expose:
       - "8000"
 
