@@ -3,6 +3,13 @@ version: "2"
 
 services:
 
+  dynalite:
+    image: '${REGISTRY}dynalite:${DYNALITE_VERSION}'
+    expose:
+      - "4567"
+    ports:
+      - "4567"
+
   minikine:
     image: '${REGISTRY}minikine:${MINIKINE_VERSION}'
     environment:
@@ -10,7 +17,7 @@ services:
       MINIKINE_STREAM_INVALID: "invalid"
       MINIKINE_STREAM_ERROR: "error"
       MINIKINE_STREAM_SHARDS: "4"
-    ports:
-      - "4567"
     expose:
+      - "4567"
+    ports:
       - "4567"

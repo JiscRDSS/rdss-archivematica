@@ -10,11 +10,6 @@ version: "2"
 
 services:
 
-  dynalite:
-    build:
-      context: "../src/rdss-archivematica-channel-adapter/hack/minikine"
-      dockerfile: "dynalite.Dockerfile"
-
   archivematica-automation-tools:
     build: '../src/rdss-archivematica-automation-tools/'
 
