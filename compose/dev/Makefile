@@ -4,6 +4,12 @@ BASE_DIR ?= ${CURDIR}
 
 DEFAULT_COMPOSE_FILE = $(shell realpath ../docker-compose.qa.yml):$(shell realpath ../docker-compose.dev.yml)
 
+MOCK_AWS ?= true
+ifeq ("$(MOCK_AWS)", "true")
+	DEFAULT_COMPOSE_FILE_2 := $(shell realpath ../docker-compose.mock-aws.qa.yml):$(shell realpath ../docker-compose.mock-aws.dev.yml):$(DEFAULT_COMPOSE_FILE)
+	override DEFAULT_COMPOSE_FILE=$(DEFAULT_COMPOSE_FILE_2)
+endif
+
 COMPOSE_FILE ?= "${DEFAULT_COMPOSE_FILE}"
 
 VERSION ?= $(shell git describe --tags --always --dirty)

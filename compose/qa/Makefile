@@ -6,6 +6,12 @@ DEFAULT_COMPOSE_FILE = $(shell realpath ../docker-compose.qa.yml)
 
 COMPOSE_FILE ?= "${DEFAULT_COMPOSE_FILE}"
 
+MOCK_AWS ?= true
+ifeq ("$(MOCK_AWS)", "true")
+	DEFAULT_COMPOSE_FILE_2 := $(shell realpath ../docker-compose.mock-aws.qa.yml):$(DEFAULT_COMPOSE_FILE)
+	override DEFAULT_COMPOSE_FILE=$(DEFAULT_COMPOSE_FILE_2)
+endif
+
 VERSION ?= $(shell git describe --tags --always --dirty)
 export VERSION
 

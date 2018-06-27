@@ -41,9 +41,22 @@ endif
 override COMPOSE_FILE ?= $(shell echo \
 	"$(foreach DIR, $(COMPOSE_DIRS),${CURDIR}/docker-compose.$(DIR).yml)"\
 	| tr ' ' ':')
+
+# Do we want to mock AWS services?
+MOCK_AWS ?= true
+ifeq ("$(MOCK_AWS)", "true")
+	COMPOSE_FILE_2 := $(shell realpath ${CURDIR}/docker-compose.mock-aws.$(ENV).yml):$(COMPOSE_FILE)
+	override COMPOSE_FILE=$(COMPOSE_FILE_2)
+endif
+
 ifeq ("$(ENV)", "dev")
 	# Include qa config because dev overrides/extends this
 	COMPOSE_FILE_2 := $(shell realpath ${CURDIR}/docker-compose.qa.yml):$(COMPOSE_FILE)
+	ifeq ("$(MOCK_AWS)", "true")
+		# Include mock-aws qa config too because mock-aws.dev extends this
+		COMPOSE_FILE_3 := $(shell realpath ${CURDIR}/docker-compose.mock-aws.qa.yml):$(COMPOSE_FILE_2)
+		override COMPOSE_FILE_2=$(COMPOSE_FILE_3)
+	endif
 	override COMPOSE_FILE=$(COMPOSE_FILE_2)
 endif
 export COMPOSE_FILE
@@ -64,6 +77,7 @@ build clean destroy:
 
 check-vars:
 	@echo "ENV = '$(ENV)'"
+	@echo "MOCK_AWS = '$(MOCK_AWS)'"
 	@echo "SHIBBOLETH_CONFIG = '$(SHIBBOLETH_CONFIG)'"
 	@echo "SHIBBOLETH_IDP = '$(SHIBBOLETH_IDP)'"
 	@echo "COMPOSE_DIRS = '$(COMPOSE_DIRS)'"

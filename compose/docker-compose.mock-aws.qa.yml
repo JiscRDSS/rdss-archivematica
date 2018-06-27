@@ -1,0 +1,16 @@
+---
+version: "2"
+
+services:
+
+  minikine:
+    image: '${REGISTRY}minikine:${MINIKINE_VERSION}'
+    environment:
+      MINIKINE_STREAM_MAIN: "main"
+      MINIKINE_STREAM_INVALID: "invalid"
+      MINIKINE_STREAM_ERROR: "error"
+      MINIKINE_STREAM_SHARDS: "4"
+    ports:
+      - "4567"
+    expose:
+      - "4567"

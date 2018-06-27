@@ -140,19 +140,6 @@ services:
     expose:
       - "4567"
 
-  # TODO Move to dev. For QA we should use AWS Kinesis instead.
-  minikine:
-    image: '${REGISTRY}minikine:${MINIKINE_VERSION}'
-    environment:
-      MINIKINE_STREAM_MAIN: "main"
-      MINIKINE_STREAM_INVALID: "invalid"
-      MINIKINE_STREAM_ERROR: "error"
-      MINIKINE_STREAM_SHARDS: "4"
-    ports:
-      - "4567"
-    expose:
-      - "4567"
-
   archivematica-automation-tools:
     image: '${REGISTRY}archivematica-automation-tools:${AM_AUTOTOOLS_VERSION}'
     environment:
@@ -298,16 +285,15 @@ services:
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.REPOSITORY.DYNAMODB_ENDPOINT: "http://dynalite:4567"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.REPOSITORY.DYNAMODB_TABLE: "rdss_am_messages"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.BACKEND: "kinesis"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.TLS: "false"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT: "http://minikine:4567"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.TLS: "${RDSS_ADAPTER_KINESIS_TLS}"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT: "${RDSS_ADAPTER_KINESIS_ENDPOINT}"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.TLS_DYNAMODB: "false"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT_DYNAMODB: "http://dynalite:4567"
-      AWS_REGION: "kinalite-does-not-care"
-      AWS_ACCESS_KEY: "kinesis-does-not-care"
-      AWS_SECRET_KEY: "kinesis-does-not-care"
+      AWS_REGION: "${RDSS_ADAPTER_KINESIS_AWS_REGION}"
+      AWS_ACCESS_KEY: "${RDSS_ADAPTER_KINESIS_AWS_ACCESS_KEY}"
+      AWS_SECRET_KEY: "${RDSS_ADAPTER_KINESIS_AWS_SECRET_KEY}"
     links:
       - "archivematica-dashboard"
-      - "minikine"
       - "dynalite"
     volumes:
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
@@ -324,22 +310,20 @@ services:
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.INVALID: "invalid"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.ERROR: "error"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.BACKEND: "kinesis"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT: "http://minikine:4567"
-      AWS_REGION: "kinalite-does-not-care"
-      AWS_ACCESS_KEY: "kinesis-does-not-care"
-      AWS_SECRET_KEY: "kinesis-does-not-care"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.TLS: "${RDSS_ADAPTER_KINESIS_TLS}"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT: "${RDSS_ADAPTER_KINESIS_ENDPOINT}"
+      AWS_REGION: "${RDSS_ADAPTER_KINESIS_AWS_REGION}"
+      AWS_ACCESS_KEY: "${RDSS_ADAPTER_KINESIS_AWS_ACCESS_KEY}"
+      AWS_SECRET_KEY: "${RDSS_ADAPTER_KINESIS_AWS_SECRET_KEY}"
     links:
       - "archivematica-dashboard"
-      - "minikine"
     ports:
       - "6060" # See net/http/pprof
 
   # TODO Change this to use AWS service for QA but still use mock for dev
   rdss-archivematica-msgcreator:
     image: '${REGISTRY}rdss-archivematica-msgcreator:${RDSS_MSGCREATOR_VERSION}'
-    command: "-addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint=http://minikine:4567 -kinesis-stream=main -kinesis-region=eu-west-2 -s3-access-key=AKIAIOSFODNN7EXAMPLE -s3-secret-key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY -s3-region=eu-west-2 -s3-endpoint=https://minio:9000"
-    links:
-      - "minikine"
+    command: "-addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint='${RDSS_ADAPTER_KINESIS_ENDPOINT}' -kinesis-stream=main -kinesis-region='${RDSS_ADAPTER_KINESIS_AWS_REGION}' -s3-access-key=AKIAIOSFODNN7EXAMPLE -s3-secret-key=wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY -s3-region=eu-west-2 -s3-endpoint=https://minio:9000"
     expose:
       - "8000"
 

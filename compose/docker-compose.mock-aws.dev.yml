@@ -1,0 +1,16 @@
+---
+version: "2"
+
+#
+# Dev environment configuration for mock AWS services
+#
+# This compose file is intended to be used with docker-compose.mock-aws.qa.yml,
+# the definitions here just add build config.
+#
+
+services:
+
+  minikine:
+    build:
+      context: "../src/rdss-archivematica-channel-adapter/hack/minikine"
+      dockerfile: "minikine.Dockerfile"
