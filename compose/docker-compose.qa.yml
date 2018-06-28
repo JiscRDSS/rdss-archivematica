@@ -235,7 +235,7 @@ services:
       # TODO Replace this with reference to AWS RDS hosted MySQL
       - "mysql"
 
-  # TODO Change this to use AWS servicesfor QA but still use mock for dev
+  # TODO Change this to use AWS services for QA but still use mock for dev
   rdss-archivematica-channel-adapter-consumer:
     image: '${REGISTRY}rdss-archivematica-channel-adapter:${RDSS_CHANADAPTER_VERSION}'
     command: "consumer"
@@ -253,9 +253,9 @@ services:
       RDSS_ARCHIVEMATICA_ADAPTER_S3.ACCESS_KEY: "${RDSS_ADAPTER_S3_AWS_ACCESS_KEY}"
       RDSS_ARCHIVEMATICA_ADAPTER_S3.SECRET_KEY: "${RDSS_ADAPTER_S3_AWS_SECRET_KEY}"
       RDSS_ARCHIVEMATICA_ADAPTER_S3.REGION: "${RDSS_ADAPTER_S3_AWS_REGION}"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.MAIN: "main"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.INVALID: "invalid"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.ERROR: "error"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.MAIN: "${RDSS_ADAPTER_QUEUE_INPUT}"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.INVALID: "${RDSS_ADAPTER_QUEUE_INVALID}"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.ERROR: "${RDSS_ADAPTER_QUEUE_ERROR}"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.REPOSITORY.BACKEND: "dynamodb"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.REPOSITORY.DYNAMODB_TLS: "${RDSS_ADAPTER_DYNAMODB_TLS}"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.REPOSITORY.DYNAMODB_ENDPOINT: "${RDSS_ADAPTER_DYNAMODB_ENDPOINT}"
@@ -275,15 +275,15 @@ services:
     ports:
       - "6060" # See net/http/pprof
 
-  # TODO Change this to use AWS servicesfor QA but still use mock for dev
+  # TODO Change this to use AWS services for QA but still use mock for dev
   rdss-archivematica-channel-adapter-publisher:
     image: '${REGISTRY}rdss-archivematica-channel-adapter:${RDSS_CHANADAPTER_VERSION}'
     command: "publisher"
     environment:
       RDSS_ARCHIVEMATICA_ADAPTER_LOGGING.LEVEL: "debug"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.MAIN: "main"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.INVALID: "invalid"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.ERROR: "error"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.MAIN: "${RDSS_ADAPTER_QUEUE_OUTPUT}"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.INVALID: "${RDSS_ADAPTER_QUEUE_INVALID}"
+      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.ERROR: "${RDSS_ADAPTER_QUEUE_ERROR}"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.BACKEND: "kinesis"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.TLS: "${RDSS_ADAPTER_KINESIS_TLS}"
       RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT: "${RDSS_ADAPTER_KINESIS_ENDPOINT}"
@@ -298,7 +298,7 @@ services:
   # TODO Change this to use AWS service for QA but still use mock for dev
   rdss-archivematica-msgcreator:
     image: '${REGISTRY}rdss-archivematica-msgcreator:${RDSS_MSGCREATOR_VERSION}'
-    command: "-addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint='${RDSS_ADAPTER_KINESIS_ENDPOINT}' -kinesis-stream=main -kinesis-region='${RDSS_ADAPTER_KINESIS_AWS_REGION}' -s3-access-key='${RDSS_ADAPTER_S3_AWS_ACCESS_KEY}' -s3-secret-key='${RDSS_ADAPTER_S3_AWS_SECRET_KEY}' -s3-region=eu-west-2 -s3-endpoint='${RDSS_ADAPTER_S3_ENDPOINT}'"
+    command: "-addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint='${RDSS_ADAPTER_KINESIS_ENDPOINT}' -kinesis-stream='${RDSS_ADAPTER_QUEUE_INPUT}' -kinesis-region='${RDSS_ADAPTER_KINESIS_AWS_REGION}' -s3-access-key='${RDSS_ADAPTER_S3_AWS_ACCESS_KEY}' -s3-secret-key='${RDSS_ADAPTER_S3_AWS_SECRET_KEY}' -s3-region='${RDSS_ADAPTER_S3_AWS_REGION}' -s3-endpoint='${RDSS_ADAPTER_S3_ENDPOINT}'"
     expose:
       - "8000"
 

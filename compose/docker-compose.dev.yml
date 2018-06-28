@@ -68,7 +68,7 @@ services:
   rdss-archivematica-msgcreator:
     build:
       context: "../src/qa/rdss-archivematica-msgcreator"
-    entrypoint: "go run main.go -addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint='${RDSS_ADAPTER_KINESIS_ENDPOINT}' -kinesis-stream=main -kinesis-region='${RDSS_ADAPTER_KINESIS_AWS_REGION}'-s3-access-key='${RDSS_ADAPTER_S3_AWS_ACCESS_KEY}' -s3-secret-key='${RDSS_ADAPTER_S3_AWS_SECRET_KEY}' -s3-region='${RDSS_ADAPTER_S3_AWS_REGION}' -s3-endpoint='${RDSS_ADAPTER_S3_ENDPOINT}'"
+    entrypoint: "go run main.go -addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint='${RDSS_ADAPTER_KINESIS_ENDPOINT}' -kinesis-stream='${RDSS_ADAPTER_QUEUE_INPUT}' -kinesis-region='${RDSS_ADAPTER_KINESIS_AWS_REGION}'-s3-access-key='${RDSS_ADAPTER_S3_AWS_ACCESS_KEY}' -s3-secret-key='${RDSS_ADAPTER_S3_AWS_SECRET_KEY}' -s3-region='${RDSS_ADAPTER_S3_AWS_REGION}' -s3-endpoint='${RDSS_ADAPTER_S3_ENDPOINT}'"
     volumes:
       - "${VOL_BASE}/../src/qa/rdss-archivematica-msgcreator:/go/src/github.com/JiscRDSS/rdss-archivematica-msgcreator"
       

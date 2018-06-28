@@ -264,10 +264,12 @@ The following are the main environment variables that are supported by this buil
 
 There are many more - for the full list see the [compose environment file](.env) and the comments there.
 
-AWS Services
--------------
+Channel Adapter
+-----------------
 
 The RDSS Channel Adapter publisher and consumer require access to AWS services, namely DynamoDB, Kinesis and S3. If these are not available, for example on a local development or QA environment, then mock services will be used instead. However, if you do wish to use real AWS services, the following will be of use.
+
+In addition, the names of the queues to use for a deployment must be specified. For local usage, the defaults are fine, but for real usage they should include the deployment id too.
 
 ### DynamoDB Parameters
 
@@ -286,6 +288,15 @@ The RDSS Channel Adapter publisher and consumer require access to AWS services, 
 | `RDSS_ADAPTER_KINESIS_ENDPOINT` | The endpoint to use for the Kinesis service. Default to using the mock "minikine" service. Set to `''` to use real AWS service. |
 | `RDSS_ADAPTER_KINESIS_TLS` | Whether or not to use TLS encryption when connecting to the Kinesis service. Defaults to `false` but set to `true` if using real AWS. |
 
+### Queue Parameters
+
+| Variable | Description |
+|---|---|
+| `RDSS_ADAPTER_QUEUE_ERROR` | The name of the queue to use for error messages. Default is `error`. |
+| `RDSS_ADAPTER_QUEUE_INPUT` | The name of the queue to use for input messages. Default is `input`. |
+| `RDSS_ADAPTER_QUEUE_INVALID` | The name of the queue to use for invalid messages. Default is `invalid` |
+| `RDSS_ADAPTER_QUEUE_OUTPUT` | The name of the queue to use for output messages. Default is `output`. |
+
 ### S3 Parameters
 
 | Variable | Description |
@@ -295,9 +306,9 @@ The RDSS Channel Adapter publisher and consumer require access to AWS services, 
 | `RDSS_ADAPTER_S3_AWS_SECRET_KEY` | The AWS secret key to use when accessing S3. |
 | `RDSS_ADAPTER_S3_ENDPOINT` | The endpoint to use for the S3 service. Defaults to using the mock "minio" service. |
 
-### Example AWS usage
+### Example AWS Usage
 
-To use the real AWS services, use the following environment variables:
+To use the real AWS services, with custom queues, use the following environment variables:
 
 	export RDSS_ADAPTER_DYNAMODB_ENDPOINT=''
 	export RDSS_ADAPTER_DYNAMODB_TLS='true'
@@ -306,12 +317,18 @@ To use the real AWS services, use the following environment variables:
 	export RDSS_ADAPTER_KINESIS_AWS_REGION="${AWS_REGION}"
 	export RDSS_ADAPTER_KINESIS_ENDPOINT=''
 	export RDSS_ADAPTER_KINESIS_TLS='true'
+	export RDSS_ADAPTER_QUEUE_ERROR="institution_${PROJECT_ID}_error_${ENV}"
+	export RDSS_ADAPTER_QUEUE_INPUT="institution_${PROJECT_ID}_input_${ENV}"
+	export RDSS_ADAPTER_QUEUE_INVALID="institution_${PROJECT_ID}_invalid_${ENV}"
+	export RDSS_ADAPTER_QUEUE_OUTPUT=""institution_${PROJECT_ID}_output_${ENV}"
 	export RDSS_ADAPTER_S3_ENDPOINT=''
 	export RDSS_ADAPTER_S3_AWS_ACCESS_KEY="${AWS_ACCESS_KEY_ID}"
 	export RDSS_ADAPTER_S3_AWS_SECRET_KEY="${AWS_SECRET_ACCESS_KEY}"
 	export RDSS_ADAPTER_S3_AWS_REGION="${AWS_REGION}"
 
-You can then use a command like `make all MOCK_AWS=false` or `docker-compose up` and the exported environment variables will be used to configure the deployed services.
+For Jisc use, the `${PROJECT_ID}` should match the `jisc_id` of the deployment, and `${ENV}` should be one of `dev`, `uat`, or `prod`.
+
+Having exported these variables, you can then use a command like `make all MOCK_AWS=false` or `docker-compose up` and they will be used to configure the deployed services.
 
 Secrets
 --------
