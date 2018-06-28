@@ -274,7 +274,7 @@ The RDSS Channel Adapter publisher and consumer require access to AWS services, 
 | Variable | Description |
 |---|---|
 | `RDSS_ADAPTER_DYNAMODB_ENDPOINT` | The endpoint to use for the DynamoDB service. Defaults to using the mock "dynalite" service. |
-| `RDSS_ADAPTER_DYNAMODB_TLS` | Whether or not to use TLS encryption when connecting to the DynamoDB service. Defaults to `false`. |
+| `RDSS_ADAPTER_DYNAMODB_TLS` | Whether or not to use TLS encryption when connecting to the DynamoDB service. Defaults to `false` but set to `true` if using real AWS. |
 
 ### Kinesis Parameters
 
@@ -283,8 +283,8 @@ The RDSS Channel Adapter publisher and consumer require access to AWS services, 
 | `RDSS_ADAPTER_KINESIS_AWS_ACCESS_KEY` | The AWS access key to use when accessing Kinesis. |
 | `RDSS_ADAPTER_KINESIS_AWS_REGION` | The AWS region to use when accessing Kinesis. |
 | `RDSS_ADAPTER_KINESIS_AWS_SECRET_KEY` | The AWS secret key to use when accessing Kinesis. |
-| `RDSS_ADAPTER_KINESIS_ENDPOINT` | The endpoint to use for the Kinesis service. Default to using the mock "minikine" service. |
-| `RDSS_ADAPTER_KINESIS_TLS` | Whether or not to use TLS encryption when connecting to the Kinesis service. Defaults to `false`. |
+| `RDSS_ADAPTER_KINESIS_ENDPOINT` | The endpoint to use for the Kinesis service. Default to using the mock "minikine" service. Set to `''` to use real AWS service. |
+| `RDSS_ADAPTER_KINESIS_TLS` | Whether or not to use TLS encryption when connecting to the Kinesis service. Defaults to `false` but set to `true` if using real AWS. |
 
 ### S3 Parameters
 
@@ -295,6 +295,23 @@ The RDSS Channel Adapter publisher and consumer require access to AWS services, 
 | `RDSS_ADAPTER_S3_AWS_SECRET_KEY` | The AWS secret key to use when accessing S3. |
 | `RDSS_ADAPTER_S3_ENDPOINT` | The endpoint to use for the S3 service. Defaults to using the mock "minio" service. |
 
+### Example AWS usage
+
+To use the real AWS services, use the following environment variables:
+
+	export RDSS_ADAPTER_DYNAMODB_ENDPOINT=''
+	export RDSS_ADAPTER_DYNAMODB_TLS='true'
+	export RDSS_ADAPTER_KINESIS_AWS_ACCESS_KEY="${AWS_ACCESS_KEY_ID}"
+	export RDSS_ADAPTER_KINESIS_AWS_SECRET_KEY="${AWS_SECRET_ACCESS_KEY}"
+	export RDSS_ADAPTER_KINESIS_AWS_REGION="${AWS_REGION}"
+	export RDSS_ADAPTER_KINESIS_ENDPOINT=''
+	export RDSS_ADAPTER_KINESIS_TLS='true'
+	export RDSS_ADAPTER_S3_ENDPOINT=''
+	export RDSS_ADAPTER_S3_AWS_ACCESS_KEY="${AWS_ACCESS_KEY_ID}"
+	export RDSS_ADAPTER_S3_AWS_SECRET_KEY="${AWS_SECRET_ACCESS_KEY}"
+	export RDSS_ADAPTER_S3_AWS_REGION="${AWS_REGION}"
+
+You can then use a command like `make all MOCK_AWS=false` or `docker-compose up` and the exported environment variables will be used to configure the deployed services.
 
 Secrets
 --------
