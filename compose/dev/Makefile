@@ -99,7 +99,8 @@ bootstrap-dashboard:
 					--api-key="test" \
 					--ss-url="http://archivematica-storage-service:8000" \
 					--ss-user="test" \
-					--ss-api-key="test"
+					--ss-api-key="test" \
+					--site-url="http://archivematica-dashboard:8000/"
 	# Create RDSS storage locations
 	docker-compose exec archivematica-storage-service \
 		python /rdss/create-storage-locations.py \
