@@ -297,7 +297,7 @@ services:
   # TODO Change this to use AWS service for QA but still use mock for dev
   rdss-archivematica-msgcreator:
     image: '${REGISTRY}rdss-archivematica-msgcreator:${RDSS_MSGCREATOR_VERSION}'
-    command: "-addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint='${RDSS_ADAPTER_KINESIS_ENDPOINT}' -kinesis-stream='${RDSS_ADAPTER_QUEUE_INPUT}' -kinesis-region='${RDSS_ADAPTER_KINESIS_AWS_REGION}' -s3-access-key='${RDSS_ADAPTER_S3_AWS_ACCESS_KEY}' -s3-secret-key='${RDSS_ADAPTER_S3_AWS_SECRET_KEY}' -s3-region='${RDSS_ADAPTER_S3_AWS_REGION}' -s3-endpoint='${RDSS_ADAPTER_S3_ENDPOINT}'"
+    command: "-addr=0.0.0.0:8000 -prefix=/msgcreator -kinesis-endpoint='${RDSS_ADAPTER_KINESIS_ENDPOINT}' -kinesis-stream='${RDSS_ADAPTER_QUEUE_INPUT}' -kinesis-region='${RDSS_ADAPTER_KINESIS_AWS_REGION}' -s3-access-key='${RDSS_ADAPTER_S3_AWS_ACCESS_KEY}' -s3-secret-key='${RDSS_ADAPTER_S3_AWS_SECRET_KEY}' -s3-region='${RDSS_ADAPTER_S3_AWS_REGION}' -s3-endpoint='${RDSS_ADAPTER_S3_ENDPOINT}' -checksums"
     expose:
       - "8000"
 
