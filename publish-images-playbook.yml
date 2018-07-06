@@ -21,9 +21,9 @@
 
     projects:
 
-      - name: "Archivematica (JiscRDSS fork)"
-        repo: "https://github.com/JiscRDSS/archivematica"
-        version: "v0.6.5"
+      - name: "Archivematica"
+        repo: "https://github.com/artefactual/archivematica"
+        version: "qa/1.x" # To be soon: v1.8.0
         dest: "./src/archivematica"
         images:
           - name: "{{ registry }}archivematica-dashboard"
@@ -36,9 +36,9 @@
             path: "./src/archivematica/src/"
             dockerfile: "MCPClient.Dockerfile"
 
-      - name: "Archivematica Storage Service (JiscRDSS fork)"
-        repo: "https://github.com/JiscRDSS/archivematica-storage-service"
-        version: "v0.4.0"
+      - name: "Archivematica Storage Service"
+        repo: "https://github.com/artefactual/archivematica-storage-service"
+        version: "qa/0.x" # To be soon: v0.12.0
         dest: "./src/archivematica-storage-service"
         images:
           - name: "{{ registry }}archivematica-storage-service"
@@ -56,7 +56,7 @@
 
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-        version: "v0.6.1"
+        version: "master" # To be soon: v0.7.0
         dest: "./src/rdss-archivematica-channel-adapter"
         images:
           - name: "{{ registry }}rdss-archivematica-channel-adapter"
