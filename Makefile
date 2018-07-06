@@ -16,21 +16,21 @@ build: build-images
 
 clone: check-ansible-playbook  ## Clone source code repositories.
 	ansible-playbook \
-		--extra-vars="env=$(ENV) registry=$(REGISTRY) rdss_version=$(VERSION)" \
+		--extra-vars="env=$(ENV) registry=$(REGISTRY)" \
 		--tags=clone \
 			$(ROOT_DIR)/publish-images-playbook.yml \
 			$(ROOT_DIR)/publish-qa-images-playbook.yml
 
 build-images: check-ansible-playbook  ## Build Docker images.
 	ansible-playbook \
-		--extra-vars="env=$(ENV) registry=$(REGISTRY) rdss_version=$(VERSION)" \
+		--extra-vars="env=$(ENV) registry=$(REGISTRY)" \
 		--tags=clone,build \
 			$(ROOT_DIR)/publish-images-playbook.yml \
 			$(ROOT_DIR)/publish-qa-images-playbook.yml
 
 publish: check-ansible-playbook  ## Publish Docker images to a registry.
 	ansible-playbook \
-		--extra-vars="env=$(ENV) registry=$(REGISTRY) rdss_version=$(VERSION)" \
+		--extra-vars="env=$(ENV) registry=$(REGISTRY)" \
 			$(ROOT_DIR)/publish-images-playbook.yml \
 			$(ROOT_DIR)/publish-qa-images-playbook.yml
 

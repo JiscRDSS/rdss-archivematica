@@ -123,13 +123,11 @@
         # Ignore false ANSIBLE0016 claiming this task should be a handler
         - skip_ansible_lint
 
-    # Don't tag as 'latest' if version contains 'rc' or rdss_version does
+    # Don't tag as 'latest' if version contains 'rc'
     - name: "Build and tag images"
       command: "docker build
         -t {{ item.1.name }}:{{ item.0.item.version | regex_replace('/', '_')  | truncate(128, True)}}
-        {{ '-t ' + item.1.name + ':latest' if (env != 'jisc') or 'rc' not in item.0.item.version and 'rc' not in rdss_version else '' }}
-        --build-arg ARCHIVEMATICA_VERSION={{ rdss_version }}
-        --build-arg AGENT_CODE={{ rdss_version }}
+        {{ '-t ' + item.1.name + ':latest' if (env != 'jisc') or 'rc' not in item.0.item.version else '' }}
         -f {{ item.1.dockerfile }} ."
       args:
         chdir: "{{ item.1.path }}"

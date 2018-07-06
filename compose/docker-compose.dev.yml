@@ -26,9 +26,6 @@ services:
     build:
       context: "../src/archivematica/src"
       dockerfile: "MCPClient.Dockerfile"
-      args:
-        ARCHIVEMATICA_VERSION: "${VERSION}"
-        AGENT_CODE: "${VERSION}"
     volumes:
       - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
       - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"
@@ -38,9 +35,6 @@ services:
     build:
       context: "../src/archivematica/src"
       dockerfile: "dashboard.Dockerfile"
-      args:
-        ARCHIVEMATICA_VERSION: "${VERSION}"
-        AGENT_CODE: "${VERSION}"
     volumes:
       - "${VOL_BASE}/../src/archivematica/src/archivematicaCommon/:/src/archivematicaCommon/"
       - "${VOL_BASE}/../src/archivematica/src/dashboard/:/src/dashboard/"

@@ -70,8 +70,6 @@
       command: "docker build
         -t {{ item.1.name }}:{{ item.0.item.version | regex_replace('/', '_')  | truncate(128, True)}}
         -t {{ item.1.name }}:latest
-        --build-arg ARCHIVEMATICA_VERSION={{ rdss_version }}
-        --build-arg AGENT_CODE={{ rdss_version }}
         -f {{ item.1.dockerfile }} ."
       args:
         chdir: "{{ item.1.path }}"

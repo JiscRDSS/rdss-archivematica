@@ -84,7 +84,7 @@ bootstrap-dashboard:
 		--rm \
 		--entrypoint /src/dashboard/src/manage.py \
 			archivematica-dashboard \
-				set_agent_code --agent-code=$(VERSION)
+				set_agent_code $(VERSION)
 	# Add initial Dashboard user account
 	docker-compose run \
 		--rm \
