@@ -67,7 +67,7 @@ export COMPOSE_FILE
 VERSION ?= $(shell git describe --tags --always --dirty)
 export VERSION
 
-all: destroy build create-secrets up bootstrap list
+all: destroy build create-secrets up bootstrap restart-all-services list
 
 bootstrap create-secrets reset-processing-configs:
 	$(foreach DIR, $(COMPOSE_DIRS), $(MAKE) -C $(DIR) $@ ;)
@@ -177,6 +177,15 @@ destroy-volumes:
 
 list:
 	docker-compose ps
+
+restart-all-services:
+	# Restart all services and then restart again the gearmand and its
+	# dependent services 
+	docker-compose restart
+	docker-compose restart gearmand
+	docker-compose restart archivematica-mcp-client
+	docker-compose restart archivematica-mcp-server
+	docker-compose restart archivematica-dashboard
 
 up:
 	docker-compose up -d
