@@ -6,7 +6,11 @@ BASE_DIR ?= ${CURDIR}
 
 VOL_BASE ?= $(BASE_DIR)/..
 
-DEFAULT_COMPOSE_FILE = $(shell realpath ../docker-compose.am-shib.yml)
+ifeq ("$(ENV)", "dev")
+        DEFAULT_COMPOSE_FILE := $(shell realpath ../docker-compose.am-shib.dev.yml)
+else
+        DEFAULT_COMPOSE_FILE := $(shell realpath ../docker-compose.am-shib.yml)
+endif
 
 COMPOSE_FILE ?= "${DEFAULT_COMPOSE_FILE}"
 

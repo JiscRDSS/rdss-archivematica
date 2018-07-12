@@ -57,7 +57,9 @@ ifeq ("$(ENV)", "dev")
 		COMPOSE_FILE_3 := $(shell realpath ${CURDIR}/docker-compose.mock-aws.qa.yml):$(COMPOSE_FILE_2)
 		override COMPOSE_FILE_2=$(COMPOSE_FILE_3)
 	endif
-	override COMPOSE_FILE=$(COMPOSE_FILE_2)
+        # Use am-shib.dev.yml instead am-shib.yml
+        COMPOSE_FILE_4 := $(subst am-shib.yml,am-shib.dev.yml,$(COMPOSE_FILE_2))
+        override COMPOSE_FILE=$(COMPOSE_FILE_4)
 endif
 export COMPOSE_FILE
 
