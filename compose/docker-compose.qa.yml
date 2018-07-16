@@ -143,12 +143,17 @@ services:
       ARCHIVEMATICA_MCPSERVER_CLIENT_HOST: "mysql"
       ARCHIVEMATICA_MCPSERVER_CLIENT_DATABASE: "MCP"
       ARCHIVEMATICA_MCPSERVER_MCPSERVER_MCPARCHIVEMATICASERVER: "gearmand:4730"
+      ARCHIVEMATICA_MCPSERVER_MCPSERVER_PROMETHEUS_HTTP_SERVER: "127.0.0.1:7999"
     volumes:
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
     links:
       # TODO Replace this with reference to AWS RDS hosted MySQL for QA
       - "mysql"
       - "gearmand"
+    ports:
+      - "7999"
+    expose:
+      - "7999"
 
   archivematica-mcp-client:
     image: '${REGISTRY}archivematica-mcp-client:${AM_MCPCLIENT_VERSION}'
