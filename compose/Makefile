@@ -49,6 +49,13 @@ ifeq ("$(MOCK_AWS)", "true")
 	override COMPOSE_FILE=$(COMPOSE_FILE_2)
 endif
 
+# Do we want Instrumentation?
+INSTRUMENTATION ?= false
+ifeq ("$(INSTRUMENTATION)", "true")
+	COMPOSE_FILE_2 := $(shell realpath ${CURDIR}/docker-compose.instrumentation.yml):$(COMPOSE_FILE)
+	override COMPOSE_FILE=$(COMPOSE_FILE_2)
+endif
+
 ifeq ("$(ENV)", "dev")
 	# Include qa config because dev overrides/extends this
 	COMPOSE_FILE_2 := $(shell realpath ${CURDIR}/docker-compose.qa.yml):$(COMPOSE_FILE)

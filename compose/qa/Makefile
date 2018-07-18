@@ -12,6 +12,12 @@ ifeq ("$(MOCK_AWS)", "true")
 	override DEFAULT_COMPOSE_FILE=$(DEFAULT_COMPOSE_FILE_2)
 endif
 
+INSTRUMENTATION ?= false
+ifeq ("$(INSTRUMENTATION)", "true")
+	DEFAULT_COMPOSE_FILE_2 := $(shell realpath ../docker-compose.instrumentation.yml):$(DEFAULT_COMPOSE_FILE)
+	override DEFAULT_COMPOSE_FILE=$(DEFAULT_COMPOSE_FILE_2)
+endif
+
 VERSION ?= $(shell git describe --tags --always --dirty)
 export VERSION
 
