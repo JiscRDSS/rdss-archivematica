@@ -280,26 +280,6 @@ services:
     ports:
       - "6060" # See net/http/pprof
 
-  # TODO Change this to use AWS services for QA but still use mock for dev
-  rdss-archivematica-channel-adapter-publisher:
-    image: '${REGISTRY}rdss-archivematica-channel-adapter:${RDSS_CHANADAPTER_VERSION}'
-    command: "publisher"
-    environment:
-      RDSS_ARCHIVEMATICA_ADAPTER_LOGGING.LEVEL: "debug"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.MAIN: "${RDSS_ADAPTER_QUEUE_OUTPUT}"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.INVALID: "${RDSS_ADAPTER_QUEUE_INVALID}"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.QUEUES.ERROR: "${RDSS_ADAPTER_QUEUE_ERROR}"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.BACKEND: "kinesis"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.TLS: "${RDSS_ADAPTER_KINESIS_TLS}"
-      RDSS_ARCHIVEMATICA_ADAPTER_BROKER.KINESIS.ENDPOINT: "${RDSS_ADAPTER_KINESIS_ENDPOINT}"
-      AWS_REGION: "${RDSS_ADAPTER_KINESIS_AWS_REGION}"
-      AWS_ACCESS_KEY: "${RDSS_ADAPTER_KINESIS_AWS_ACCESS_KEY}"
-      AWS_SECRET_KEY: "${RDSS_ADAPTER_KINESIS_AWS_SECRET_KEY}"
-    links:
-      - "archivematica-dashboard"
-    ports:
-      - "6060" # See net/http/pprof
-
   # TODO Change this to use AWS service for QA but still use mock for dev
   rdss-archivematica-msgcreator:
     image: '${REGISTRY}rdss-archivematica-msgcreator:${RDSS_MSGCREATOR_VERSION}'

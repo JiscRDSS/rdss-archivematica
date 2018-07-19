@@ -52,13 +52,6 @@ services:
     volumes:
       - "${VOL_BASE}/../src/rdss-archivematica-channel-adapter:/go/src/github.com/JiscRDSS/rdss-archivematica-channel-adapter"
 
-  rdss-archivematica-channel-adapter-publisher:
-    build:
-      context: "../src/rdss-archivematica-channel-adapter"
-    entrypoint: "go run main.go publisher"
-    volumes:
-      - "${VOL_BASE}/../src/rdss-archivematica-channel-adapter:/go/src/github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-
   rdss-archivematica-msgcreator:
     build:
       context: "../src/qa/rdss-archivematica-msgcreator"

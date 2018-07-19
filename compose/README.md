@@ -196,7 +196,6 @@ After a successful build of the Shibboleth-enabled Archivematica services and Ne
 	rdss_nginx-ssl_1                                      /usr/local/bin/ep -v /etc/ ...   Up       0.0.0.0:443->443/tcp, 80/tcp
 	rdss_nginx_1                                          nginx -g daemon off;             Up       0.0.0.0:34057->80/tcp, 0.0.0.0:34056->8000/tcp
 	rdss_rdss-archivematica-channel-adapter-consumer_1    /go/bin/rdss-archivematica ...   Up       0.0.0.0:34061->6060/tcp
-	rdss_rdss-archivematica-channel-adapter-publisher_1   /go/bin/rdss-archivematica ...   Exit 1
 	rdss_rdss-archivematica-msgcreator_1                  /go/bin/rdss-archivematica ...   Up       8000/tcp
 	rdss_redis_1                                          docker-entrypoint.sh --sav ...   Up       6379/tcp
 	rdss_shib-sp-proxy_1                                  /usr/local/bin/run-app.sh        Up       80/tcp
@@ -269,6 +268,8 @@ Channel Adapter
 -----------------
 
 The RDSS Channel Adapter publisher and consumer require access to AWS services, namely DynamoDB, Kinesis and S3. If these are not available, for example on a local development or QA environment, then mock services will be used instead. However, if you do wish to use real AWS services, the following will be of use.
+
+The publisher is not being used at the moment since we're not producing messages yet.
 
 In addition, the names of the queues to use for a deployment must be specified. For local usage, the defaults are fine, but for real usage they should include the deployment id too.
 
