@@ -104,7 +104,9 @@ create-volumes:
 	@mkdir -p ${AM_PIPELINE_DATA}
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(AM_PIPELINE_DATA) $(COMPOSE_PROJECT_NAME)_am-pipeline-data
-	@mkdir -p ${SS_LOCATION_DATA}/automated ${SS_LOCATION_DATA}/interactive
+	@mkdir -p ${SS_LOCATION_DATA}/automated \
+		${SS_LOCATION_DATA}/interactive \
+		${SS_LOCATION_DATA}/adapter
 	@docker volume create --opt type=none --opt o=bind \
 		--opt device=$(SS_LOCATION_DATA) $(COMPOSE_PROJECT_NAME)_am-ss-location-data
 	@mkdir -p $(SS_STAGING_DATA)
