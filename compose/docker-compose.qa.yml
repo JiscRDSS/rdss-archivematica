@@ -252,6 +252,7 @@ services:
       RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.URL: "http://archivematica-dashboard:8000"
       RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.USER: "test"
       RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.KEY: "test"
+      RDSS_ARCHIVEMATICA_ADAPTER_AMCLIENT.TRANSFER_DIR: "/home/adapter"
       RDSS_ARCHIVEMATICA_ADAPTER_S3.ENDPOINT: "${RDSS_ADAPTER_S3_ENDPOINT}"
       RDSS_ARCHIVEMATICA_ADAPTER_S3.FORCE_PATH_STYLE: "true"
       RDSS_ARCHIVEMATICA_ADAPTER_S3.INSECURE_SKIP_VERIFY: "true"
@@ -277,6 +278,7 @@ services:
       - "archivematica-dashboard"
     volumes:
       - "archivematica_pipeline_data:/var/archivematica/sharedDirectory:rw"
+      - "archivematica_storage_service_location_data:/home:rw"
     ports:
       - "6060" # See net/http/pprof
 

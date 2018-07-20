@@ -1,18 +1,19 @@
 #!/usr/bin/env python
 
-"""This script aims to create two Transfer Storage locations in the
+"""This script aims to create three Transfer Storage locations in the
 Archivematica storage service if they don't already exist. These relate to the
-"automated workflow" and the "interactive workflow" that are used in the RDSS
-deployment.
+"automated workflow", the "interactive workflow" and the channel-adapter
+consumer that are used in the RDSS deployment. 
 
 It first lists the existing Locations defined in the Storage Service via the
-API. It checks to see if any of them have the same path as the two locations we
-wish to add - `/home/automated` and `/home/interactive`.
+API. It checks to see if any of them have the same path as the three locations
+we wish to add - `/home/automated`, `/home/interactive` and `/home/adapter`.
 
-If either of the two locations do not exist, it creates them. It first obtains
-the resource URIs for the Pipeline and Space that the new locations will be
-added to using the Storage Service API. It assumes that there will only be one
-Pipeline and Space, since this is what is expected in the RDSS deployment.
+If either of the three locations do not exist, it creates them. It first
+obtains the resource URIs for the Pipeline and Space that the new locations
+will be added to using the Storage Service API. It assumes that there will only
+be one Pipeline and Space, since this is what is expected in the RDSS
+deployment.
 
 Having identified the URIs for the pipeline and space, it then uses the API to
 create the required locations.
@@ -64,6 +65,7 @@ print "Using API key '%s'" % args.api_key
 
 automated_exists = False
 interactive_exists = False
+adapter_exists = False
 
 r = requests.get(
     '%s/api/v2/location/' % args.base_url,
@@ -79,8 +81,10 @@ for loc in r.json()['objects']:
         automated_exists = True
     if loc['path'] == '/home/interactive':
         interactive_exists = True
+    if loc['path'] == '/home/adapter':
+        adapter_exists = True
 
-if not automated_exists or not interactive_exists:
+if not automated_exists or not interactive_exists or not adapter_exists:
     # Get the URI of the pipeline. In RDSS we only have one.
     pipeline_uri = requests.get(
             '%s/api/v2/pipeline/' % args.base_url,
@@ -151,5 +155,30 @@ if not automated_exists or not interactive_exists:
     else:
         print "Location for interactive workflow already exists."
 
+    if not adapter_exists:
+        # Location for channel adapter doesn't exist, create it
+        r = requests.post(
+            '%s/api/v2/location/' % args.base_url,
+            headers={
+                'Authorization': 'ApiKey %s:%s' % (
+                    args.api_user,
+                    args.api_key)},
+            json={
+                'pipeline': [pipeline_uri],
+                'purpose': 'TS',
+                'relative_path': 'home/adapter',
+                'description': 'rdss-archivematica-channel-adapter',
+                'space': space_uri
+            }
+        )
+        if r.ok:
+            print "Location for channel adapter created."
+        else:
+            print "%s %s" % (r.status_code, r.reason)
+            print r.text
+    else:
+        print "Location for channel adapter already exists."
+
 else:
     print "Locations for automated and interactive workflows already exist."
+    print "Location for channel adapter already exists."
