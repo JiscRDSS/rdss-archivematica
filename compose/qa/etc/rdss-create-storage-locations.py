@@ -168,6 +168,7 @@ if not automated_exists or not interactive_exists or not adapter_exists:
                 'purpose': 'TS',
                 'relative_path': 'home/adapter',
                 'description': 'rdss-archivematica-channel-adapter',
+                'default': True,
                 'space': space_uri
             }
         )
