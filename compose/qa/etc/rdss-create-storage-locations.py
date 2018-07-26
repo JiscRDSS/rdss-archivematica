@@ -12,8 +12,8 @@ we wish to add - `/home/automated`, `/home/interactive` and `/home/adapter`.
 If either of the three locations do not exist, it creates them. It first
 obtains the resource URIs for the Pipeline and Space that the new locations
 will be added to using the Storage Service API. It assumes that there will only
-be one Pipeline and Space, since this is what is expected in the RDSS
-deployment.
+be one Pipeline and the default FS Space has the index #0, since this is what
+is expected in the RDSS deployment.
 
 Having identified the URIs for the pipeline and space, it then uses the API to
 create the required locations.

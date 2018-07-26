@@ -21,6 +21,17 @@ COMPOSE_FILE ?= "${DEFAULT_COMPOSE_FILE}"
 VERSION ?= $(shell git describe --tags --always --dirty)
 export VERSION
 
+define get_var_from_envfile
+$(shell grep ^${1}= .env| tail -n1 | cut -d= -f2- | tr -d \'\" )
+endef
+# Read S3_AIP_STORE from .env file if they are not defined.
+S3_AIP_STORE ?=  $(call get_var_from_envfile,S3_AIP_STORE)
+S3_AIP_STORE_ACCESS_KEY_ID ?= $(call get_var_from_envfile,S3_AIP_STORE_ACCESS_KEY_ID)
+S3_AIP_STORE_ENDPOINT_URL ?= $(call get_var_from_envfile,S3_AIP_STORE_ENDPOINT_URL)
+S3_AIP_STORE_PATH ?= $(call get_var_from_envfile,S3_AIP_STORE_PATH)
+S3_AIP_STORE_REGION ?= $(call get_var_from_envfile,S3_AIP_STORE_REGION)
+S3_AIP_STORE_SECRET_ACCESS_KEY ?= $(call get_var_from_envfile,S3_AIP_STORE_SECRET_ACCESS_KEY)
+
 all: destroy bootstrap
 	docker-compose ps
 
@@ -113,6 +124,20 @@ bootstrap-dashboard:
 			--base-url http://localhost:8000 \
 			--api-user test \
 			--api-key test
+
+ifeq ("$(S3_AIP_STORE)", "true")
+	# Create RDSS S3 space and AIP store
+	docker-compose exec archivematica-storage-service \
+		python /rdss/create-s3-space-location.py \
+			--base-url http://localhost:8000 \
+			--api-user test \
+			--api-key test \
+			--s3-access-key-id "$(S3_AIP_STORE_ACCESS_KEY_ID)" \
+			--s3-secret-access-key "$(S3_AIP_STORE_SECRET_ACCESS_KEY)" \
+			--s3-path "$(S3_AIP_STORE_PATH)" \
+			--s3-region "$(S3_AIP_STORE_REGION)" \
+			--s3-endpoint-url "$(S3_AIP_STORE_ENDPOINT_URL)"
+endif
 
 bootstrap-dashboard-frontend:
 	docker-compose run --rm --no-deps \
