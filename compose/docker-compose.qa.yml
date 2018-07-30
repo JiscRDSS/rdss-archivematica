@@ -282,6 +282,7 @@ services:
       - "archivematica_storage_service_location_data:/home:rw"
     ports:
       - "6060" # See net/http/pprof
+    restart: on-failure
 
   # TODO Change this to use AWS service for QA but still use mock for dev
   rdss-archivematica-msgcreator:
