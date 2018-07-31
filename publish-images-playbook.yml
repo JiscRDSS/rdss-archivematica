@@ -23,7 +23,7 @@
 
       - name: "Archivematica"
         repo: "https://github.com/artefactual/archivematica"
-        version: "qa/1.x" # To be soon: v1.8.0
+        version: "a0a025d2a9e04a7c3c07768bedfd5f3c849d4997" # To be soon: v1.8.0
         dest: "./src/archivematica"
         images:
           - name: "{{ registry }}archivematica-dashboard"
@@ -38,7 +38,7 @@
 
       - name: "Archivematica Storage Service"
         repo: "https://github.com/artefactual/archivematica-storage-service"
-        version: "qa/0.x" # To be soon: v0.12.0
+        version: "7252debcb839dde76f6b7d0ab915b87391df05af" # To be soon: v0.12.0
         dest: "./src/archivematica-storage-service"
         images:
           - name: "{{ registry }}archivematica-storage-service"
@@ -56,7 +56,7 @@
 
       - name: "RDSS Archivematica Channel Adapter"
         repo: "https://github.com/JiscRDSS/rdss-archivematica-channel-adapter"
-        version: "master" # To be soon: v0.7.0
+        version: "v0.7.0-rc.3" # To be soon: v0.7.0
         dest: "./src/rdss-archivematica-channel-adapter"
         images:
           - name: "{{ registry }}rdss-archivematica-channel-adapter"
