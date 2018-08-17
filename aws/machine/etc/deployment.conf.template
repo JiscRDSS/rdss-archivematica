@@ -175,15 +175,24 @@ RDSS_ADAPTER_QUEUE_OUTPUT=${RDSS_ADAPTER_QUEUE_OUTPUT:-"institution_${PROJECT_ID
 # The name of the table to use for checkpoints data. This table will be created
 # if it doesn't exist. Default is
 # "rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_checkpoints".
-RDSS_ADAPTER_TABLE_CHECKPOINTS=rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_checkpoints
+RDSS_ADAPTER_TABLE_CHECKPOINTS=${RDSS_ADAPTER_TABLE_CHECKPOINTS:-"rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_checkpoints"}
 
 # The name of the table to use for clients data. This table will be created
 # if it doesn't exist. Default is
 # "rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_clients".
-RDSS_ADAPTER_TABLE_CLIENTS=rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_clients
+RDSS_ADAPTER_TABLE_CLIENTS=${RDSS_ADAPTER_TABLE_CLIENTS:-"rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_clients"}
 
 # The name of the table to use for metadata data. This table will be created if
 # it doesn't exist. Default is
 # "rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_metadata".
-RDSS_ADAPTER_TABLE_METADATA=rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_metadata
+RDSS_ADAPTER_TABLE_METADATA=${RDSS_ADAPTER_TABLE_METADATA:-"rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_metadata"}
 
+# The name of the table to use for messages. This table will be created if
+ # it doesn't exist. Default is
+ # "rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_consumer_storage".
+ RDSS_ADAPTER_CONSUMER_DYNAMODB_TABLE=${RDSS_ADAPTER_CONSUMER_DYNAMODB_TABLE:-"rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_consumer_storage"}
+
+ # The name of the table to use for messages. This table will be created if
+ # it doesn't exist. Default is
+ # "rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_messages".
+ RDSS_ADAPTER_BROKER_REPOSITORY_DYNAMODB_TABLE=${RDSS_ADAPTER_BROKER_REPOSITORY_DYNAMODB_TABLE:-"rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_messages"}
