@@ -60,6 +60,14 @@ create_channel_adapter_resources()
         "AttributeName=Key,KeyType=HASH" \
         "AttributeName=Key,AttributeType=S" \
         "ReadCapacityUnits=10,WriteCapacityUnits=10"
+    aws_dynamodb_create_table "${RDSS_ADAPTER_CONSUMER_DYNAMODB_TABLE}" \
+         "AttributeName=Key,KeyType=HASH" \
+         "AttributeName=Key,AttributeType=S" \
+         "ReadCapacityUnits=10,WriteCapacityUnits=10"
+    aws_dynamodb_create_table "${RDSS_ADAPTER_BROKER_REPOSITORY_DYNAMODB_TABLE}" \
+         "AttributeName=Key,KeyType=HASH" \
+         "AttributeName=Key,AttributeType=S" \
+         "ReadCapacityUnits=10,WriteCapacityUnits=10"
     # Create Kinesis streams
     aws_kinesis_create_stream "${RDSS_ADAPTER_QUEUE_ERROR}"
     aws_kinesis_create_stream "${RDSS_ADAPTER_QUEUE_INPUT}"
@@ -432,6 +440,8 @@ main()
     log_info "      Checkpoints: ${RDSS_ADAPTER_TABLE_CHECKPOINTS}"
     log_info "      Clients:     ${RDSS_ADAPTER_TABLE_CLIENTS}"
     log_info "      Metadata:    ${RDSS_ADAPTER_TABLE_METADATA}"
+    log_info "      Messages:    ${RDSS_ADAPTER_BROKER_REPOSITORY_DYNAMODB_TABLE}"
+    log_info "      Consumer Storage:    ${RDSS_ADAPTER_CONSUMER_DYNAMODB_TABLE}"
     log_info "    Kinesis Streams:"
     log_info "      Input:       ${RDSS_ADAPTER_QUEUE_INPUT}"
     log_info "      Output:      ${RDSS_ADAPTER_QUEUE_OUTPUT}"
