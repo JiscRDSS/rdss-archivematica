@@ -70,6 +70,8 @@ teardown_channel_adapter_resources()
     aws_dynamodb_delete_table "${RDSS_ADAPTER_TABLE_CHECKPOINTS}"
     aws_dynamodb_delete_table "${RDSS_ADAPTER_TABLE_CLIENTS}"
     aws_dynamodb_delete_table "${RDSS_ADAPTER_TABLE_METADATA}"
+    aws_dynamodb_delete_table "${RDSS_ADAPTER_BROKER_REPOSITORY_DYNAMODB_TABLE}"
+    aws_dynamodb_delete_table "${RDSS_ADAPTER_CONSUMER_DYNAMODB_TABLE}"
     if [ ! -z "${DESTROY_KINESIS_QUEUES}" ] ; then
        # Delete Kinesis streams
        aws_kinesis_delete_stream "${RDSS_ADAPTER_QUEUE_ERROR}"
