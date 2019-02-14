@@ -172,6 +172,11 @@ RDSS_ADAPTER_QUEUE_INVALID=${RDSS_ADAPTER_QUEUE_INVALID:-"institution_${PROJECT_
 # use for their environment.
 RDSS_ADAPTER_QUEUE_OUTPUT=${RDSS_ADAPTER_QUEUE_OUTPUT:-"institution_${PROJECT_ID}_output_${ENVIRONMENT}"}
 
+# This is used to prefix the names of the DynamoDB tables used to share state
+# across multiple consumers. If you are setting up more than one consumer
+# remember to define the same value in all of them.
+RDSS_ADAPTER_KINESIS_APP_NAME=${RDSS_ADAPTER_KINESIS_APP_NAME:-"rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}"}
+
 # The name of the table to use for checkpoints data. This table will be created
 # if it doesn't exist. Default is
 # "rdss_adapter_${PROJECT_ID}_${ENVIRONMENT}_checkpoints".

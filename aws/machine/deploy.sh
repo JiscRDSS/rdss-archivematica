@@ -131,6 +131,7 @@ deploy_containers() {
             export RDSS_ADAPTER_KINESIS_AWS_ACCESS_KEY=\"${access_key}\" ; \
             export RDSS_ADAPTER_KINESIS_AWS_SECRET_KEY=\"${secret_key}\" ; \
             export RDSS_ADAPTER_KINESIS_AWS_REGION=\"${AWS_REGION}\" ; \
+            export RDSS_ADAPTER_KINESIS_APP_NAME=\"${RDSS_ADAPTER_KINESIS_APP_NAME}\" ; \
             export RDSS_ADAPTER_KINESIS_ENDPOINT='' ; \
             export RDSS_ADAPTER_KINESIS_ROLE=\"${RDSS_ADAPTER_KINESIS_ROLE}\" ; \
             export RDSS_ADAPTER_KINESIS_ROLE_EXTERNAL_ID=\"${RDSS_ADAPTER_KINESIS_ROLE_EXTERNAL_ID}\" ; \
