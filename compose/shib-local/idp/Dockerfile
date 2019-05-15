@@ -6,7 +6,7 @@ MAINTAINER Arkivum Limited
 # 1) Install openssl and unzip
 # 2) Download and install xmlsectool
 # 3) Make keytool executable
-RUN yum install -y openssl unzip && \
+RUN yum install -y openssl unzip wget && \
   cd /opt && \
   wget "http://shibboleth.net/downloads/tools/xmlsectool/2.0.0/xmlsectool-2.0.0-bin.zip" && \
   unzip "xmlsectool-2.0.0-bin.zip" && \
