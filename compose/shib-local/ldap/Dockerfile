@@ -8,4 +8,6 @@ MAINTAINER Arkivum Limited
 COPY bootstrap.sh /container/service/ldap-bootstrap/process.sh
 
 # Install the 'runit' tool because Osixia requires it for multi-service image
-RUN apt-get -y update && /container/tool/add-service-available :runit
+RUN sed -i '2d' /etc/apt/sources.list && \
+  apt-get -y update && \
+  /container/tool/add-service-available :runit
