@@ -286,6 +286,9 @@ deploy_dockerhost()
     else
         aws_r53_add_host "${PUBLIC_HOSTED_ZONE}" "archivematica" "${pub_ip}"
     fi
+    # Set vm.max_map_count=262144 (See elasticsearch container requirements)
+    echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf
+    sudo sysctl -p 
 }
 
 deploy_hosted_zones()
