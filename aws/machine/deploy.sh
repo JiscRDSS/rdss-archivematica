@@ -327,13 +327,14 @@ deploy_nfs_server()
     local -r volume_name="${NFS_INSTANCE}-data"
     local volume_id
     volume_id="$(aws_ec2_get_id_for_volume_name "${volume_name}")"
+    availability_zone="$(aws_ec2_get_instance_availability_zone "${instance_id}")"
     if [ "${volume_id}" == "" ] ; then
         # Create a new EBS volume for data storage
         log_info "Creating EBS volume '${volume_name}' ..."
         volume_id=$(aws ec2 create-volume \
             --size "${NFS_STORAGE_SIZE}" \
             --region "${AWS_REGION}" \
-            --availability-zone "${AWS_REGION}a" \
+            --availability-zone "${availability_zone}" \
             --volume-type "${NFS_STORAGE_VOLUME_TYPE}" \
             --query 'VolumeId' \
             --output text)

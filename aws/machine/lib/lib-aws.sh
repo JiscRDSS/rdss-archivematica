@@ -376,6 +376,22 @@ aws_ec2_get_instance_attached_volumes()
     echo "${attached_volumes}"
 }
 
+# Gets the current instance availability zone for the given instance id.
+aws_ec2_get_instance_availability_zone()
+{
+    local -r instance_id="$1"
+    # Establish session
+    session_get
+    # Get instance state
+    log_debug "Getting instance availability zone for '${instance_id}'..."
+    # Use AWS CLI to describe the instance and get its availability zone
+    local -r instance_availability_zone="$(aws ec2 describe-instances \
+        --instance-ids "${instance_id}" \
+        --query "Reservations[*].Instances[*].[Placement.AvailabilityZone]" \
+        --output text)"
+    echo "${instance_availability_zone}"
+}
+
 # Gets the current instance state for the given instance id.
 aws_ec2_get_instance_state()
 {
