@@ -206,6 +206,7 @@ deploy_dockerhost()
     # Provision the machine, check dependencies, mount volumes, prepare images
     # and repos, and then deploy the containers
     docker_machine_provision && \
+        update_sysctl && \
         check_dockerhost_dependencies && \
         remote_mount_nfs "${nfs_host}" && \
         remote_mount_s3fs "${S3_BUCKET_PARAMS}" && \
@@ -330,13 +331,14 @@ deploy_nfs_server()
     local -r volume_name="${NFS_INSTANCE}-data"
     local volume_id
     volume_id="$(aws_ec2_get_id_for_volume_name "${volume_name}")"
+    availability_zone="$(aws_ec2_get_instance_availability_zone "${instance_id}")"
     if [ "${volume_id}" == "" ] ; then
         # Create a new EBS volume for data storage
         log_info "Creating EBS volume '${volume_name}' ..."
         volume_id=$(aws ec2 create-volume \
             --size "${NFS_STORAGE_SIZE}" \
             --region "${AWS_REGION}" \
-            --availability-zone "${AWS_REGION}a" \
+            --availability-zone "${availability_zone}" \
             --volume-type "${NFS_STORAGE_VOLUME_TYPE}" \
             --query 'VolumeId' \
             --output text)
@@ -467,6 +469,14 @@ saveconfig_compose()
     docker-machine scp "${CONFIG_OUTPUT_FILE_COMPOSE}"\
         "${DOCKERHOST_INSTANCE}":/home/ubuntu/"${CONFIG_OUTPUT_FILE_COMPOSE}"
     log_info "Compose settings saved in ${DOCKERHOST_INSTANCE}:/home/ubuntu/${CONFIG_OUTPUT_FILE_COMPOSE}"
+}
+
+update_sysctl()
+{
+    # Set vm.max_map_count=262144 (See elasticsearch container requirements)
+    docker-machine ssh "${DOCKERHOST_INSTANCE}" \
+        "echo "vm.max_map_count=262144" | sudo tee -a /etc/sysctl.conf && \
+        sudo sysctl -p"
 }
 
 # Entrypoint ###################################################################
